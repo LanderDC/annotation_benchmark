@@ -1,0 +1,591 @@
+{
+  "Capsid Protein": {
+    "keywords": [
+      "capsid protein",
+      "major capsid protein",
+      "minor capsid protein",
+      "coat protein",
+      "vp1",
+      "vp2",
+      "vp3",
+      "vp4",
+      "vp5",
+      "vp6",
+      "vp7",
+      "l1",
+      "virion structural protein",
+      "structural protein",
+      "head protein",
+      "internal protein",
+      "capsid"
+    ],
+    "exclude": [
+      "nucleocapsid",
+      "nucleoprotein",
+      "nonstructural",
+      "non-structural"
+    ],
+    "description": "Capsid proteins forming the icosahedral or other geometric viral shell"
+  },
+  "Nucleocapsid Protein": {
+    "keywords": [
+      "nucleocapsid",
+      "nucleoprotein",
+      "np protein",
+      "n protein",
+      "core protein",
+      "ribonucleoprotein",
+      "rnp protein",
+      "virion core",
+      "core protein"
+    ],
+    "exclude": [],
+    "description": "Nucleocapsid proteins packaging and condensing the viral genome in helical or amorphous structures"
+  },
+  "Envelope/Surface Glycoprotein": {
+    "keywords": [
+      "envelope glycoprotein",
+      "envelope protein",
+      "spike",
+      "glycoprotein gp",
+      "glycoprotein",
+      "surface glycoprotein",
+      "gp120",
+      "gp41",
+      "hemagglutinin",
+      "neuraminidase",
+      "fusion protein",
+      "attachment glycoprotein",
+      "gn ",
+      "gc ",
+      "e1 protein",
+      "e2 protein",
+      "ha protein",
+      "na protein",
+      "f protein",
+      "spike protein",
+      "membrane glycoprotein"
+    ],
+    "exclude": [
+      "non-structural",
+      "nonstructural"
+    ],
+    "description": "Envelope and surface glycoproteins mediating receptor binding, membrane fusion, and viral entry"
+  },
+  "Matrix/Tegument Structural": {
+    "keywords": [
+      "matrix protein",
+      "tegument",
+      "m protein",
+      "vp13",
+      "vp14",
+      "vp16",
+      "ul",
+      "ul21",
+      "ul121",
+      "us protein",
+      "inner envelope",
+      "matrix"
+    ],
+    "exclude": [
+      "non-structural",
+      "nonstructural"
+    ],
+    "description": "Matrix and tegument proteins bridging capsid and envelope, involved in assembly and budding"
+  },
+  "DNA Packaging/Capsid Maturation": {
+    "keywords": [
+      "portal",
+      "terminase",
+      "dna packaging",
+      "capsid maturation",
+      "prohead",
+      "scaffolding",
+      "head protein",
+      "head-tail",
+      "scaffold"
+    ],
+    "exclude": [],
+    "description": "Proteins involved in DNA translocation into capsids and capsid maturation (mainly dsDNA viruses)"
+  },
+  "Tail/Baseplate Structural": {
+    "keywords": [
+      "tail",
+      "baseplate",
+      "tail fiber",
+      "tail spike",
+      "tail tube",
+      "tail sheath",
+      "collar",
+      "tail tip"
+    ],
+    "exclude": [],
+    "description": "Tail, baseplate, and fiber proteins for attachment and DNA injection (bacteriophage-like viruses)"
+  },
+  "Occlusion Body Protein": {
+    "keywords": [
+      "occlusion",
+      "polyhedrin",
+      "granulin",
+      "p10 protein",
+      "occlusion-derived",
+      "inclusion body",
+      "a-type inclusion"
+    ],
+    "exclude": [],
+    "description": "Proteins forming occlusion bodies or inclusion bodies that protect virions (baculoviruses, poxviruses)"
+  },
+  "RNA-Dependent RNA Polymerase (RdRp)": {
+    "keywords": [
+      "rdrp",
+      "rna-dependent rna polymerase",
+      "rna dependent rna polymerase",
+      "rna directed rna polymerase",
+      "rna-directed rna polymerase",
+      "rna polymerase",
+      "pb1",
+      "pb2",
+      "pa",
+      "l-protein",
+      "l protein",
+      "replicase"
+    ],
+    "exclude": [
+      "dna polymerase",
+      "reverse transcriptase"
+    ],
+    "description": "RNA-dependent RNA polymerases catalyzing viral RNA genome replication and transcription"
+  },
+  "DNA Polymerase": {
+    "keywords": [
+      "dna polymerase",
+      "dna-dependent dna polymerase",
+      "dna dependent dna polymerase",
+      "dna directed dna polymerase",
+      "dna-directed dna polymerase",
+      "dna pol"
+    ],
+    "exclude": [
+      "reverse transcriptase",
+      "rna-dependent",
+      "replicase"
+    ],
+    "description": "DNA polymerases catalyzing viral DNA genome replication"
+  },
+  "Reverse Transcriptase": {
+    "keywords": [
+      "reverse transcriptase",
+      "rt protein",
+      "rna-dependent dna polymerase",
+      "rna directed dna polymerase",
+      "rna-directed dna polymerase",
+      "rna dependent dna polymerase",
+      "pol protein"
+    ],
+    "exclude": [],
+    "description": "Reverse transcriptases synthesizing DNA from RNA templates (retroviruses, pararetroviruses)"
+  },
+  "Helicase": {
+    "keywords": [
+      "helicase",
+      "dna helicase",
+      "rna helicase"
+    ],
+    "exclude": [
+      "ntpase",
+      "atpase",
+      "gtpase"
+    ],
+    "description": "Helicases unwinding DNA or RNA duplexes during replication and recombination"
+  },
+  "NTPase/ATPase": {
+    "keywords": [
+      "ntpase",
+      "atpase",
+      "gtpase",
+      "adenosine triphosphatase",
+      "nucleoside triphosphatase",
+      "aaa+ atpase"
+    ],
+    "exclude": [
+      "helicase",
+      "terminase",
+      "packaging protein"
+    ],
+    "description": "NTPases and ATPases providing energy for various viral processes (not helicases or packaging)"
+  },
+  "Primase/Primase-Polymerase": {
+    "keywords": [
+      "primase",
+      "helicase-primase",
+      "primase-polymerase"
+    ],
+    "exclude": [],
+    "description": "Primases synthesizing RNA primers for DNA replication"
+  },
+  "Genome-Linked Protein (VPg/Terminal)": {
+    "keywords": [
+      "vpg",
+      "genome-linked",
+      "terminal protein",
+      "genome linked"
+    ],
+    "exclude": [],
+    "description": "Proteins covalently linked to viral genome termini, serving as primers"
+  },
+  "mRNA Capping/Methyltransferase": {
+    "keywords": [
+      "methyltransferase",
+      "mtase",
+      "capping enzyme",
+      "guanylyltransferase",
+      "n7-methyltransferase",
+      "2'-o-methyltransferase",
+      "methylase",
+      "mrna cap"
+    ],
+    "exclude": [
+      "histone"
+    ],
+    "description": "Enzymes catalyzing mRNA cap synthesis and methylation"
+  },
+  "Nuclease (Endo/Exonuclease)": {
+    "keywords": [
+      "nuclease",
+      "endonuclease",
+      "exonuclease",
+      "dnase",
+      "rnase",
+      "ribonuclease"
+    ],
+    "exclude": [],
+    "description": "Nucleases involved in genome processing, recombination, or cap-snatching"
+  },
+  "Replication Cofactor/Processivity Factor": {
+    "keywords": [
+      "processivity",
+      "replication cofactor",
+      "polymerase cofactor",
+      "replication accessory",
+      "vp35",
+      "replication associated"
+    ],
+    "exclude": [],
+    "description": "Cofactors stabilizing polymerase complexes and enhancing processivity"
+  },
+  "Viral Protease": {
+    "keywords": [
+      "protease",
+      "proteinase",
+      "peptidase",
+      "3clpro",
+      "mpro",
+      "plpro",
+      "papain-like",
+      "chymotrypsin"
+    ],
+    "exclude": [],
+    "description": "Viral proteases cleaving polyproteins into mature functional proteins"
+  },
+  "Polyprotein Precursor": {
+    "keywords": [
+      "polyprotein",
+      "orf1a",
+      "orf1ab",
+      "precursor protein",
+      "gag-pol",
+      "gag protein",
+      "gag-pol",
+      "gag"
+    ],
+    "exclude": [],
+    "description": "Polyprotein precursors encoding multiple proteins cleaved post-translationally"
+  },
+  "Transcriptional Regulator/Transactivator": {
+    "keywords": [
+      "transcription",
+      "transactivator",
+      "transcriptional",
+      "tat protein",
+      "ie protein",
+      "immediate-early",
+      "early protein",
+      "late protein",
+      "vltf",
+      "e1a",
+      "e2a"
+    ],
+    "exclude": [],
+    "description": "Proteins regulating viral and host transcription"
+  },
+  "RNA-Binding Regulatory Protein": {
+    "keywords": [
+      "rna-binding",
+      "rna binding",
+      "rnp",
+      "ribonucleoprotein",
+      "zinc finger",
+      "znf",
+      "zccch"
+    ],
+    "exclude": [],
+    "description": "RNA-binding proteins regulating RNA stability, translation, and packaging"
+  },
+  "RNA Export/Splicing Regulator": {
+    "keywords": [
+      "rev protein",
+      "export",
+      "splicing",
+      "nuclear export"
+    ],
+    "exclude": [],
+    "description": "Proteins regulating RNA nuclear export and splicing (retroviruses, nuclear DNA viruses)"
+  },
+  "Assembly/Morphogenesis Factor": {
+    "keywords": [
+      "assembly",
+      "morphogenesis",
+      "budding",
+      "nsm protein",
+      "virion assembly",
+      "maturation protein"
+    ],
+    "exclude": [],
+    "description": "Proteins coordinating virion assembly, morphogenesis, and budding"
+  },
+  "Innate Immune/Interferon Antagonist": {
+    "keywords": [
+      "ns1",
+      "nss",
+      "v protein",
+      "c protein",
+      "interferon",
+      "ifn antagonist",
+      "stat",
+      "irf",
+      "immune evasion",
+      "nef",
+      "vpu",
+      "vif",
+      "vpr"
+    ],
+    "exclude": [],
+    "description": "Proteins antagonizing innate immunity, particularly interferon pathways"
+  },
+  "Apoptosis/Cell-Cycle Modulator": {
+    "keywords": [
+      "apoptosis",
+      "bcl-2",
+      "cell cycle",
+      "v-cyclin",
+      "anti-apoptotic"
+    ],
+    "exclude": [],
+    "description": "Viral proteins modulating host apoptosis and cell-cycle pathways"
+  },
+  "Cytokine/Receptor Mimic or Modulator": {
+    "keywords": [
+      "cytokine",
+      "interleukin",
+      "chemokine",
+      "tnf",
+      "receptor",
+      "il-",
+      "v-il",
+      "decoy receptor",
+      "chemokine receptor",
+      "g-protein coupled receptor",
+      "secreted protein",
+      "secreted immunomodulatory"
+    ],
+    "exclude": [],
+    "description": "Viral mimics of cytokines or receptors, or proteins modulating cytokine signaling"
+  },
+  "Host Shutoff/Translation Inhibitor": {
+    "keywords": [
+      "host shutoff",
+      "shutoff",
+      "translation inhibitor",
+      "nsp1"
+    ],
+    "exclude": [],
+    "description": "Proteins inhibiting host mRNA translation or transcription"
+  },
+  "Virion Release/Budding Facilitator": {
+    "keywords": [
+      "release",
+      "budding",
+      "egress",
+      "late domain",
+      "tetherin antagonist"
+    ],
+    "exclude": [],
+    "description": "Proteins facilitating virion release and budding from cells"
+  },
+  "Movement Protein": {
+    "keywords": [
+      "movement protein",
+      "mp protein",
+      "plasmodesmata"
+    ],
+    "exclude": [],
+    "description": "Proteins mediating cell-to-cell movement in plant viruses"
+  },
+  "Integrase/Recombinase": {
+    "keywords": [
+      "integrase",
+      "int protein",
+      "recombinase",
+      "integration"
+    ],
+    "exclude": [],
+    "description": "Enzymes integrating viral DNA into host genome or mediating recombination"
+  },
+  "Episome Maintenance/Replication Origin Binding": {
+    "keywords": [
+      "ebna1",
+      "episome",
+      "origin binding",
+      "replication origin",
+      "partitioning"
+    ],
+    "exclude": [],
+    "description": "Proteins maintaining episomal viral genomes and ensuring replication/segregation"
+  },
+  "Membrane Remodeling/Replication Organelle": {
+    "keywords": [
+      "ns4a",
+      "ns4b",
+      "membrane remodeling",
+      "replication complex",
+      "vesicle"
+    ],
+    "exclude": [],
+    "description": "Proteins inducing membrane vesicles and replication organelles"
+  },
+  "Viroporin/Ion Channel": {
+    "keywords": [
+      "viroporin",
+      "ion channel",
+      "m2 protein",
+      "channel"
+    ],
+    "exclude": [],
+    "description": "Small membrane proteins forming ion channels"
+  },
+  "Nucleotide Metabolism Enzyme": {
+    "keywords": [
+      "ribonucleotide reductase",
+      "dutpase",
+      "thymidine kinase",
+      "thymidylate",
+      "nucleotide kinase",
+      "deoxynucleoside",
+      "deoxyribonucleoside",
+      "rnr"
+    ],
+    "exclude": [],
+    "description": "Enzymes modulating dNTP pools for viral DNA replication"
+  },
+  "Viral Kinase/Phosphoprotein": {
+    "keywords": [
+      "kinase",
+      "phosphoprotein",
+      "serine/threonine",
+      "tyrosine kinase",
+      "phospho protein",
+      "protein kinase"
+    ],
+    "exclude": [],
+    "description": "Viral kinases phosphorylating viral/host proteins; phosphoproteins regulating replication"
+  },
+  "Ligase": {
+    "keywords": [
+      "ligase",
+      "dna ligase",
+      "rna ligase"
+    ],
+    "exclude": [
+      "ubiquitin ligase",
+      "e3 ubiquitin"
+    ],
+    "description": "Viral ligases joining DNA or RNA molecules"
+  },
+  "Ubiquitin/SUMO Pathway Protein": {
+    "keywords": [
+      "ubiquitin",
+      "e3 ubiquitin ligase",
+      "deubiquitinase",
+      "sumo",
+      "isg15"
+    ],
+    "exclude": [],
+    "description": "Proteins modulating ubiquitin or SUMO pathways"
+  },
+  "Other Viral Enzyme": {
+    "keywords": [
+      "lipase",
+      "esterase",
+      "phospholipase",
+      "deaminase",
+      "transferase",
+      "amidotransferase",
+      "aminotransferase",
+      "oxidoreductase",
+      "hydrolase",
+      "lyase",
+      "isomerase"
+    ],
+    "exclude": [
+      "methyltransferase",
+      "polymerase",
+      "transferase rna",
+      "transferase dna"
+    ],
+    "description": "Other viral enzymes (lipases, esterases, deaminases, etc.)"
+  },
+  "Viroplasm/Viral Factory Protein": {
+    "keywords": [
+      "viroplasm",
+      "viral factory",
+      "inclusion",
+      "replication factory"
+    ],
+    "exclude": [
+      "a-type inclusion"
+    ],
+    "description": "Proteins forming viral replication factories or viroplasms"
+  },
+  "Accessory/Virulence Factor": {
+    "keywords": [
+      "accessory",
+      "virulence",
+      "pathogenicity",
+      "host range"
+    ],
+    "exclude": [],
+    "description": "Accessory proteins modulating virulence, host range, or tissue tropism"
+  },
+  "Non-Structural Protein (General)": {
+    "keywords": [
+      "non-structural",
+      "nonstructural",
+      "ns protein",
+      "nsp"
+    ],
+    "exclude": [],
+    "description": "General non-structural proteins with diverse or unclear roles"
+  },
+  "Hypothetical Protein": {
+    "keywords": [
+      "uncharacterized",
+      "hypothetical",
+      "unknown",
+      "putative protein",
+      "orf protein",
+      "predicted protein"
+    ],
+    "exclude": [],
+    "description": "Proteins with unknown or uncharacterized function"
+  }
+}
