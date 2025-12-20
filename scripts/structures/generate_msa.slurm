@@ -11,7 +11,7 @@ cd $VSC_SCRATCH/annotation_benchmark
 
 conda activate colabfoldv_env
 
-awk -f scripts/split_large_proteins.awk data/benchmark_data.faa > data/benchmark_data_split.faa
+awk -f scripts/structures/split_large_proteins.awk data/benchmark_data.faa > data/benchmark_data_split.faa
 sed -i 's/ /_/g' data/benchmark_data_split.faa
 
 mkdir -p results/boltz
@@ -21,4 +21,4 @@ colabfold_search data/benchmark_data_split.faa $VSC_SCRATCH/colabfoldDBs/colabfo
 
 conda activate boltz
 
-scripts/parse_fasta2yml.py results/boltz/msas results/boltz/msas_parsed
+scripts/parse_fasta2yml.py results/boltz/msas results/boltz/inputs
