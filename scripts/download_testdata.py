@@ -345,23 +345,14 @@ def download_virus_proteins(
     # Write JSON metadata file
     if output_json and all_metadata:
         logger.info(f"Writing JSON metadata for {len(all_metadata)} proteins...")
-        json_output = {
-            "metadata": {
-                "download_date": datetime.now().isoformat(),
-                "total_proteins": total_proteins,
-                "total_accessions": len(accessions),
-                "source_accessions": accessions,
-            },
-            "proteins": all_metadata,
-        }
 
         with open(output_json, "w", encoding="utf-8") as json_handle:
-            json.dump(json_output, json_handle, indent=2, ensure_ascii=False)
+            json.dump(all_metadata, json_handle, indent=2, ensure_ascii=False)
 
         logger.info(f"JSON metadata saved to: {output_json}")
 
-    logger.info(f"Download complete! Total proteins extracted: {total_proteins}")
-    logger.info(f"Proteins saved to: {output_fasta}")
+        logger.info(f"Download complete! Total proteins extracted: {total_proteins}")
+        logger.info(f"Proteins saved to: {output_fasta}")
 
     # Print summary statistics
     if all_metadata:
