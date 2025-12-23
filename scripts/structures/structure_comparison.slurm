@@ -8,11 +8,13 @@
 
 cd  $VSC_SCRATCH/annotation_benchmark/
 
-conda activate boltz 
+conda activate boltz
 
 # foldseek
-foldseek easy-search results/boltz/structures/* db/foldseek/bfvd results/boltz/foldseek.m8 /tmp
+#foldseek easy-search results/boltz/structures/* db/foldseek/bfvd results/boltz/foldseek.m8 /tmp
 
 # reseek
-~/data/software/reseek_patch/reseek/bin/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek.m8 -db db/reseek/bfvd.bca -columns target+query+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log err.txt -evalue 1
+#~/data/software/reseek_patch/reseek_test/bin/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek.m8 -db db/reseek/bfvd.bca -columns target+query+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log logs/reseek_err.txt -evalue 1
+# reseek switched
+~/data/software/reseek_patch/reseek_test/bin/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek_switched.m8 -db db/reseek/bfvd.bca -columns query+target+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log logs/reseek_switched_err.txt -evalue 10
 
