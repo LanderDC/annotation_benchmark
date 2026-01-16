@@ -1,0 +1,41 @@
+---
+title: Benchmarking sequence and structure homology based methods for eukaryotic virus protein annotation
+metadata-files:
+  - _authors.yaml
+bibliography: references.bib
+format:
+  nature-pdf:
+    pdf-engine: lualatex
+    journal: 
+      cite-style: sn-nature
+    cite-method: natbib
+    colorlinks: true
+    keep-tex: true
+    include-in-header:
+        - _extensions/fonts.tex
+        - text: |
+            \usepackage{lineno}
+            \linenumbers
+  docx:
+    reference-doc: custom-reference-doc.docx
+    filters:
+        - authors-block
+csl: _extensions/christopherkenny/nature/csl/nature.csl
+crossref:
+  custom:
+    - kind: float
+      reference-prefix: Supplemental Figure
+      key: suppfig
+      latex-env: suppfig
+      latex-list-of-description: Supplementary Figure
+---
+
+# Abstract
+
+# Introduction
+
+# Results
+
+# Discussion
+
+# Material and Methods

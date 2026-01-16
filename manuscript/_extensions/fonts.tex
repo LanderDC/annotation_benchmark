@@ -1,0 +1,43 @@
+\usepackage{fontspec}
+
+% Pick a test font you KNOW exists (verify with: fc-list | grep -i "Arial")
+\setmainfont{Helvetica Neue}
+\setsansfont{Helvetica Neue}
+
+% Optional: if you want another later, change both above to e.g. Fira Sans.
+
+% Force any \fontfamily{\sfdefault} back to main:
+\renewcommand{\sfdefault}{\rmdefault}
+
+% Patch section/figure/etc fonts that embed \fontfamily{\sfdefault}
+\makeatletter
+\def\sectionfont{\reset@font\fontsize{14bp}{16bp}\bfseries\selectfont}
+\def\subsectionfont{\reset@font\fontsize{12bp}{14bp}\bfseries\selectfont}
+\def\subsubsectionfont{\reset@font\fontsize{11bp}{13bp}\bfseries\selectfont}
+\def\paragraphfont{\reset@font\fontsize{10bp}{12bp}\bfseries\itshape\selectfont}
+\def\bmheadfont{\reset@font\fontsize{10bp}{12bp}\bfseries\selectfont}
+\def\figurecaptionfont{\reset@font\fontsize{8}{9.5}\selectfont}
+\def\quotefont{\reset@font\fontsize{9}{11}\selectfont}
+\def\eqnheadfont{\reset@font\fontsize{16}{18}\bfseries\selectfont}
+% Bibliography font override
+\def\bibfont{\reset@font\normalsize\selectfont}
+\makeatother
+
+% Reduce white space: widen text block and adjust margins
+\geometry{
+  paperwidth=210mm,
+  paperheight=297mm,
+  top=25.4mm,
+  bottom=25.4mm,
+  left=31.7mm,
+  right=31.7mm,
+  headsep=2.54mm,
+  footskip=12mm,
+  % For single-column pages
+  textwidth=174mm,
+  textheight=245mm
+}
+% If you use double-column option, uncomment:
+% \if@iicol
+%   \geometry{text={174mm,240mm}}
+% \fi

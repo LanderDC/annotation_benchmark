@@ -1,0 +1,41 @@
+author:
+  - name: 
+      given: Lander 
+      family: De Coninck
+    affiliations: 
+      - ref: cev
+      - ref: jgi
+    orcid: 0000-0001-6847-2379
+    email: lander.deconinck@kuleuven.be
+    corresponding: true
+  - name: Uri Neri
+    affiliations: 
+      - ref: jgi
+    orcid: 0000-0003-0894-2484
+    email: uneri@lbl.gov
+    corresponding: false
+  - name: Simon Roux
+    affiliations: 
+      - ref: jgi
+    orcid: 0000-0002-5831-5895
+    email: sroux@lbl.gov
+    corresponding: false
+
+
+affiliations:
+  - id: cev
+    name: KU Leuven
+    department: Microbiology, Immunology and Transplantation
+    group: Clincial and Epidemiological Virology
+    address: Herestraat 49, box 1040
+    city: Leuven
+    country: Belgium
+    postal-code: 3000
+  - id: jgi
+    name: Lawrence Berkeley National Laboratory
+    department: DOE Joint Genome Institute
+    address: Cyclotron Road 1
+    city: Berkeley
+    state: CA
+    country: USA
+    postal-code: CA 94720
