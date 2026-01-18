@@ -4,7 +4,6 @@ author:
       family: De Coninck
     affiliations: 
       - ref: cev
-      - ref: jgi
     orcid: 0000-0001-6847-2379
     email: lander.deconinck@kuleuven.be
     corresponding: true
