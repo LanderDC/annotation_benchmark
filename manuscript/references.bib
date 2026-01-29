@@ -1,2 +1,189 @@
 
 
+@misc{passaroBoltz2AccurateEfficient2025,
+  title = {Boltz-2: {{Towards Accurate}} and {{Efficient Binding Affinity Prediction}}},
+  shorttitle = {Boltz-2},
+  author = {Passaro, Saro and Corso, Gabriele and Wohlwend, Jeremy and Reveiz, Mateo and Thaler, Stephan and Somnath, Vignesh Ram and Getz, Noah and Portnoi, Tally and Roy, Julien and Stark, Hannes and {Kwabi-Addo}, David and Beaini, Dominique and Jaakkola, Tommi and Barzilay, Regina},
+  year = 2025,
+  month = jun,
+  primaryclass = {New Results},
+  pages = {2025.06.14.659707},
+  publisher = {bioRxiv},
+  doi = {10.1101/2025.06.14.659707},
+  urldate = {2026-01-28},
+  abstract = {Accurately modeling biomolecular interactions is a central challenge in modern biology. While recent advances, such as AlphaFold3 and Boltz-1, have substantially improved our ability to predict biomolecular complex structures, these models still fall short in predicting binding affinity, a critical property underlying molecular function and therapeutic efficacy. Here, we present Boltz-2, a new structural biology foundation model that exhibits strong performance for both structure and affinity prediction. Boltz-2 introduces controllability features including experimental method conditioning, distance constraints, and multi-chain template integration for structure prediction, and is, to our knowledge, the first AI model to approach the performance of free-energy perturbation (FEP) methods in estimating small molecule--protein binding affinity. Crucially, it achieves strong correlation with experimental readouts on many benchmarks, while being at least 1000\texttimes{} more computationally efficient than FEP. By coupling Boltz-2 with a generative model for small molecules, we demonstrate an effective workflow to find diverse, synthesizable, high-affinity binders, as estimated by absolute FEP simulations on the TYK2 target. To foster broad adoption and further innovation at the intersection of machine learning and biology, we are releasing Boltz-2 weights, inference, and training code 1 under a permissive open license, providing a robust and extensible foundation for both academic and industrial research.},
+  archiveprefix = {bioRxiv},
+  chapter = {New Results},
+  copyright = {\copyright{} 2025, Posted by Cold Spring Harbor Laboratory. This pre-print is available under a Creative Commons License (Attribution 4.0 International), CC BY 4.0, as described at http://creativecommons.org/licenses/by/4.0/},
+  langid = {english}
+}
+
+@article{kimBFVDLargeRepository2025,
+  title = {{{BFVD}}---a Large Repository of Predicted Viral Protein Structures},
+  author = {Kim, Rachel Seongeun and Levy~Karin, Eli and Mirdita, Milot and Chikhi, Rayan and Steinegger, Martin},
+  year = 2025,
+  month = jan,
+  journal = {Nucleic Acids Research},
+  volume = {53},
+  number = {D1},
+  pages = {D340-D347},
+  issn = {1362-4962},
+  doi = {10.1093/nar/gkae1119},
+  urldate = {2026-01-28},
+  abstract = {The AlphaFold Protein Structure Database (AFDB) is the largest repository of accurately predicted structures with taxonomic labels. Despite providing predictions for over 214 million UniProt entries, the AFDB does not cover viral sequences, severely limiting their study. To address this, we created the Big Fantastic Virus Database (BFVD), a repository of 351 242 protein structures predicted by applying ColabFold to the viral sequence representatives of the UniRef30 clusters. By utilizing homology searches across two petabases of assembled sequencing data, we improved 36\% of these structure predictions beyond ColabFold's initial results. BFVD holds a unique repertoire of protein structures as over 62\% of its entries show no or low structural similarity to existing repositories. We demonstrate how a substantial fraction of bacteriophage proteins, which remained unannotated based on their sequences, can be matched with similar structures from BFVD. In that, BFVD is on par with the AFDB, while holding nearly three orders of magnitude fewer structures. BFVD is an important virus-specific expansion to protein structure repositories, offering new opportunities to advance viral research. BFVD can be freely downloaded at bfvd.steineggerlab.workers.dev and queried using Foldseek and UniProt labels at bfvd.foldseek.com.}
+}
+
+@article{bourasProteinStructureinformedBacteriophage2026,
+  title = {Protein Structure-Informed Bacteriophage Genome Annotation with {{Phold}}},
+  author = {Bouras, George and Grigson, Susanna R. and Mirdita, Milot and Heinzinger, Michael and Papudeshi, Bhavya and Mallawaarachchi, Vijini and Green, Renee and Kim, Rachel Seongeun and Mihalia, Victor and Psaltis, Alkis James and Wormald, Peter-John and Vreugde, Sarah and Steinegger, Martin and Edwards, Robert A.},
+  year = 2026,
+  month = jan,
+  journal = {Nucleic Acids Research},
+  volume = {54},
+  number = {1},
+  publisher = {Oxford Academic},
+  doi = {10.1093/nar/gkaf1448},
+  urldate = {2026-01-28},
+  abstract = {Abstract. Bacteriophage (phage) genome annotation is essential for understanding their functional potential and suitability for use as therapeutic agents.},
+  langid = {english}
+}
+
+@article{boulayEmpathiEmbeddingbasedPhage2025,
+  title = {Empathi: Embedding-Based Phage Protein Annotation Tool by Hierarchical Assignment},
+  shorttitle = {Empathi},
+  author = {Boulay, Alexandre and Leprince, Audrey and Enault, Fran{\c c}ois and Rousseau, Elsa and Galiez, Clovis},
+  year = 2025,
+  month = oct,
+  journal = {Nature Communications},
+  volume = {16},
+  number = {1},
+  pages = {9114},
+  publisher = {Nature Publishing Group},
+  issn = {2041-1723},
+  doi = {10.1038/s41467-025-64177-5},
+  urldate = {2026-01-28},
+  abstract = {Bacteriophages, viruses infecting bacteria, are estimated to outnumber their cellular hosts by 10-fold, acting as key players in all microbial ecosystems. Under evolutionary pressure by their host, they evolve rapidly and encode a large diversity of protein sequences. Consequently, the majority of functions carried by phage proteins remain elusive. Current tools to comprehensively identify phage protein functions from their sequence either lack sensitivity (those relying on homology for instance) or specificity (assigning a single coarse grain function to a protein). Here, we introduce Empathi, a protein-embedding-based classifier that assigns functions in a hierarchical manner. New categories were specifically elaborated for phage protein functions and organized such that molecular-level functions are respected in each category, making them well suited for training machine learning classifiers based on protein embeddings. Empathi outperforms homology-based methods on a dataset of cultured phage genomes, tripling the number of annotated homologous groups. On the EnVhogDB database, the most recent and extensive database of metagenomically-sourced phage proteins, Empathi doubled the annotated fraction of protein families from 16\% to 33\%. Having a more global view of the repertoire of functions a phage possesses will assuredly help to understand them and their interactions with bacteria better.},
+  copyright = {2025 The Author(s)},
+  langid = {english},
+  keywords = {Bacteriophages,Machine learning,Protein function predictions}
+}
+
+@misc{UniProt2026,
+  title = {{{UniProt}}},
+  year = 2026,
+  month = jan,
+  journal = {UniProt},
+  urldate = {2026-01-28},
+  abstract = {UniProt is the world's leading high-quality, comprehensive and freely accessible resource of protein sequence and functional information.},
+  howpublished = {https://www.uniprot.org/help/refprot\_only\_changes},
+  langid = {english}
+}
+
+@misc{PHROGFamiliesProkaryotic,
+  title = {{{PHROG}}: Families of Prokaryotic Virus Proteins Clustered Using Remote Homology \textbar{} {{NAR Genomics}} and {{Bioinformatics}} \textbar{} {{Oxford Academic}}},
+  urldate = {2026-01-28},
+  howpublished = {https://academic.oup.com/nargab/article/3/3/lqab067/6342220?login=false}
+}
+
+@article{terzianPHROGFamiliesProkaryotic2021,
+  title = {{{PHROG}}: Families of Prokaryotic Virus Proteins Clustered Using Remote Homology},
+  shorttitle = {{{PHROG}}},
+  author = {Terzian, Paul and Olo~Ndela, Eric and Galiez, Clovis and Lossouarn, Julien and P{\'e}rez~Bucio, Rub{\'e}n~Enrique and Mom, Robin and Toussaint, Ariane and Petit, Marie-Agn{\`e}s and Enault, Fran{\c c}ois},
+  year = 2021,
+  month = sep,
+  journal = {NAR Genomics and Bioinformatics},
+  volume = {3},
+  number = {3},
+  pages = {lqab067},
+  issn = {2631-9268},
+  doi = {10.1093/nargab/lqab067},
+  urldate = {2026-01-28},
+  abstract = {Viruses are abundant, diverse and ancestral biological entities. Their diversity is high, both in terms of the number of different protein families encountered and in the sequence heterogeneity of each protein family. The recent increase in sequenced viral genomes constitutes a great opportunity to gain new insights into this diversity and consequently urges the development of annotation resources to help functional and comparative analysis. Here, we introduce PHROG (Prokaryotic Virus Remote Homologous Groups), a library of viral protein families generated using a new clustering approach based on remote homology detection by HMM profile-profile comparisons. Considering 17~473 reference (pro)viruses of prokaryotes, 868~340 of the total 938~864 proteins were grouped into 38~880 clusters that proved to be a 2-fold deeper clustering than using a classical strategy based on BLAST-like similarity searches, and yet to remain homogeneous. Manual inspection of similarities to various reference sequence databases led to the annotation of 5108 clusters (containing 50.6~\% of the total protein dataset) with 705 different annotation terms, included in 9 functional categories, specifically designed for viruses. Hopefully, PHROG will be a useful tool to better annotate future prokaryotic viral sequences thus helping the scientific community to better understand the evolution and ecology of these entities.}
+}
+
+@article{altschulBasicLocalAlignment1990,
+  title = {Basic Local Alignment Search Tool},
+  author = {Altschul, Stephen F. and Gish, Warren and Miller, Webb and Myers, Eugene W. and Lipman, David J.},
+  year = 1990,
+  volume = {215},
+  number = {3},
+  pages = {403--410},
+  publisher = {J Mol Biol},
+  doi = {10.1016/S0022-2836(05)80360-2},
+  urldate = {2021-02-22},
+  abstract = {A new approach to rapid sequence comparison, basic local alignment search tool (BLAST), directly approximates alignments that optimize a measure of local similarity, the maximal segment pair (MSP) score. Recent mathematical results on the stochastic properties of MSP scores allow an analysis of the performance of this method as well as the statistical significance of alignments it generates. The basic algorithm is simple and robust; it can be implemented in a number of ways and applied in a variety of contexts including straight-forward DNA and protein sequence database searches, motif searches, gene identification searches, and in the analysis of multiple regions of similarity in long DNA sequences. In addition to its flexibility and tractability to mathematical analysis, BLAST is an order of magnitude faster than existing sequence comparison tools of comparable sensitivity. \copyright{} 1990, Academic Press Limited. All rights reserved.},
+  pmid = {2231712},
+  keywords = {Algorithms,Amino Acid Sequence,Base Sequence*,D J Lipman,Databases,doi:10.1016/S0022-2836(05)80360-2,Factual,MEDLINE,Mutation*,National Center for Biotechnology Information,National Institutes of Health,National Library of Medicine,NCBI,NIH,NLM,Nucleic Acid,P.H.S.,pmid:2231712,PubMed Abstract,Research Support,S F Altschul,Sensitivity and Specificity,Sequence Homology,Software*,U.S. Gov't,W Gish}
+}
+
+@article{steineggerMMseqs2EnablesSensitive2017,
+  title = {{{MMseqs2}} Enables Sensitive Protein Sequence Searching for the Analysis of Massive Data Sets},
+  author = {Steinegger, Martin and S{\"o}ding, Johannes},
+  year = 2017,
+  month = nov,
+  journal = {Nature Biotechnology},
+  volume = {35},
+  number = {11},
+  pages = {1026--1028},
+  publisher = {Nature Publishing Group},
+  issn = {1546-1696},
+  doi = {10.1038/nbt.3988},
+  urldate = {2026-01-28},
+  copyright = {2017 Springer Nature America, Inc.},
+  langid = {english},
+  keywords = {Environmental microbiology,Functional clustering,Sequence annotation,Software}
+}
+
+@article{buchfinkSensitiveProteinAlignments2021,
+  title = {Sensitive Protein Alignments at Tree-of-Life Scale Using {{DIAMOND}}},
+  author = {Buchfink, Benjamin and Reuter, Klaus and Drost, Hajk-Georg},
+  year = 2021,
+  month = apr,
+  journal = {Nature Methods},
+  volume = {18},
+  number = {4},
+  pages = {366--368},
+  publisher = {Nature Publishing Group},
+  issn = {1548-7105},
+  doi = {10.1038/s41592-021-01101-x},
+  urldate = {2026-01-28},
+  abstract = {We are at the beginning of a genomic revolution in which all known species are planned to be sequenced. Accessing such data for comparative analyses is crucial in this new age of data-driven biology. Here, we introduce an improved version of DIAMOND that greatly exceeds previous search performances and harnesses supercomputing to perform tree-of-life scale protein alignments in hours, while matching the sensitivity of the gold standard BLASTP.},
+  copyright = {2021 The Author(s)},
+  langid = {english},
+  keywords = {Computational biology and bioinformatics,Genome informatics,Genomic analysis,Sequencing,Software}
+}
+
+@article{mirditaColabFoldMakingProtein2022,
+  title = {{{ColabFold}}: Making Protein Folding Accessible to All},
+  shorttitle = {{{ColabFold}}},
+  author = {Mirdita, Milot and Sch{\"u}tze, Konstantin and Moriwaki, Yoshitaka and Heo, Lim and Ovchinnikov, Sergey and Steinegger, Martin},
+  year = 2022,
+  month = jun,
+  journal = {Nature Methods},
+  volume = {19},
+  number = {6},
+  pages = {679--682},
+  publisher = {Nature Publishing Group},
+  issn = {1548-7105},
+  doi = {10.1038/s41592-022-01488-1},
+  urldate = {2026-01-28},
+  abstract = {ColabFold offers accelerated prediction of protein structures and complexes by combining the fast homology search of MMseqs2 with AlphaFold2 or RoseTTAFold. ColabFold's 40-60-fold faster search and optimized model utilization enables prediction of close to 1,000 structures per day on a server with one graphics processing unit. Coupled with Google Colaboratory, ColabFold becomes a free and accessible platform for protein folding. ColabFold is open-source software available at https://github.com/sokrypton/ColabFoldand its novel environmental databases are available at https://colabfold.mmseqs.com.},
+  copyright = {2022 The Author(s)},
+  langid = {english},
+  keywords = {Computational models,Protein databases,Protein structure predictions,Software}
+}
+
+@article{mutzProteinStructuromeOrthornavirae2024,
+  title = {The Protein Structurome of {{Orthornavirae}} and Its Dark Matter},
+  author = {Mutz, Pascal and Camargo, Antonio Pedro and Sahakyan, Harutyun and Neri, Uri and Butkovic, Anamarija and Wolf, Yuri I. and Krupovic, Mart and Dolja, Valerian V. and Koonin, Eugene V.},
+  year = 2024,
+  month = dec,
+  journal = {mBio},
+  volume = {16},
+  number = {2},
+  pages = {e03200-24},
+  publisher = {American Society for Microbiology},
+  doi = {10.1128/mbio.03200-24},
+  urldate = {2026-01-28}
+}
+
