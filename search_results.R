@@ -93,26 +93,11 @@ all_results_annotations <- all_results |>
   left_join(categories_df, by = "subject_base") |>
   select(-subject_base)
 
-all_results_annotations <- all_results_annotations |>
-  mutate(
-    categories = map(
-      categories,
-      ~ {
-        if (is.null(.x)) {
-          return(character(0))
-        }
-        vals <- tolower(unlist(.x, use.names = FALSE))
-        vals[!vals %in% deprioritized]
-      }
-    )
-  ) |>
-  filter(lengths(categories) > 0)
-
 # -------------------------
 # Top 25 hits per query/method
 # -------------------------
 
-best_25 <- all_results |>
+best_25 <- all_results_annotations |>
   group_by(method, query_id) |>
   arrange(evalue, .by_group = TRUE) |>
   mutate(hit_rank = row_number()) |>
@@ -236,12 +221,81 @@ pair_pct_filt <- pairwise_pct(subject_methods_filt, "Filtered hits")
 # Top hit per query/method
 # -------------------------
 
-all_results_top <- best_25 |>
+top_results <- best_25 |>
   group_by(method, query_id) |>
   arrange(evalue, subject_id, .by_group = TRUE) |>
   slice_head(n = 1) |>
   ungroup()
 
+subject_methods_top <- build_subject_methods(top_results)
+pair_pct_top <- pairwise_pct(subject_methods_top, "Top hits")
+
+# -------------------------
+# Comparison plot
+# -------------------------
+
+method_order <- c(
+  "blastp",
+  "diamond",
+  "mmseqs2",
+  "ProstT5-foldseek",
+  "TEA-mmseqs2",
+  "Boltz-foldseek",
+  "Boltz-reseek"
+)
+
+rbind(pair_pct_all, pair_pct_filt, pair_pct_top) |>
+  mutate(
+    method = factor(method, levels = method_order),
+    method_right = glue("{method_right}\n(n={total_hits})"),
+    method_right = forcats::fct_reorder(
+      method_right,
+      match(str_remove(method_right, "\\n.*$"), method_order),
+      .desc = TRUE
+    )
+  ) |>
+  ggplot(aes(method, method_right, fill = shared_pct)) +
+  geom_tile(color = "white") +
+  geom_text(
+    aes(
+      label = if_else(
+        shared_pct < 100,
+        glue("{shared_hits}\n({shared_pct}%)"),
+        ""
+      ),
+      color = shared_pct > 80
+    ),
+    size = 1.5
+  ) +
+  scale_color_manual(
+    values = c(`TRUE` = "white", `FALSE` = "white"),
+    guide = "none"
+  ) +
+  scale_fill_gradient(low = "#f7fbff", high = "#08306b", limits = c(0, 100)) +
+  labs(
+    title = "Pairwise hit overlap across methods",
+    fill = "% shared hits"
+  ) +
+  guides(
+    fill = guide_colorbar(
+      title.position = "left",
+      barwidth = unit(.5, "cm"),
+      barheight = unit(2, "cm"),
+      title.hjust = 0.5,
+    )
+  ) +
+  facet_wrap(~dataset, scales = "free_y") +
+  theme_void() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 6),
+    axis.text.y = element_text(size = 6, hjust = 1),
+    axis.title = element_blank(),
+    legend.text = element_text(size = 7),
+    legend.title = element_text(size = 8, angle = 90),
+    plot.title = element_text(size = 10),
+    strip.text = element_text(size = 8)
+  )
+ggsave("figures/hit_overlap_methods.pdf", dpi = 300, width = 9, height = 3)
 
 # -------------------------
 # Category weighting
@@ -249,13 +303,28 @@ all_results_top <- best_25 |>
 
 weight_expr <- function(e) ifelse(e == 0, 1000, -log10(e))
 
+# fix doesnt work
 weighted <- filtered_results |>
-  mutate(weight = weight_expr(evalue)) |>
-  unnest(categories) |>
   mutate(
-    category = categories %||% "Unknown",
+    weight = weight_expr(evalue),
+    # normalize categories to a list-column of character vectors
+    categories = map(
+      categories,
+      ~ {
+        if (is.null(.x)) {
+          NA_character_
+        } else {
+          as.character(unlist(.x))
+        }
+      }
+    )
+  ) |>
+  unnest_longer(categories, values_to = "category", keep_empty = TRUE) |>
+  mutate(
+    category = coalesce(category, "Unknown"),
     is_low_priority = as.integer(str_to_lower(category) %in% deprioritized)
-  )
+  ) |>
+  select(-categories)
 
 category_weights <- weighted |>
   group_by(query_id, method, category, is_low_priority) |>

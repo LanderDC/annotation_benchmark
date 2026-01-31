@@ -37,17 +37,26 @@ crossref:
 
 # Introduction
 
-# Results
+# Results & Discussion
+## Dataset overview
+- general overview of data and structures
+  - TODO: kingdom distribution (proteins vs species)
+- performance of methods in hits
+- comparison of methods in shared hits
+- comparison of functional annotation per method to original
+- how many are informative annotations
+  - TODO: which conversions from hypothetical protein to informative (phages?)
+- computational benchmark (roughly)
 
 ![A) Waffle plot showing the distribution of the number of proteins from the different viral Kingdoms. Each tile roughly corresponds to 110 proteins. B) A cumulative distribution function plot showing the percentage of predicted structures from the test set with a pLDDT score above the pLDDT score on the x-axis. The inset shows a violin- and boxplot with all pLDDT scores from the predicted structures (n=11,467).](../figures/dataset_overview.pdf){#fig-overview}
 
 @fig-overview
 
-![Bar plot showing the number of proteins that got a hit against the BFVD shown per method before and after filtering the reported results on e-value < 1e-3.](../figures/hits_per_method.pdf){#fig-hits}
+![Bar plot showing the number of proteins that got a hit against the BFVD shown per method before and after filtering the reported results on e-value lower than 1e-3.](../figures/hits_per_method.pdf){#fig-hits}
 
 @fig-hits
 
-# Discussion
+# Conclusion
 
 # Material and Methods
 ## Dataset selection
