@@ -99,6 +99,14 @@ plddt_df <- enframe(plddt_list, name = "id", value = "entry") |>
   ) |>
   select(id, complex_plddt, plddt_category)
 
+plddt_df |>
+  summarise(
+    mean_plddt = mean(complex_plddt),
+    median_plddt = median(complex_plddt),
+    sd_plddt = sd(complex_plddt),
+    n_structures = n()
+  )
+
 ##
 ## pLDDT CDF summary
 ## ------------------
