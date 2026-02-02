@@ -106,7 +106,7 @@ best_25 <- all_results_annotations |>
   ungroup()
 
 filtered_results <- best_25 |>
-  filter(evalue < 1e-3)
+  filter(evalue <= 1e-3)
 
 # -------------------------
 # Counts per method
@@ -120,7 +120,7 @@ counts_all <- all_results |>
 counts_filtered <- filtered_results |>
   distinct(method, query_id) |>
   count(method, name = "unique_queries") |>
-  mutate(dataset = "Filtered hits\n(e<1e-3)")
+  mutate(dataset = "Filtered hits\n(e=<1e-3)")
 
 counts_plot_df <- bind_rows(counts_all, counts_filtered)
 
@@ -137,14 +137,23 @@ counts_plot_df <- counts_plot_df |>
         "Boltz-foldseek",
         "Boltz-reseek"
       )
+    ),
+    type = case_when(
+      method %in% c("blastp", "diamond", "mmseqs2") ~ "Sequence",
+      method %in% c("ProstT5-foldseek", "TEA-mmseqs2") ~ "Embedding",
+      T ~ "Structure"
     )
   )
 
 unique_hits_plot <- ggplot(
   counts_plot_df,
-  aes(x = method, y = unique_queries, fill = dataset)
+  aes(x = method, y = unique_queries)
 ) +
-  geom_col(position = position_dodge(), width = .8) +
+  geom_col(
+    aes(fill = type, alpha = dataset),
+    position = position_dodge(),
+    width = .8
+  ) +
   geom_hline(yintercept = 11467, linetype = "dashed", linewidth = 0.4) +
   geom_text(
     y = 12000,
@@ -153,9 +162,11 @@ unique_hits_plot <- ggplot(
     size = 3,
     check_overlap = T
   ) +
-  scale_fill_manual(
-    values = c("All hits" = "#e56d12ff", "Filtered hits\n(e<1e-3)" = "#FFDBBB"),
-  ) +
+  #scale_fill_manual(
+  #  values = c("All hits" = "#e56d12ff", "Filtered hits\n(e<1e-3)" = "#FFDBBB"),
+  #) +
+  scale_alpha_discrete(range = c(1, 0.3), name = "") +
+  scale_fill_brewer(palette = "Set1") +
   labs(
     y = "# test proteins with hit"
   ) +
@@ -394,14 +405,21 @@ pairwise_comparison_plot <- function(
 pct_all_plot <- pairwise_comparison_plot(pair_pct_all, title = "Best 25 hits")
 pct_filt_plot <- pairwise_comparison_plot(
   pair_pct_filt,
-  title = "Best 25 filtered hits (e<1e-3)"
+  title = "Best 25 filtered hits (e=<1e-3)"
 )
 pct_top_plot <- pairwise_comparison_plot(pair_pct_top, title = "Top hits")
 
 (free(
   (unique_hits_plot +
     guides(
-      fill = guide_legend(keyheight = unit(.5, "cm"), keywidth = unit(.5, "cm"))
+      fill = guide_legend(
+        keyheight = unit(.5, "cm"),
+        keywidth = unit(.5, "cm")
+      ),
+      alpha = guide_legend(
+        keyheight = unit(.5, "cm"),
+        keywidth = unit(.5, "cm")
+      )
     ) +
     theme(axis.title.y = element_text(size = 8))) +
     pct_all_plot,
@@ -767,6 +785,8 @@ ggsave(
   units = "mm"
 )
 
+
+## STOP
 pairwise_matches_full <- bind_rows(
   pairwise_matches,
   pairwise_matches |>

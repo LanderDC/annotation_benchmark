@@ -187,3 +187,120 @@
   urldate = {2026-01-28}
 }
 
+@article{heinzingerBilingualLanguageModel2024,
+  title = {Bilingual Language Model for Protein Sequence and Structure},
+  author = {Heinzinger, Michael and Weissenow, Konstantin and Sanchez, Joaquin~Gomez and Henkel, Adrian and Mirdita, Milot and Steinegger, Martin and Rost, Burkhard},
+  year = 2024,
+  month = dec,
+  journal = {NAR Genomics and Bioinformatics},
+  volume = {6},
+  number = {4},
+  pages = {lqae150},
+  issn = {2631-9268},
+  doi = {10.1093/nargab/lqae150},
+  urldate = {2026-01-28},
+  abstract = {Adapting language models to protein sequences spawned the development of powerful protein language models (pLMs). Concurrently, AlphaFold2 broke through in protein structure prediction. Now we can systematically and comprehensively explore the dual nature of proteins that act and exist as three-dimensional (3D) machines and evolve as linear strings of one-dimensional (1D) sequences. Here, we leverage pLMs to simultaneously model both modalities in a single model. We encode protein structures as token sequences using the 3Di-alphabet introduced by the 3D-alignment method Foldseek. For training, we built a non-redundant dataset from AlphaFoldDB and fine-tuned an existing pLM (ProtT5) to translate between 3Di and amino acid sequences. As a proof-of-concept for our novel approach, dubbed Protein `structure-sequence' T5 (ProstT5), we showed improved performance for subsequent, structure-related prediction tasks, leading to three orders of magnitude speedup for deriving 3Di. This will be crucial for future applications trying to search metagenomic sequence databases at the sensitivity of structure comparisons. Our work showcased the potential of pLMs to tap into the information-rich protein structure revolution fueled by AlphaFold2. ProstT5 paves the way to develop new tools integrating the vast resource of 3D predictions and opens new research avenues in the post-AlphaFold2 era.}
+}
+
+@article{elnaggarProtTransUnderstandingLanguage2022,
+  title = {{{ProtTrans}}: {{Toward Understanding}} the {{Language}} of {{Life Through Self-Supervised Learning}}},
+  shorttitle = {{{ProtTrans}}},
+  author = {Elnaggar, Ahmed and Heinzinger, Michael and Dallago, Christian and Rehawi, Ghalia and Wang, Yu and Jones, Llion and Gibbs, Tom and Feher, Tamas and Angerer, Christoph and Steinegger, Martin and Bhowmik, Debsindhu and Rost, Burkhard},
+  year = 2022,
+  month = oct,
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume = {44},
+  number = {10},
+  pages = {7112--7127},
+  issn = {1939-3539},
+  doi = {10.1109/TPAMI.2021.3095381},
+  urldate = {2026-02-01},
+  abstract = {Computational biology and bioinformatics provide vast data gold-mines from protein sequences, ideal for Language Models (LMs) taken from Natural Language Processing (NLP). These LMs reach for new prediction frontiers at low inference costs. Here, we trained two auto-regressive models (Transformer-XL, XLNet) and four auto-encoder models (BERT, Albert, Electra, T5) on data from UniRef and BFD containing up to 393 billion amino acids. The protein LMs (pLMs) were trained on the Summit supercomputer using 5616 GPUs and TPU Pod up-to 1024 cores. Dimensionality reduction revealed that the raw pLM-embeddings from unlabeled data captured some biophysical features of protein sequences. We validated the advantage of using the embeddings as exclusive input for several subsequent tasks: (1) a per-residue (per-token) prediction of protein secondary structure (3-state accuracy Q3=81\%-87\%); (2) per-protein (pooling) predictions of protein sub-cellular location (ten-state accuracy: Q10=81\%) and membrane versus water-soluble (2-state accuracy Q2=91\%). For secondary structure, the most informative embeddings (ProtT5) for the first time outperformed the state-of-the-art without multiple sequence alignments (MSAs) or evolutionary information thereby bypassing expensive database searches. Taken together, the results implied that pLMs learned some of the grammar of the language of life. All our models are available through https://github.com/agemagician/ProtTrans.},
+  keywords = {Amino acids,Computational biology,Computational modeling,Databases,deep learning,high performance computing,language modeling,machine learning,Proteins,Task analysis,Three-dimensional displays,Training}
+}
+
+@article{vankempenFastAccurateProtein2024,
+  title = {Fast and Accurate Protein Structure Search with {{Foldseek}}},
+  author = {{van Kempen}, Michel and Kim, Stephanie S. and Tumescheit, Charlotte and Mirdita, Milot and Lee, Jeongjae and Gilchrist, Cameron L. M. and S{\"o}ding, Johannes and Steinegger, Martin},
+  year = 2024,
+  month = feb,
+  journal = {Nature Biotechnology},
+  volume = {42},
+  number = {2},
+  pages = {243--246},
+  publisher = {Nature Publishing Group},
+  issn = {1546-1696},
+  doi = {10.1038/s41587-023-01773-0},
+  urldate = {2026-01-28},
+  abstract = {As structure prediction methods are generating millions of publicly available protein structures, searching these databases is becoming a bottleneck. Foldseek aligns the structure of a query protein against a database by describing tertiary amino acid interactions within proteins as sequences over a structural alphabet. Foldseek decreases computation times by four to five orders of magnitude with 86\%, 88\% and 133\% of the sensitivities of Dali, TM-align and CE, respectively.},
+  copyright = {2023 The Author(s)},
+  langid = {english},
+  keywords = {Computational biology and bioinformatics,Software,Structural biology}
+}
+
+@misc{pantoliniRewritingProteinAlphabets2026,
+  title = {Rewriting Protein Alphabets with Language Models},
+  author = {Pantolini, Lorenzo and Studer, Gabriel and Engist, Laura and Pud{\v z}iuvelyt{\.e}, Ieva and Pommerening, Florian and Waterhouse, Andrew Mark and Tauriello, Gerardo and Steinegger, Martin and Schwede, Torsten and Durairaj, Janani},
+  year = 2026,
+  month = jan,
+  primaryclass = {New Results},
+  pages = {2025.11.27.690975},
+  publisher = {bioRxiv},
+  issn = {2692-8205},
+  doi = {10.1101/2025.11.27.690975},
+  urldate = {2026-01-28},
+  abstract = {Detecting remote homology with speed and sensitivity is crucial for tasks like function annotation and structure prediction. We introduce a novel approach using contrastive learning to convert protein language model embeddings into a new 20-letter alphabet, TEA, enabling highly efficient large-scale protein homology searches. Searching with our alphabet performs on par with and complements structure-based methods without requiring any structural information, and with the speed of sequence search. Ultimately, we bring the exciting advances in protein language model representation learning to the plethora of sequence bioinformatics algorithms developed over the past century, offering a powerful new tool for biological discovery.},
+  archiveprefix = {bioRxiv},
+  chapter = {New Results},
+  copyright = {\copyright{} 2026, Posted by openRxiv. This pre-print is available under a Creative Commons License (Attribution 4.0 International), CC BY 4.0, as described at http://creativecommons.org/licenses/by/4.0/},
+  langid = {english}
+}
+
+@article{linEvolutionaryscalePredictionAtomiclevel2023,
+  title = {Evolutionary-Scale Prediction of Atomic-Level Protein Structure with a Language Model},
+  author = {Lin, Zeming and Akin, Halil and Rao, Roshan and Hie, Brian and Zhu, Zhongkai and Lu, Wenting and Smetanin, Nikita and Verkuil, Robert and Kabeli, Ori and Shmueli, Yaniv and {dos Santos Costa}, Allan and {Fazel-Zarandi}, Maryam and Sercu, Tom and Candido, Salvatore and Rives, Alexander},
+  year = 2023,
+  month = mar,
+  journal = {Science},
+  volume = {379},
+  number = {6637},
+  pages = {1123--1130},
+  publisher = {American Association for the Advancement of Science},
+  doi = {10.1126/science.ade2574},
+  urldate = {2026-02-01},
+  abstract = {Recent advances in machine learning have leveraged evolutionary information in multiple sequence alignments to predict protein structure. We demonstrate direct inference of full atomic-level protein structure from primary sequence using a large language model. As language models of protein sequences are scaled up to 15 billion parameters, an atomic-resolution picture of protein structure emerges in the learned representations. This results in an order-of-magnitude acceleration of high-resolution structure prediction, which enables large-scale structural characterization of metagenomic proteins. We apply this capability to construct the ESM Metagenomic Atlas by predicting structures for {$>$}617 million metagenomic protein sequences, including {$>$}225 million that are predicted with high confidence, which gives a view into the vast breadth and diversity of natural proteins.}
+}
+
+@article{edgarProteinStructureAlignment2024,
+  title = {Protein Structure Alignment by {{Reseek}} Improves Sensitivity to Remote Homologs},
+  author = {Edgar, Robert C},
+  year = 2024,
+  month = nov,
+  journal = {Bioinformatics},
+  volume = {40},
+  number = {11},
+  pages = {btae687},
+  issn = {1367-4811},
+  doi = {10.1093/bioinformatics/btae687},
+  urldate = {2026-01-28},
+  abstract = {Recent breakthroughs in protein fold prediction from amino acid sequences have unleashed a deluge of new structures, presenting new opportunities and challenges to bioinformatics.Reseek is a novel protein structure alignment algorithm based on sequence alignment where each residue in the protein backbone is represented by a letter in a ``mega-alphabet'' of 85~899~345~920 ({$\sim$}1011) distinct states. Reseek achieves substantially improved sensitivity to remote homologs compared to state-of-the-art methods including DALI, TMalign, and Foldseek, with comparable speed to Foldseek, the fastest previous method. Scaling to large databases of AI-predicted folds is analyzed. Foldseek E-values are shown to be under-estimated by several orders of magnitude, while Reseek E-values are in good agreement with measured error rates.https://github.com/rcedgar/reseek.}
+}
+
+@misc{edgarProteinStructureAlignment2025,
+  title = {Protein Structure Alignment Significance Is Often Exaggerated},
+  author = {Edgar, Robert C. and Sahakyan, Harutyun},
+  year = 2025,
+  month = aug,
+  primaryclass = {New Results},
+  pages = {2025.07.17.665375},
+  publisher = {bioRxiv},
+  issn = {2692-8205},
+  doi = {10.1101/2025.07.17.665375},
+  urldate = {2026-01-28},
+  abstract = {Machine learning has generated millions of high-quality predicted protein structures, creating a need for computationally efficient structure search algorithms and robust estimates of statistical significance at this scale. We show that unrelated proteins have a universal tendency towards convergent evolution of secondary and tertiary motifs, causing an excess of high-scoring false positive alignments. We investigate popular structure search and alignment algorithms, finding that previous methods routinely overestimate significance by up to six orders of magnitude. To address these issues, and to accommodate recent innovations in search algorithm design, we describe a novel method for estimating statistical significance. We show that its E-values are accurate, scale successfully with database size, and are robust against the (generally unknown) diversity of folds in the database. We implement our approach in an online structure search service based on Reseek at https://reseek.online.},
+  archiveprefix = {bioRxiv},
+  chapter = {New Results},
+  copyright = {\copyright{} 2025, Posted by Cold Spring Harbor Laboratory. This pre-print is available under a Creative Commons License (Attribution 4.0 International), CC BY 4.0, as described at http://creativecommons.org/licenses/by/4.0/},
+  langid = {english}
+}
+

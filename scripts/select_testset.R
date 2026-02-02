@@ -33,3 +33,32 @@ sample_df |>
   write_csv(
     "~/OneDrive - KU Leuven/Documents/Visit Simon Roux/benchmark annotation/benchmark_set.csv"
   )
+
+
+kingdom_df <- sample_df |>
+  select(Kingdom) |>
+  count(Kingdom) |>
+  mutate(
+    Kingdom = if_else(!is.na(Kingdom), glue("*{Kingdom}*"), Kingdom),
+    Kingdom = replace_na(Kingdom, "Unclassified")
+  )
+
+kingdom_palette <- setNames(
+  ggokabeito::palette_okabe_ito(1:(length(unique(kingdom_counts$kingdom)) - 1)),
+  setdiff(unique(kingdom_counts$kingdom), "Unclassified")
+)
+kingdom_palette["Unclassified"] <- "lightgrey"
+
+kingdom_df |>
+  ggplot(aes(x = Kingdom, y = n, fill = Kingdom)) +
+  geom_col() +
+  scale_fill_manual(values = kingdom_palette) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(y = "Number of genomes") +
+  theme_classic() +
+  theme(
+    legend.position = "none",
+    axis.text.x = ggtext::element_markdown(angle = 45, hjust = 1),
+    axis.title.x = element_blank()
+  )
+ggsave("figures/kingdom_distribution.pdf", width = 4, height = 3, dpi = 300)

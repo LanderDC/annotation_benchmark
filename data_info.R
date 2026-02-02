@@ -22,11 +22,16 @@ kingdom_df <- benchmark_data |>
       "\\b[^,]*virae\\b"
     )
   ) |>
-  select(protein_id, kingdom) |>
+  select(protein_id, kingdom, source) |>
   mutate(
     kingdom = if_else(!is.na(kingdom), glue("*{kingdom}*"), kingdom),
     kingdom = replace_na(kingdom, "Unclassified")
   )
+
+kingdom_df |>
+  select(kingdom, source) |>
+  distinct() |>
+  count(kingdom)
 
 kingdom_counts <- kingdom_df |>
   count(kingdom)
