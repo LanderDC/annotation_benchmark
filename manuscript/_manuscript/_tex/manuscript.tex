@@ -317,6 +317,12 @@ Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\aut
 \tightlist
 \item
   general overview of data and structures
+
+  \begin{itemize}
+  \tightlist
+  \item
+    TODO: add annotation of BFVD (eukaryotic vs prokaryotic viruses)
+  \end{itemize}
 \item
   performance of methods in hits
 \item
@@ -383,16 +389,15 @@ predicted structures (n=11,467).}
 
 \end{figure}%
 
-\subsection{Performance of sequence and structure homology-based
-annotation
-methods}\label{performance-of-sequence-and-structure-homology-based-annotation-methods}
+\subsection{Performance of the different
+methods}\label{performance-of-the-different-methods}
 
 We started by evaluating how many of the proteins in our test set got a
 hit against the BFVD for each method (see Figure~\ref{fig-overlap}A). In
 addition, we also filtered the results of each method on an e-value
 lower than 1e-3 to see how this affected the number of hits for each
 test protein. The methods relying on structure homology clearly had a
-lower number of proteins with hits against the BFVD compared to the
+lower number of test proteins with hits against the BFVD compared to the
 sequence homology-based methods. In contrast, TEA had the most number of
 test proteins with a hit, almost reaching the total number of test
 proteins (n=11,318). The three sequence based methods had a comparable
@@ -420,18 +425,20 @@ noting that Reseek seemed to perform worse in this metric when looking
 at the filtered results (see Figure~\ref{fig-overlap}C), however this is
 due to the large reduction in number of hits after filtering. This
 reduction is due to the more stringent e-value calculations in Reseek
-compared to Foldseek\textsuperscript{2,3}. Noteworthy, while ProstT5 was
-the worst performer across the three comparisons, TEA performed better
-in the top hits comparison and was on par with the structure based
-methods when comparing to the sequence based methods.
+compared to Foldseek\textsuperscript{2,3}. It is worth noting that while
+ProstT5 was the worst performer across the three comparisons, TEA
+performed better in the top hits comparison and was on par with the
+structure based methods when comparing to the sequence based methods.
 
-Overall, the embedding and structure based methods that should be better
-to detect remote homologs had low agreement on shared hits among each
-other. And although they did find more hits for the test proteins on
-default settings (see y-axis Figure~\ref{fig-overlap}B), this was almost
-entirely removed after filtering the hits (see y-axis
+Overall, the embedding and structure based methods, that should be
+better to detect remote homologs, had low agreement on shared hits among
+each other. And although they did find more hits for the test proteins
+on default settings (see y-axis Figure~\ref{fig-overlap}B), this was
+almost entirely removed after filtering the hits on e-value (see y-axis
 Figure~\ref{fig-overlap}C). This effect was most pronounced for Reseek,
-which claims to calculate the most correct e-values\textsuperscript{2}.
+which claims to calculate the most correct e-values\textsuperscript{2}
+and thus leaving the question if the Foldseek searches do not report too
+many false positives.
 
 \begin{figure}[H]
 
