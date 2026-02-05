@@ -42,7 +42,16 @@ crossref:
 - comparison of functional annotation per method to original
 - how many are informative annotations
   - TODO: which conversions from hypothetical protein to informative (phages?)
-- TODO: computational benchmark
+- TODO: computational benchmark + add database sizes
+- TODO: check correlation between structure quality/TEA entropy and correct annotation/agreement between methods
+- TODO: add recall, precision and F1 plots
+- TODO: make annotations better (local LLM, GenePT?)
+- TODO: do structure search of non-informative vs informative BFVD entries
+- Try out LucaVirus?
+- Also test on Nomburg dataset, should have ground truth labels (see LucaVirus paper)
+
+
+- possible explanation for bad structure results: small representation of viruses in training sets due to biosafety concerns?
 
 # Abstract
 
