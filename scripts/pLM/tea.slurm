@@ -9,16 +9,87 @@
 #SBATCH --gpu_cmode=exclusive
 #SBATCH --time="1-00:00:00"
 
+set -euo pipefail
+
+cd $VSC_SCRATCH/annotation_benchmark
+
 # TEA
 conda activate tea
 
-tea_convert -f data/benchmark_data.faa -o results/tea/benchmark_data.tfa -H
-mmseqs easy-search results/tea/benchmark_data.tfa db/tea/bfvd.tfa results/tea/tea_results.m8 /tmp \
-    --threads 16 \
-    --comp-bias-corr 0 \
-    --mask 0 \
-    --gap-open 18 \
-    --gap-extend 3 \
-    --sub-mat /lustre1/project/stg_00029/LDC/software/miniforge3-wice/envs/tea/lib/python3.12/site-packages/tea/matcha.out \
-    --seed-sub-mat /lustre1/project/stg_00029/LDC/software/miniforge3-wice/envs/tea/lib/python3.12/site-packages/tea/matcha.out \
-    --exact-kmer-matching 1
+mkdir -p results/tea
+mkdir -p results/hyperfine/tea
+
+HYPERFINE_DIR="results/hyperfine/tea"
+
+benchmark_step() {
+    local step_name="$1"
+    local step_cmd="$2"
+    local step_slug="${step_name// /_}"
+    local step_script="${HYPERFINE_DIR}/${step_slug}.sh"
+    local step_json="${HYPERFINE_DIR}/${step_slug}.json"
+
+    cat > "${step_script}" <<EOF
+#!/bin/bash
+set -euo pipefail
+${step_cmd}
+EOF
+    chmod +x "${step_script}"
+
+    hyperfine \
+        --runs 1 \
+        --warmup 0 \
+        --command-name "${step_name}" \
+        --export-json "${step_json}" \
+                "bash '${step_script}'"
+}
+
+benchmark_gpu_step() {
+        local step_name="$1"
+        local step_cmd="$2"
+        local step_slug="${step_name// /_}"
+        local step_script="${HYPERFINE_DIR}/${step_slug}.sh"
+        local step_json="${HYPERFINE_DIR}/${step_slug}.json"
+        local step_gpu_trace="${HYPERFINE_DIR}/${step_slug}.gpu_mem_mb.tsv"
+        local step_gpu_max="${HYPERFINE_DIR}/${step_slug}.gpu_max_mem_mb.txt"
+
+        cat > "${step_script}" <<EOF
+#!/bin/bash
+set -euo pipefail
+
+if command -v nvidia-smi >/dev/null 2>&1; then
+    nvidia-smi --query-gpu=timestamp,memory.used --format=csv,noheader,nounits -lms 200 > "${step_gpu_trace}" &
+    monitor_pid=\$!
+else
+    monitor_pid=""
+fi
+
+cleanup_monitor() {
+    if [ -n "\${monitor_pid:-}" ]; then
+        kill "\${monitor_pid}" 2>/dev/null || true
+        wait "\${monitor_pid}" 2>/dev/null || true
+    fi
+}
+
+trap cleanup_monitor EXIT
+
+${step_cmd}
+
+cleanup_monitor
+trap - EXIT
+
+if [ -s "${step_gpu_trace}" ]; then
+    awk -F',' 'BEGIN {max=0} {gsub(/ /,"",\$2); if (\$2+0>max) max=\$2+0} END {print max}' "${step_gpu_trace}" > "${step_gpu_max}"
+fi
+EOF
+        chmod +x "${step_script}"
+
+        hyperfine \
+                --runs 1 \
+                --warmup 0 \
+                --command-name "${step_name}" \
+                --export-json "${step_json}" \
+                "bash '${step_script}'"
+}
+
+benchmark_gpu_step "tea_convert" "tea_convert -f data/benchmark_data.faa -o results/tea/benchmark_data.tfa -H"
+benchmark_gpu_step "tea_mmseqs_easy_search" "mmseqs easy-search results/tea/benchmark_data.tfa db/tea/bfvd.tfa results/tea/tea_results.m8 /tmp --threads 16 --comp-bias-corr 0 --mask 0 --gap-open 18 --gap-extend 3 --sub-mat /lustre1/project/stg_00029/LDC/software/miniforge3-wice/envs/tea/lib/python3.12/site-packages/tea/matcha.out --seed-sub-mat /lustre1/project/stg_00029/LDC/software/miniforge3-wice/envs/tea/lib/python3.12/site-packages/tea/matcha.out --exact-kmer-matching 1"
