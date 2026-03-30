@@ -45,11 +45,11 @@ EOF
 
 # Diamond
 #diamond makedb --in bfvd.fasta --db bfvd.dmnd
-benchmark_step "diamond_blastp" "diamond blastp --evalue 10 --sensitive --threads 72 --db db/diamond/bfvd.dmnd --query data/benchmark_data.faa --outfmt 6 --out results/diamond/diamond.m8 --index-chunks 1 --block-size 5"
+benchmark_step "diamond_blastp" "diamond blastp --evalue 10 --sensitive --threads 72 --db db/diamond/bfvd.dmnd --query data/benchmark_data.faa --outfmt 6 --out results/diamond/diamond.m8"
 
 # BLASTp
 #makeblastdb -in bfvd.fasta -out bfvd -dbtype prot
-benchmark_step "blastp_search" "blastp -evalue 10 -query data/benchmark_data.faa -db db/blast/bfvd -evalue 1e-3 -outfmt 6 -num_threads 72 -out results/blastp/blastp.m8"
+benchmark_step "blastp_search" "blastp -evalue 10 -query data/benchmark_data.faa -db db/blast/bfvd -outfmt 6 -num_threads 72 -out results/blastp/blastp.m8"
 
 # MMseqs2
 benchmark_step "mmseqs_easy_search" "mmseqs easy-search data/benchmark_data.faa db/mmseqs/bfvd.fasta results/mmseqs/mmseqs.m8 /tmp -e 10"
