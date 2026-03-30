@@ -38,6 +38,7 @@ EOF
 		--warmup 0 \
 		--command-name "${step_name}" \
 		--export-json "${step_json}" \
+		--show-output \
 		"bash '${step_script}'"
 }
 
