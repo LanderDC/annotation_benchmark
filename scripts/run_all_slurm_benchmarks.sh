@@ -4,6 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
+mkdir -p "${PROJECT_ROOT}/logs"
+
 normalize_job_id() {
     local raw_job_id="$1"
     raw_job_id="${raw_job_id%%;*}"
@@ -44,6 +46,8 @@ JOB_COMBINE_RAW="$(sbatch --parsable \
     -A lp_jm_virome_group \
     -M wice \
     --time="00:10:00" \
+    --output="logs/combine_hyperfine-%j.log" \
+    --error="logs/combine_hyperfine-%j.log" \
     --dependency="afterok:${ALL_DONE_DEPENDENCY}" \
     --wrap="cd ${PROJECT_ROOT} && python scripts/combine_hyperfine_results.py --input-dir results/hyperfine --output results/hyperfine/hyperfine_combined.json")"
 JOB_COMBINE="$(normalize_job_id "${JOB_COMBINE_RAW}")"

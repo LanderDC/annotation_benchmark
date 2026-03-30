@@ -8,6 +8,8 @@
 #SBATCH --gpus-per-node=1
 #SBATCH --gpu_cmode=exclusive
 #SBATCH --time="12:00:00"
+#SBATCH --output="logs/foldseek_prostt5-%j.log"
+#SBATCH --error="logs/foldseek_prostt5-%j.log"
 
 set -euo pipefail
 

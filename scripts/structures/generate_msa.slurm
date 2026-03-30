@@ -6,6 +6,8 @@
 #SBATCH -M wice
 #SBATCH --time="1-00:00:00"
 #SBATCH -p bigmem
+#SBATCH --output="logs/generate_msa-%j.log"
+#SBATCH --error="logs/generate_msa-%j.log"
 
 set -euo pipefail
 

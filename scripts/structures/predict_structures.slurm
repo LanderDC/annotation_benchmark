@@ -8,6 +8,8 @@
 #SBATCH --gpus-per-node=1
 #SBATCH --gpu_cmode=exclusive
 #SBATCH --time="3-00:00:00"
+#SBATCH --output="logs/predict_structures-%j.log"
+#SBATCH --error="logs/predict_structures-%j.log"
 
 set -euo pipefail
 
