@@ -1,0 +1,456 @@
+{
+  "n_records": 15,
+  "input_dir": "results/hyperfine",
+  "records": [
+    {
+      "script": "aa_benchmark",
+      "step": "blastp_search",
+      "command_name": "blastp_search",
+      "timing": {
+        "mean_seconds": 194.16206315634003,
+        "stddev_seconds": null,
+        "min_seconds": 194.16206315634003,
+        "max_seconds": 194.16206315634003,
+        "median_seconds": 194.16206315634003,
+        "user_seconds": 11347.967393259998,
+        "system_seconds": 12.762974719999999,
+        "times_seconds": [
+          194.16206315634003
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          1018572800
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": null
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/aa_benchmark/blastp_search.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/aa_benchmark/blastp_search.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/aa_benchmark/blastp_search.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "aa_benchmark",
+      "step": "diamond_blastp",
+      "command_name": "diamond_blastp",
+      "timing": {
+        "mean_seconds": 8.23983475238,
+        "stddev_seconds": null,
+        "min_seconds": 8.23983475238,
+        "max_seconds": 8.23983475238,
+        "median_seconds": 8.23983475238,
+        "user_seconds": 334.36815276,
+        "system_seconds": 95.24295631999999,
+        "times_seconds": [
+          8.23983475238
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          2584211456
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": null
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/aa_benchmark/diamond_blastp.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/aa_benchmark/diamond_blastp.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/aa_benchmark/diamond_blastp.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "aa_benchmark",
+      "step": "mmseqs_easy_search",
+      "command_name": "mmseqs_easy_search",
+      "timing": {
+        "mean_seconds": 6.9931831583,
+        "stddev_seconds": null,
+        "min_seconds": 6.9931831583,
+        "max_seconds": 6.9931831583,
+        "median_seconds": 6.9931831583,
+        "user_seconds": 345.83937202,
+        "system_seconds": 2.78215422,
+        "times_seconds": [
+          6.9931831583
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          3238240256
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": null
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/aa_benchmark/mmseqs_easy_search.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/aa_benchmark/mmseqs_easy_search.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/aa_benchmark/mmseqs_easy_search.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "foldseek_prostt5",
+      "step": "foldseek_createdb_prostt5",
+      "command_name": "foldseek_createdb_prostt5",
+      "timing": {
+        "mean_seconds": 437.00709309724004,
+        "stddev_seconds": null,
+        "min_seconds": 437.00709309724004,
+        "max_seconds": 437.00709309724004,
+        "median_seconds": 437.00709309724004,
+        "user_seconds": 410.43923795999996,
+        "system_seconds": 23.099829659999997,
+        "times_seconds": [
+          437.00709309724004
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          3146735616
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": 5285.0
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/foldseek_prostt5/foldseek_createdb_prostt5.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/foldseek_prostt5/foldseek_createdb_prostt5.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/foldseek_prostt5/foldseek_createdb_prostt5.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "foldseek_prostt5",
+      "step": "foldseek_easy_search_prostt5",
+      "command_name": "foldseek_easy_search_prostt5",
+      "timing": {
+        "mean_seconds": 209.20341750472,
+        "stddev_seconds": null,
+        "min_seconds": 209.20341750472,
+        "max_seconds": 209.20341750472,
+        "median_seconds": 209.20341750472,
+        "user_seconds": 3217.73118846,
+        "system_seconds": 8.10181288,
+        "times_seconds": [
+          209.20341750472
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          4086542336
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": 0.0
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/foldseek_prostt5/foldseek_easy_search_prostt5.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/foldseek_prostt5/foldseek_easy_search_prostt5.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/foldseek_prostt5/foldseek_easy_search_prostt5.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "generate_msa",
+      "step": "colabfold_search",
+      "command_name": "colabfold_search",
+      "timing": {
+        "mean_seconds": 6627.912780246659,
+        "stddev_seconds": null,
+        "min_seconds": 6627.912780246659,
+        "max_seconds": 6627.912780246659,
+        "median_seconds": 6627.912780246659,
+        "user_seconds": 288553.52177121997,
+        "system_seconds": 2656.17915198,
+        "times_seconds": [
+          6627.912780246659
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          414930554880
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": null
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/generate_msa/colabfold_search.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/generate_msa/colabfold_search.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/generate_msa/colabfold_search.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "generate_msa",
+      "step": "parse_fasta_to_yml",
+      "command_name": "parse_fasta_to_yml",
+      "timing": {
+        "mean_seconds": 14.71025819554,
+        "stddev_seconds": null,
+        "min_seconds": 14.71025819554,
+        "max_seconds": 14.71025819554,
+        "median_seconds": 14.71025819554,
+        "user_seconds": 5.4397314,
+        "system_seconds": 3.10773008,
+        "times_seconds": [
+          14.71025819554
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          14290944
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": null
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/generate_msa/parse_fasta_to_yml.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/generate_msa/parse_fasta_to_yml.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/generate_msa/parse_fasta_to_yml.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "generate_msa",
+      "step": "sanitize_fasta_headers",
+      "command_name": "sanitize_fasta_headers",
+      "timing": {
+        "mean_seconds": 1.3141873065,
+        "stddev_seconds": null,
+        "min_seconds": 1.3141873065,
+        "max_seconds": 1.3141873065,
+        "median_seconds": 1.3141873065,
+        "user_seconds": 0.11074487999999999,
+        "system_seconds": 0.63592978,
+        "times_seconds": [
+          1.3141873065
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          4116480
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": null
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/generate_msa/sanitize_fasta_headers.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/generate_msa/sanitize_fasta_headers.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/generate_msa/sanitize_fasta_headers.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "generate_msa",
+      "step": "split_large_proteins",
+      "command_name": "split_large_proteins",
+      "timing": {
+        "mean_seconds": 0.5040150697800001,
+        "stddev_seconds": null,
+        "min_seconds": 0.5040150697800001,
+        "max_seconds": 0.5040150697800001,
+        "median_seconds": 0.5040150697800001,
+        "user_seconds": 0.044175519999999996,
+        "system_seconds": 0.01736866,
+        "times_seconds": [
+          0.5040150697800001
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          7602176
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": null
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/generate_msa/split_large_proteins.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/generate_msa/split_large_proteins.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/generate_msa/split_large_proteins.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "predict_structures",
+      "step": "boltz_predict",
+      "command_name": "boltz_predict",
+      "timing": {
+        "mean_seconds": 146931.0666800736,
+        "stddev_seconds": null,
+        "min_seconds": 146931.0666800736,
+        "max_seconds": 146931.0666800736,
+        "median_seconds": 146931.0666800736,
+        "user_seconds": 107097.05981667999,
+        "system_seconds": 49284.317732799995,
+        "times_seconds": [
+          146931.0666800736
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          31049879552
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": 80005.0
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/predict_structures/boltz_predict.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/predict_structures/boltz_predict.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/predict_structures/boltz_predict.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "predict_structures",
+      "step": "collect_predicted_structures",
+      "command_name": "collect_predicted_structures",
+      "timing": {
+        "mean_seconds": 46.67577747966,
+        "stddev_seconds": null,
+        "min_seconds": 46.67577747966,
+        "max_seconds": 46.67577747966,
+        "median_seconds": 46.67577747966,
+        "user_seconds": 0.26980076,
+        "system_seconds": 16.424901839999997,
+        "times_seconds": [
+          46.67577747966
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          13619200
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": null
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/predict_structures/collect_predicted_structures.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/predict_structures/collect_predicted_structures.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/predict_structures/collect_predicted_structures.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "structure_comparison",
+      "step": "foldseek-structures",
+      "command_name": "foldseek-structures",
+      "timing": {
+        "mean_seconds": 121.40770703246,
+        "stddev_seconds": null,
+        "min_seconds": 121.40770703246,
+        "max_seconds": 121.40770703246,
+        "median_seconds": 121.40770703246,
+        "user_seconds": 7348.1679525,
+        "system_seconds": 40.4421396,
+        "times_seconds": [
+          121.40770703246
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          4373741568
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": null
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/structure_comparison/foldseek-structures.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/structure_comparison/foldseek-structures.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/structure_comparison/foldseek-structures.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "structure_comparison",
+      "step": "reseek",
+      "command_name": "reseek",
+      "timing": {
+        "mean_seconds": 7847.0493885684,
+        "stddev_seconds": null,
+        "min_seconds": 7847.0493885684,
+        "max_seconds": 7847.0493885684,
+        "median_seconds": 7847.0493885684,
+        "user_seconds": 530972.11167166,
+        "system_seconds": 139.33876276,
+        "times_seconds": [
+          7847.0493885684
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          2650488832
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": null
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/structure_comparison/reseek.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/structure_comparison/reseek.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/structure_comparison/reseek.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "tea",
+      "step": "tea_convert",
+      "command_name": "tea_convert",
+      "timing": {
+        "mean_seconds": 295.01834337294,
+        "stddev_seconds": null,
+        "min_seconds": 295.01834337294,
+        "max_seconds": 295.01834337294,
+        "median_seconds": 295.01834337294,
+        "user_seconds": 233.75548343999998,
+        "system_seconds": 35.105337219999996,
+        "times_seconds": [
+          295.01834337294
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          5184536576
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": 26497.0
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/tea/tea_convert.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/tea/tea_convert.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/tea/tea_convert.gpu_mem_mb.tsv"
+      }
+    },
+    {
+      "script": "tea",
+      "step": "tea_mmseqs_easy_search",
+      "command_name": "tea_mmseqs_easy_search",
+      "timing": {
+        "mean_seconds": 68.40580235348,
+        "stddev_seconds": null,
+        "min_seconds": 68.40580235348,
+        "max_seconds": 68.40580235348,
+        "median_seconds": 68.40580235348,
+        "user_seconds": 1024.2356886599998,
+        "system_seconds": 2.60932256,
+        "times_seconds": [
+          68.40580235348
+        ]
+      },
+      "memory": {
+        "memory_usage_byte": [
+          2045030400
+        ]
+      },
+      "gpu_memory": {
+        "max_memory_mb": 0.0
+      },
+      "source_files": {
+        "hyperfine_json": "results/hyperfine/tea/tea_mmseqs_easy_search.json",
+        "gpu_max_mem_mb_txt": "results/hyperfine/tea/tea_mmseqs_easy_search.gpu_max_mem_mb.txt",
+        "gpu_memory_trace_tsv": "results/hyperfine/tea/tea_mmseqs_easy_search.gpu_mem_mb.tsv"
+      }
+    }
+  ]
+}

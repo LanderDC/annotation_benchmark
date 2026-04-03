@@ -1,5 +1,11 @@
 results/*
+
+!results/boltz/
+results/boltz/*
 !results/boltz/combined_plddt_scores.json
+
+!results/hyperfine/
+results/hyperfine/*
 !results/hyperfine/hyperfine_combined.json
 
 tmp_results/
