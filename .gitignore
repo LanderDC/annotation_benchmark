@@ -1,4 +1,13 @@
-results/
+results/*
+!results/boltz/combined_plddt_scores.json
+!results/hyperfine/hyperfine_combined.json
+
+tmp_results/
+
 logs/
 db/
 *.log
+
+# tests to use different pLM (LucaVirus)
+# for TEA conversion
+scripts/pLM/tea_*.py
