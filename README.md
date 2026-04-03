@@ -1,209 +1,181 @@
 # Annotation Benchmark
 
-Benchmarking different annotation methods for viral genomes (BLAST, DIAMOND, MMseqs2, TEA, Foldseek, and RESeeK) against the Big Fantastic Virus Database.
+Benchmarking protein annotation methods for viral genomes against the Big Fantastic Virus Database (BFVD).
 
 ## Overview
 
-This project provides a comprehensive framework for evaluating and comparing various protein annotation tools on viral genomic data. The benchmark includes:
+This repository contains data, scripts, benchmark outputs and analysis code for comparing:
 
-- **Data Collection**: Automated downloading of viral protein data from NCBI GenBank
-- **Classification**: Functional categorization of viral proteins into 45+ categories
-- **Benchmarking**:  Performance evaluation of multiple annotation procedures
+- **Sequence-based methods**: BLASTP, DIAMOND, MMseqs2
+- **Embedding-based methods**: TEA, ProstT5/Foldseek
+- **Structure-based methods**: Foldseek, Reseek
+
+Main components:
+
+- Data collection from NCBI GenBank
+- Functional classification of benchmark proteins
+- Search benchmark result aggregation
 
 ## Repository Structure
 
-```
+```text
 annotation_benchmark/
-├── data/                                    # Benchmark datasets
-│   ├── benchmark_accessions.txt            # GenBank accession list
-│   ├── benchmark_data.faa                  # Protein sequences (FASTA)
-│   ├── benchmark_data.json                 # Complete protein metadata
-│   ├── benchmark_data_classified.json      # Proteins with functional classifications
-│   ├── benchmark_data_split.faa            # Split protein sequences
-│   ├── benchmark_set.csv                   # Benchmark dataset summary
-│   └── viral_protein_functional_categories.json  # Classification rules
-├── scripts/                                 # Analysis and processing scripts
-│   ├── download_testdata.py                # Download proteins from GenBank
-│   ├── classify_viral_proteins.py          # Classify proteins by function
-│   ├── parse_fasta2yml.py                  # Parse FASTA to YAML format
-│   ├── select_testset.R                    # R script for test set selection
-│   ├── aa/                                 # Amino acid analysis scripts
-│   ├── pLM/                                # Protein language model scripts
-│   └── structures/                         # Structural analysis scripts
-└── README.md                                # This file
+├── README.md
+├── rproject.toml
+├── rv.lock
+├── analyze_results.ipynb
+├── data_info.R
+├── search_results.R
+├── data/
+│   ├── benchmark_accessions.txt
+│   ├── benchmark_data.faa
+│   ├── benchmark_data.json
+│   ├── benchmark_data_classified.json
+│   ├── benchmark_data_split.faa
+│   ├── benchmark_set.csv
+│   ├── bfvd_category_annotations.json
+│   └── viral_protein_functional_categories.json
+├── scripts/
+│   ├── download_testdata.py
+│   ├── classify_viral_proteins.py
+│   ├── combine_hyperfine_results.py
+│   ├── select_testset.R
+│   ├── run_all_slurm_benchmarks.sh
+│   ├── aa/
+│   │   └── aa_benchmark.slurm
+│   ├── pLM/
+│   │   ├── foldseek_prostt5.slurm
+│   │   └── tea.slurm
+│   └── structures/
+│       ├── combine_confidence_scores.py
+│       ├── create_colabfoldv_orthornavirae_db.slurm
+│       ├── generate_msa.slurm
+│       ├── parse_fasta2yml.py
+│       ├── predict_structures.slurm
+│       ├── split_large_proteins.awk
+│       └── structure_comparison.slurm
+├── results/
+│   ├── boltz/
+│   │   └── combined_plddt_scores.json
+│   ├── hyperfine/
+│   │   └── hyperfine_combined.json
+│   └── search_results/
+│       ├── blastp.m8
+│       ├── diamond.m8
+│       ├── foldseek.m8
+│       ├── mmseqs.m8
+│       ├── prostt5_results.m8
+│       ├── reseek.m8
+│       ├── reseek_switched.m8
+│       └── tea_results.m8
+├── figures/
+│   ├── boltz_plddt_cdf.pdf
+│   ├── dataset_overview.pdf
+│   ├── hit_overlap_methods.pdf
+│   ├── hit_overlap_summary.pdf
+│   ├── hits_per_method.pdf
+│   ├── kingdom_distribution.pdf
+│   ├── total_hits_vs_evalue.pdf
+│   └── unique_queries_vs_evalue.pdf
+├── manuscript/
+│   ├── manuscript.qmd
+│   ├── _quarto.yml
+│   ├── _authors.yaml
+│   ├── references.bib
+│   ├── sn-jnl.cls
+│   ├── sn-nature.bst
+│   ├── _extensions/
+│   └── _manuscript/
+└── rv/
+    ├── library/
+    └── scripts/
 ```
 
 ## Installation
 
 ### Prerequisites
 
-- Python 3.8+
-- Biopython
-- R (for test set selection)
+- Python 3.10+
+- R 4.3+
+- SLURM environment (for HPC benchmark jobs)
 
-### Setup
+### Python packages
 
 ```bash
-# Clone the repository
-git clone https://github.com/LanderDC/annotation_benchmark.git
-cd annotation_benchmark
+pip install biopython pyyaml needletail
+```
 
-# Install Python dependencies
-pip install biopython
+### R packages used in analysis scripts
 
-# (Optional) Install R dependencies for test set selection
-Rscript -e "install.packages('tidyverse')"
+```r
+install.packages(c(
+  "tidyverse", "jsonlite", "fs", "glue", "patchwork",
+  "ggpubr", "waffle", "ggokabeito", "ggtext", "readxl"
+))
 ```
 
 ## Usage
 
-### 1. Download Viral Protein Data
-
-Download protein sequences and metadata from GenBank using accession numbers:
+### 1) Download benchmark proteins from GenBank
 
 ```bash
 python scripts/download_testdata.py \
-    -i data/benchmark_accessions.txt \
-    -e your.email@example.com \
-    -o data/benchmark_data.faa \
-    -j data/benchmark_data.json
+  -i data/benchmark_accessions.txt \
+  -e your.email@example.com \
+  -o data/benchmark_data.faa \
+  -j data/benchmark_data.json
 ```
 
-**Options:**
-- `-i, --input`: Input file with GenBank accessions (one per line)
-- `-a, --accessions`: GenBank accession numbers (space-separated)
-- `-e, --email`: Your email address (required by NCBI)
-- `-o, --output`: Output FASTA file for proteins
-- `-j, --json`: Output JSON file for protein metadata
-- `-k, --api-key`: NCBI API key (optional, allows faster requests)
-- `--no-batch`: Disable batch mode
-- `--no-sequence`: Don't include protein sequences in JSON output
+Optional:
 
-**Example with API key:**
-```bash
-python scripts/download_testdata.py \
-    -i data/benchmark_accessions.txt \
-    -e your.email@example. com \
-    -o proteins.faa \
-    -j metadata.json \
-    -k YOUR_NCBI_API_KEY
-```
+- `-k/--api-key`: NCBI API key
+- `--no-batch`: disable batch fetch
+- `--no-sequence`: omit amino acid sequences in JSON output
 
-### 2. Classify Proteins by Function
-
-Classify viral proteins into functional categories:
+### 2) Classify proteins into functional categories
 
 ```bash
-python scripts/classify_viral_proteins. py \
-    data/benchmark_data.json \
-    -o data/benchmark_data_classified.json \
-    -s classification_statistics.json \
-    -c data/viral_protein_functional_categories.json
+python scripts/classify_viral_proteins.py \
+  data/benchmark_data.json \
+  -o data/benchmark_data_classified.json \
+  -s results/classification_statistics.json \
+  -c data/viral_protein_functional_categories.json
 ```
 
-**Options:**
-- `input_file`: Input JSON file with protein data
-- `-o, --output`: Output file for classifications (default: `protein_classifications.json`)
-- `-s, --stats`: Output file for statistics (default: `classification_statistics.json`)
-- `-c, --categories`: Categories JSON file (default: `viral_protein_functional_categories.json`)
-- `-a, --all-matches`: Return all matching categories (not just the first match)
-
-### 3. Parse FASTA to YAML
-
-Convert FASTA files to YAML format:
+### 3) Create YAML files for structure pipeline
 
 ```bash
-python scripts/parse_fasta2yml.py data/benchmark_data.faa
+python scripts/structures/parse_fasta2yml.py \
+  data/benchmark_data_split.faa \
+  output_yamls/ \
+  -m /path/to/msa_dir/
 ```
 
-### 4. Select Test Set
-
-Use the R script to select a representative test set:
+### 4) Aggregate Hyperfine benchmark outputs
 
 ```bash
-Rscript scripts/select_testset.R
+python scripts/combine_hyperfine_results.py \
+  --input-dir results/hyperfine \
+  --output results/hyperfine/hyperfine_combined.json
 ```
 
-## Functional Categories
+### 5) Run analysis and generate figures
 
-The classifier organizes viral proteins into 45+ functional categories, including:
-
-### Structural Proteins
-- Capsid Protein
-- Envelope/Surface Glycoprotein
-- Matrix/Tegument Structural
-- Nucleocapsid Protein
-- Tail/Baseplate Structural
-- DNA Packaging/Capsid Maturation
-
-### Enzymatic Proteins
-- DNA Polymerase
-- RNA-Dependent RNA Polymerase (RdRp)
-- Reverse Transcriptase
-- Viral Protease
-- Helicase
-- Primase/Primase-Polymerase
-- Integrase/Recombinase
-- NTPase/ATPase
-- Nuclease (Endo/Exonuclease)
-
-### Regulatory Proteins
-- Transcriptional Regulator/Transactivator
-- RNA-Binding Regulatory Protein
-- Apoptosis/Cell-Cycle Modulator
-- Innate Immune/Interferon Antagonist
-- Episome Maintenance/Replication Origin Binding
-
-### Other Categories
-- Movement Protein
-- Viroporin/Ion Channel
-- Host Shutoff/Translation Inhibitor
-- Accessory/Virulence Factor
-- And many more...
-
-## Data Format
-
-### Benchmark Data JSON Structure
-
-```json
-{
-  "protein_id": "YP_009724389. 1",
-  "gene_name": "ORF1ab",
-  "product":  "ORF1ab polyprotein",
-  "locus_tag": "",
-  "organism": "Severe acute respiratory syndrome coronavirus 2",
-  "protein_length": 7096,
-  "nucleotide_accession": "NC_045512",
-  "location": "[265: 21555](+)",
-  "taxonomy": ["Viruses", "Riboviria", "... "]
-}
+```bash
+Rscript data_info.R
+Rscript search_results.R
 ```
 
-### Classification Output Structure
+### 6) Render manuscript (Quarto)
 
-```json
-{
-  "YP_009724389.1":  {
-    "product": "ORF1ab polyprotein",
-    "gene_name": "ORF1ab",
-    "organism": "Severe acute respiratory syndrome coronavirus 2",
-    "categories": ["Polyprotein Precursor", "RNA-Dependent RNA Polymerase (RdRp)"]
-  }
-}
+From the `manuscript/` directory:
+
+```bash
+quarto render manuscript.qmd
 ```
 
-## Benchmarking Tools
+## Notes
 
-This project evaluates the following annotation methods:
-
-- **BLAST**: Traditional sequence alignment tool
-- **DIAMOND**:  Faster BLAST alternative for protein searches
-- **MMseqs2**: Ultra-fast sequence search and clustering
-- **TEA**:  Taxonomic and functional annotation tool
-- **Foldseek**: Structural alignment tool
-- **reseek**: Remote homology detection tool
-
-## Contact
-
-**Author**:  LanderDC  
-**Repository**: [LanderDC/annotation_benchmark](https://github.com/LanderDC/annotation_benchmark)
+- Search result files are in BLAST tabular (`.m8`) format.
+- Generated figures are written to `figures/`.
+- Local R environment management is handled via `rv/` and `rv.lock`.
