@@ -46,7 +46,8 @@ EOF
 benchmark_step "foldseek-structures" "foldseek easy-search results/boltz/structures/* db/foldseek/bfvd results/boltz/foldseek.m8 /tmp -e 10"
 
 # reseek QFN/DBFN switched v2.7 version
-benchmark_step "reseek" "~/data/software/reseek_patch/reseek_test/bin/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek.m8 -db db/reseek/bfvd.bca -columns query+target+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log logs/reseek_err.txt -evalue 10"
-# reseek v2.8 (gives huge results file)
-#benchmark_step "reseek" "/vsc-hard-mounts/leuven-data/337/vsc33750/software/reseek/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek.m8 -db db/reseek/bfvd.bca -columns query+target+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log logs/reseek_switched_err.txt -evalue 10"
+benchmark_step "reseek" "~/data/software/reseek_patch/reseek_test/bin/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek.m8 -db db/reseek/bfvd.bca -columns query+target+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log logs/reseek_switched_err.txt -evalue 10"
+
+# reseek v2.8 (filter on pvalue<0.05 as recommended by Rober Edgar)
+benchmark_step "reseek_v2.8" "/vsc-hard-mounts/leuven-data/337/vsc33750/software/reseek/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek_v2.8.m8 -db db/reseek/bfvd.bca -columns query+target+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log logs/reseek_err.txt -pvalue 0.05"
 
