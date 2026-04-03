@@ -43,10 +43,10 @@ EOF
 }
 
 # foldseek
-benchmark_step "foldseek-structures" "foldseek easy-search results/boltz/structures/* db/foldseek/bfvd results/boltz/foldseek.m8 /tmp -e 10"
+#benchmark_step "foldseek-structures" "foldseek easy-search results/boltz/structures/* db/foldseek/bfvd results/boltz/foldseek.m8 /tmp -e 10"
 
-# reseek
-#~/data/software/reseek_patch/reseek_test/bin/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek.m8 -db db/reseek/bfvd.bca -columns target+query+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log logs/reseek_err.txt -evalue 1
 # reseek switched
-benchmark_step "reseek" "/vsc-hard-mounts/leuven-data/337/vsc33750/software/reseek/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek.m8 -db db/reseek/bfvd.bca -columns query+target+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log logs/reseek_switched_err.txt -evalue 10"
+benchmark_step "reseek" "~/data/software/reseek_patch/reseek_test/bin/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek.m8 -db db/reseek/bfvd.bca -columns target+query+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log logs/reseek_err.txt -evalue 10"
+# reseek
+#benchmark_step "reseek" "/vsc-hard-mounts/leuven-data/337/vsc33750/software/reseek/reseek -search results/boltz/structures -sensitive -output results/boltz/reseek.m8 -db db/reseek/bfvd.bca -columns query+target+pctid+aq+ql+tl+qlo+qhi+tlo+thi+evalue+pvalue -log logs/reseek_switched_err.txt -evalue 10"
 

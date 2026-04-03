@@ -55,4 +55,4 @@ benchmark_step "colabfold_search" "colabfold_search data/benchmark_data_split.fa
 
 conda activate boltz
 
-benchmark_step "parse_fasta_to_yml" "scripts/parse_fasta2yml.py --absolute-path -m results/boltz/msas/ data/benchmark_data_split.faa results/boltz/inputs"
+benchmark_step "parse_fasta_to_yml" "scripts/structures/parse_fasta2yml.py --absolute-path -m results/boltz/msas/ data/benchmark_data_split.faa results/boltz/inputs"

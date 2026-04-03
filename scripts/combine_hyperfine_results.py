@@ -42,7 +42,7 @@ def parse_hyperfine_json(json_path: Path) -> list[dict]:
                     "system_seconds": result.get("system"),
                     "times_seconds": result.get("times", []),
                 },
-                "memory": {"memory_usage_bytes": result.get("memory_usage_bytes")},
+                "memory": {"memory_usage_byte": result.get("memory_usage_byte")},
                 "gpu_memory": {
                     "max_memory_mb": gpu_max_mem_mb,
                 },
