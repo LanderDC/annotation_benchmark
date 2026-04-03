@@ -46,7 +46,7 @@ method_files <- c(
   mmseqs2 = "mmseqs.m8",
   `ProstT5-foldseek` = "prostt5_results.m8",
   `Boltz-foldseek` = "foldseek.m8",
-  `Boltz-reseek` = "reseek_switched.m8",
+  `Boltz-reseek` = "reseek.m8",
   `TEA-mmseqs2` = "tea_results.m8",
   blastp = "blastp.m8",
   diamond = "diamond.m8"
@@ -121,6 +121,14 @@ counts_filtered <- filtered_results |>
   distinct(method, query_id) |>
   count(method, name = "unique_queries") |>
   mutate(dataset = "Filtered hits\n(e=<1e-3)")
+
+# Notice: bitscore represents e-value for reseek
+all_results |>
+  filter((method == "Boltz-reseek" & bitscore < 0.05)) |>
+  distinct(method, query_id) |>
+  count(method, name = "unique_queries") |>
+  mutate(dataset = "p-value")
+
 
 counts_plot_df <- bind_rows(counts_all, counts_filtered)
 
