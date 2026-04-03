@@ -122,7 +122,7 @@ counts_filtered <- filtered_results |>
   count(method, name = "unique_queries") |>
   mutate(dataset = "Filtered hits\n(e=<1e-3)")
 
-# Notice: bitscore represents e-value for reseek
+# Notice: bitscore represents p-value for reseek
 all_results |>
   filter((method == "Boltz-reseek" & bitscore < 0.05)) |>
   distinct(method, query_id) |>
@@ -191,6 +191,163 @@ ggsave(
   dpi = 300,
   width = 5,
   height = 3,
+)
+
+# -------------------------
+# Total hits vs e-value threshold
+# -------------------------
+
+evalue_breaks <- c(10^seq(-10, -1), 1, 10)
+
+hits_vs_evalue_df <- all_results |>
+  group_by(method) |>
+  summarise(
+    evalues_sorted = list(sort(evalue)),
+    .groups = "drop"
+  ) |>
+  mutate(
+    curve = map(
+      evalues_sorted,
+      ~ tibble(
+        evalue_threshold = evalue_breaks,
+        total_hits = findInterval(evalue_breaks, .x)
+      )
+    )
+  ) |>
+  select(method, curve) |>
+  unnest(curve) |>
+  mutate(
+    method = factor(
+      method,
+      levels = c(
+        "blastp",
+        "diamond",
+        "mmseqs2",
+        "ProstT5-foldseek",
+        "TEA-mmseqs2",
+        "Boltz-foldseek",
+        "Boltz-reseek"
+      )
+    )
+  )
+
+hits_vs_evalue_plot <- hits_vs_evalue_df |>
+  ggplot(aes(
+    x = evalue_threshold,
+    y = total_hits,
+    color = method,
+    group = method
+  )) +
+  geom_line(linewidth = 0.7) +
+  #geom_point(size = 0.9) +
+  scale_color_okabe_ito() +
+  scale_x_log10(
+    limits = c(1e-10, 10),
+    breaks = c(1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e-1, 1, 10),
+    labels = c(1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e-1, 1, 10)
+  ) +
+  labs(
+    x = "E-value threshold",
+    y = "Total number of hits",
+    color = "Method"
+  ) +
+  theme_classic() +
+  theme(
+    legend.position = "right"
+  )
+
+hits_vs_evalue_plot
+ggsave(
+  "figures/total_hits_vs_evalue.pdf",
+  dpi = 300,
+  width = 6,
+  height = 4
+)
+
+# -------------------------
+# Unique queries with hits vs e-value threshold
+# -------------------------
+
+unique_queries_vs_evalue_df <- all_results |>
+  group_by(method, query_id) |>
+  summarise(best_evalue = min(evalue), .groups = "drop") |>
+  group_by(method) |>
+  summarise(
+    best_evalues_sorted = list(sort(best_evalue)),
+    .groups = "drop"
+  ) |>
+  mutate(
+    curve = map(
+      best_evalues_sorted,
+      ~ tibble(
+        evalue_threshold = evalue_breaks,
+        unique_queries_with_hit = findInterval(evalue_breaks, .x)
+      )
+    )
+  ) |>
+  select(method, curve) |>
+  unnest(curve) |>
+  mutate(
+    method = factor(
+      method,
+      levels = c(
+        "blastp",
+        "diamond",
+        "mmseqs2",
+        "ProstT5-foldseek",
+        "TEA-mmseqs2",
+        "Boltz-foldseek",
+        "Boltz-reseek"
+      )
+    )
+  )
+
+unique_queries_vs_evalue_plot <- unique_queries_vs_evalue_df |>
+  ggplot(aes(
+    x = evalue_threshold,
+    y = unique_queries_with_hit,
+    color = method,
+  )) +
+  geom_line(linewidth = 0.7) +
+  #geom_point(size = 0.9) +
+  scale_color_okabe_ito() +
+  scale_x_log10(
+    limits = c(1e-10, 10),
+    breaks = c(1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e-1, 1, 10),
+    labels = c(1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e-1, 1, 10)
+  ) +
+  geom_hline(
+    yintercept = 11467,
+    linetype = "dashed",
+    linewidth = 0.4,
+    color = "black",
+  ) +
+  geom_text(
+    y = 11750,
+    x = -10,
+    color = "black",
+    hjust = 0,
+    label = "Total test proteins",
+    size = 3,
+    check_overlap = T
+  ) +
+  labs(
+    x = "E-value threshold",
+    y = "# test proteins with hit",
+    color = "Method"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_classic() +
+  theme(
+    legend.position = "right"
+  )
+
+unique_queries_vs_evalue_plot
+ggsave(
+  "figures/unique_queries_vs_evalue.pdf",
+  dpi = 300,
+  width = 6,
+  height = 4
 )
 
 # -------------------------
