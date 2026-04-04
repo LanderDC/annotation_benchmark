@@ -61,4 +61,9 @@ kingdom_df |>
     axis.text.x = ggtext::element_markdown(angle = 45, hjust = 1),
     axis.title.x = element_blank()
   )
-ggsave("figures/kingdom_distribution.pdf", width = 4, height = 3, dpi = 300)
+ggsave(
+  "figures/data_info/kingdom_distribution.pdf",
+  width = 4,
+  height = 3,
+  dpi = 300
+)

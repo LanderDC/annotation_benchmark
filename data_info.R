@@ -276,7 +276,7 @@ qc_plot <- (patchwork::wrap_elements(legend) /
   plot_layout(heights = c(0.1, 1))
 
 ggsave(
-  "figures/boltz_plddt_cdf.pdf",
+  "figures/data_info/boltz_plddt_cdf.pdf",
   width = 4,
   height = 3,
   dpi = 300,
@@ -291,7 +291,7 @@ ggsave(
     plot.tag = element_text(size = 10, face = "bold")
   )
 ggsave(
-  "figures/dataset_overview.pdf",
+  "figures/data_info/dataset_overview.pdf",
   width = 180,
   height = 90,
   dpi = 300,

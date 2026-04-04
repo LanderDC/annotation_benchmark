@@ -181,13 +181,13 @@ unique_hits_plot <- ggplot(
   scale_y_continuous(limits = c(0, 12500), expand = c(0, 0)) +
   theme_classic() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.x = element_text(angle = 25, hjust = 1),
     axis.title.x = element_blank(),
     legend.title = element_blank()
   )
 unique_hits_plot
 ggsave(
-  "figures/hits_per_method.pdf",
+  "figures/search_results/hits_per_method.pdf",
   dpi = 300,
   width = 5,
   height = 3,
@@ -258,7 +258,7 @@ hits_vs_evalue_plot <- hits_vs_evalue_df |>
 
 hits_vs_evalue_plot
 ggsave(
-  "figures/total_hits_vs_evalue.pdf",
+  "figures/search_results/total_hits_vs_evalue.pdf",
   dpi = 300,
   width = 6,
   height = 4
@@ -344,7 +344,7 @@ unique_queries_vs_evalue_plot <- unique_queries_vs_evalue_df |>
 
 unique_queries_vs_evalue_plot
 ggsave(
-  "figures/unique_queries_vs_evalue.pdf",
+  "figures/search_results/unique_queries_vs_evalue.pdf",
   dpi = 300,
   width = 6,
   height = 4
@@ -463,7 +463,7 @@ rbind(pair_pct_all, pair_pct_filt, pair_pct_top) |>
   facet_wrap(~dataset, scales = "free_y") +
   theme_void() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 6),
+    axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1, size = 6),
     axis.text.y = element_text(size = 6, hjust = 1),
     axis.title = element_blank(),
     legend.text = element_text(size = 7),
@@ -471,7 +471,12 @@ rbind(pair_pct_all, pair_pct_filt, pair_pct_top) |>
     plot.title = element_text(size = 10),
     strip.text = element_text(size = 8)
   )
-ggsave("figures/hit_overlap_methods.pdf", dpi = 300, width = 9, height = 3)
+ggsave(
+  "figures/search_results/hit_overlap_methods.pdf",
+  dpi = 300,
+  width = 9,
+  height = 3
+)
 
 rbind(pair_pct_all, pair_pct_filt, pair_pct_top) |>
   filter(method != method_right) |>
@@ -491,7 +496,7 @@ rbind(pair_pct_all, pair_pct_filt, pair_pct_top) |>
   scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
   theme_classic() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 6),
+    axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1, size = 6),
     axis.title.x = element_blank(),
     legend.title = element_blank(),
     legend.position = "top",
@@ -557,7 +562,7 @@ pairwise_comparison_plot <- function(
     ) +
     theme_void() +
     theme(
-      axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 6),
+      axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1, size = 6),
       axis.text.y = element_text(size = 6, hjust = 1),
       axis.title = element_blank(),
       legend.text = element_text(size = 7),
@@ -600,11 +605,11 @@ pct_top_plot <- pairwise_comparison_plot(pair_pct_top, title = "Top hits")
     plot.margin = margin(0, 2, 0, 2), # tighten outer spacing
     legend.text = element_text(size = 7),
     legend.box.just = "center",
-    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 6),
+    axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1, size = 6),
     axis.text.y = element_text(size = 6, hjust = 1),
   )
 ggsave(
-  "figures/hit_overlap_summary.pdf",
+  "figures/search_results/hit_overlap_summary.pdf",
   dpi = 300,
   width = 180,
   height = 160,
@@ -848,7 +853,7 @@ informative_methods_plot <- info_bar_df |>
     legend.title = element_blank(),
     legend.margin = margin(0, 0, 0, 0), # tighten legend padding
     legend.box.spacing = unit(2, "pt"), # reduce space between legend and plot
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+    axis.text.x = element_text(angle = 25, hjust = 1, size = 6),
     axis.text.y = element_text(size = 6),
     axis.title.x = element_blank(),
     axis.title.y = element_text(size = 8),
@@ -913,7 +918,7 @@ pct_category_matching <- pairwise_matches |>
   scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) +
   theme_classic() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+    axis.text.x = element_text(angle = 25, hjust = 1, size = 6),
     axis.text.y = element_text(size = 6),
     axis.title.x = element_blank(),
     axis.title.y = element_text(size = 8),
@@ -922,7 +927,7 @@ pct_category_matching <- pairwise_matches |>
     legend.position = "none"
   )
 ggsave(
-  "figures/category_agreement_vs_original.pdf",
+  "figures/search_results/category_agreement_vs_original.pdf",
   dpi = 300,
   width = 90,
   height = 60,
@@ -943,7 +948,7 @@ ggsave(
   )
 
 ggsave(
-  "figures/informative_and_category_agreement.pdf",
+  "figures/search_results/informative_and_category_agreement.pdf",
   dpi = 300,
   width = 90,
   height = 100,
@@ -995,45 +1000,4 @@ category_overlap_plot <- ggplot(
     fill = "% matching queries"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-# -------------------------
-# Compare labels helper
-# -------------------------
-
-compare_labels <- function(df, methods) {
-  stopifnot(length(methods) == 2)
-  method_a <- methods[[1]]
-  method_b <- methods[[2]]
-
-  method_pairs <- df |>
-    filter(method %in% methods) |>
-    distinct(query_id, method, top_category) |>
-    pivot_wider(names_from = method, values_from = top_category) |>
-    drop_na(all_of(methods)) |>
-    mutate(category_match = .data[[method_a]] == .data[[method_b]])
-
-  match_counts <- method_pairs |>
-    count(category_match, name = "n_queries") |>
-    mutate(pct_queries = round(n_queries / sum(n_queries) * 100, 1))
-
-  category_transitions <- method_pairs |>
-    filter(!category_match) |>
-    count(.data[[method_a]], .data[[method_b]], name = "n_queries") |>
-    rename(category_a = 1, category_b = 2) |>
-    arrange(desc(n_queries))
-
-  list(
-    match_counts = match_counts,
-    category_transitions = category_transitions,
-    method_pairs = method_pairs
-  )
-}
-
-compare_examples <- list(
-  blast_vs_mmseqs2 = compare_labels(best_25_top, c("blastp", "mmseqs2")),
-  blast_vs_diamond = compare_labels(best_25_top, c("blastp", "diamond")),
-  blast_vs_TEA = compare_labels(best_25_top, c("blastp", "TEA")),
-  blast_vs_ProstT5 = compare_labels(best_25_top, c("blastp", "ProstT5-3Di")),
-  blast_vs_Boltz = compare_labels(best_25_top, c("blastp", "Boltz-foldseek"))
-)
+  theme(axis.text.x = element_text(angle = 25, hjust = 1))

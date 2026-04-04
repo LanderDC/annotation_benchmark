@@ -7,9 +7,20 @@ library(patchwork)
 library(readr)
 library(stringr)
 
+method_cols <- c(
+  "blastp" = "#E69F00",
+  "diamond" = "#56B4E9",
+  "mmseqs2" = "#009E73",
+  "ProstT5-foldseek" = "#F0E442",
+  "TEA-mmseqs2" = "#0072B2",
+  "Boltz-foldseek" = "#D55E00",
+  "Boltz-reseek" = "#CC79A7"
+)
+
 input_json <- "results/hyperfine/hyperfine_combined.json"
 
-output_plot <- "figures/hyperfine_time_vs_memory_gb.pdf"
+output_plot <- "figures/computational_benchmark/hyperfine_time_vs_memory_gb.pdf"
+output_plot_workflow <- "figures/computational_benchmark/time_fold_increase.pdf"
 
 `%||%` <- function(x, y) {
   if (is.null(x)) y else x
@@ -147,6 +158,18 @@ palette <- c(
   structure = "#d95f02"
 )
 
+y_breaks <- as.numeric(unlist(lapply(0:4, function(k) (1:9) * 10^k)))
+y_breaks <- y_breaks[y_breaks <= 1000]
+y_major_breaks <- 10^(0:3)
+y_minor_breaks <- setdiff(y_breaks, y_major_breaks)
+y_labels <- as.character(y_major_breaks)
+
+x_breaks <- as.numeric(unlist(lapply(0:6, function(k) (1:9) * 10^k)))
+x_breaks <- x_breaks[x_breaks <= 1e6]
+x_major_breaks <- 10^(0:6)
+x_minor_breaks <- setdiff(x_breaks, x_major_breaks)
+x_labels <- as.character(x_major_breaks)
+
 p <- ggplot(
   bench_plot,
   aes(
@@ -157,7 +180,6 @@ p <- ggplot(
   )
 ) +
   geom_point(size = 3.2) +
-
   geom_path(
     data = path_points,
     aes(x = cumulative_time_seconds, y = memory_gb, group = path_id),
@@ -192,14 +214,32 @@ p <- ggplot(
     values = c("CPU step" = 16, "GPU step" = 17),
     name = "Execution"
   ) +
-  scale_y_log10(limits = c(NA, 1000)) +
-  scale_x_log10() +
+  scale_y_log10(
+    limits = c(NA, 1000),
+    breaks = y_major_breaks,
+    minor_breaks = y_minor_breaks,
+    labels = y_labels
+  ) +
+  scale_x_log10(
+    limits = c(1, NA),
+    breaks = x_major_breaks,
+    minor_breaks = x_minor_breaks,
+    labels = x_labels
+  ) +
+  guides(
+    x = guide_axis(minor.ticks = TRUE),
+    y = guide_axis(minor.ticks = TRUE)
+  ) +
   labs(
     #title = "Hyperfine benchmark: cumulative runtime vs memory usage",
     x = "Cumulative time (seconds)",
     y = "Memory usage (GB)"
   ) +
-  theme_bw(base_size = 12)
+  theme_bw(base_size = 12) +
+  theme(
+    panel.grid = element_blank(),
+    axis.minor.ticks.length = rel(0.6)
+  )
 
 structure_compare <- bench |>
   filter(command_name %in% c("foldseek-structures", "reseek")) |>
@@ -253,8 +293,8 @@ combined_plot <- p +
   inset_element(
     inset_plot,
     left = 0.03,
-    bottom = 0.6,
-    right = 0.35,
+    bottom = 0.55,
+    right = 0.4,
     top = 0.98,
     align_to = "panel"
   )
@@ -266,6 +306,94 @@ ggsave(
   plot = combined_plot,
   width = 180,
   height = 120,
+  units = "mm",
+  dpi = 300
+)
+
+workflow_times <- bind_rows(
+  bench |>
+    filter(command_name == "blastp_search") |>
+    transmute(workflow = "blastp", total_seconds = time_seconds),
+  bench |>
+    filter(command_name == "diamond_blastp") |>
+    transmute(workflow = "diamond", total_seconds = time_seconds),
+  bench |>
+    filter(command_name == "mmseqs_easy_search") |>
+    transmute(workflow = "mmseqs2", total_seconds = time_seconds),
+  path_points |>
+    filter(path_id == "tea_chain") |>
+    slice_max(step_order, n = 1, with_ties = FALSE) |>
+    transmute(
+      workflow = "TEA-mmseqs2",
+      total_seconds = cumulative_time_seconds
+    ),
+  path_points |>
+    filter(path_id == "foldseek_prostt5_chain") |>
+    slice_max(step_order, n = 1, with_ties = FALSE) |>
+    transmute(
+      workflow = "ProstT5-foldseek",
+      total_seconds = cumulative_time_seconds
+    ),
+  path_points |>
+    filter(path_id == "msa_to_foldseek_chain") |>
+    slice_max(step_order, n = 1, with_ties = FALSE) |>
+    transmute(
+      workflow = "Boltz-foldseek",
+      total_seconds = cumulative_time_seconds
+    ),
+  path_points |>
+    filter(path_id == "msa_to_reseek_chain") |>
+    slice_max(step_order, n = 1, with_ties = FALSE) |>
+    transmute(
+      workflow = "Boltz-reseek",
+      total_seconds = cumulative_time_seconds
+    )
+)
+
+baseline_time <- min(workflow_times$total_seconds)
+
+workflow_compare <- workflow_times |>
+  mutate(fold_vs_fastest = total_seconds / baseline_time) |>
+  arrange(fold_vs_fastest) |>
+  mutate(workflow = factor(workflow, levels = workflow))
+
+workflow_compare
+
+workflow_increase_plot <- ggplot(
+  workflow_compare,
+  aes(x = workflow, y = fold_vs_fastest, fill = workflow)
+) +
+  geom_col(width = 0.7, show.legend = FALSE) +
+  geom_hline(
+    yintercept = 1,
+    linetype = "dashed",
+    color = "grey40",
+    linewidth = 0.3
+  ) +
+  geom_text(
+    aes(label = paste0(round(fold_vs_fastest, 1), "x")),
+    vjust = -0.25,
+    size = 2
+  ) +
+  scale_y_log10() +
+  scale_fill_manual(values = method_cols) +
+  labs(
+    x = NULL,
+    y = "Runtime increase vs fastest workflow"
+  ) +
+  theme_bw(base_size = 10) +
+  theme(
+    panel.grid = element_blank(),
+    axis.text.x = element_text(angle = 25, hjust = 1)
+  )
+
+workflow_increase_plot
+
+ggsave(
+  filename = output_plot_workflow,
+  plot = workflow_increase_plot,
+  width = 90,
+  height = 90,
   units = "mm",
   dpi = 300
 )
