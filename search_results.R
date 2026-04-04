@@ -337,13 +337,17 @@ unique_queries_vs_evalue_plot <- unique_queries_vs_evalue_df |>
     color = method,
   )) +
   geom_line(linewidth = 0.7) +
-  #geom_text(
-  #  data = unique_queries_vs_evalue_labels,
-  #  aes(label = method),
-  #  hjust = -0.05,
-  #  size = 2.6,
-  #  show.legend = FALSE
-  #) +
+  ggrepel::geom_text_repel(
+    data = unique_queries_vs_evalue_labels,
+    aes(label = method),
+    box.padding = 0,
+    xlim = c(1.1, NA),
+    force = 1,
+    min.segment.length = 0,
+    segment.linetype = "dotted",
+    size = 2.6,
+    show.legend = FALSE
+  ) +
   #geom_point(size = 0.9) +
   scale_color_okabe_ito() +
   scale_x_log10(
@@ -351,12 +355,22 @@ unique_queries_vs_evalue_plot <- unique_queries_vs_evalue_df |>
     breaks = c(1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e-1, 1, 10),
     labels = c(1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e-1, 1, 10)
   ) +
-  geom_hline(
-    yintercept = 11467,
+  annotate(
+    geom = "segment",
+    x = 0,
+    xend = 10,
+    y = 11467,
+    yend = 11467,
     linetype = "dashed",
     linewidth = 0.4,
     color = "black",
   ) +
+  #geom_hline(
+  #  yintercept = 11467,
+  #  linetype = "dashed",
+  #  linewidth = 0.4,
+  #  color = "black",
+  #) +
   geom_text(
     y = 11750,
     x = -10,
@@ -374,8 +388,8 @@ unique_queries_vs_evalue_plot <- unique_queries_vs_evalue_df |>
   coord_cartesian(clip = "off") +
   theme_classic() +
   theme(
-    legend.position = "right",
-    #plot.margin = margin(5.5, 45, 5.5, 5.5)
+    legend.position = "none",
+    plot.margin = margin(5.5, 45, 5.5, 5.5)
   )
 
 unique_queries_vs_evalue_plot
