@@ -147,11 +147,17 @@ counts_plot_df <- counts_plot_df |>
       )
     ),
     type = case_when(
-      method %in% c("blastp", "diamond", "mmseqs2") ~ "Sequence",
-      method %in% c("ProstT5-foldseek", "TEA-mmseqs2") ~ "Embedding",
-      T ~ "Structure"
+      method %in% c("blastp", "diamond", "mmseqs2") ~ "sequence",
+      method %in% c("ProstT5-foldseek", "TEA-mmseqs2") ~ "embedding",
+      T ~ "structure"
     )
   )
+
+palette <- c(
+  "sequence" = "#1b9e77",
+  "embedding" = "#7570b3",
+  "structure" = "#d95f02"
+)
 
 unique_hits_plot <- ggplot(
   counts_plot_df,
@@ -170,11 +176,11 @@ unique_hits_plot <- ggplot(
     size = 3,
     check_overlap = T
   ) +
-  #scale_fill_manual(
-  #  values = c("All hits" = "#e56d12ff", "Filtered hits\n(e<1e-3)" = "#FFDBBB"),
-  #) +
   scale_alpha_discrete(range = c(1, 0.3), name = "") +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_manual(
+    values = palette,
+    breaks = c("sequence", "embedding", "structure")
+  ) +
   labs(
     y = "# test proteins with hit"
   ) +
@@ -231,6 +237,12 @@ hits_vs_evalue_df <- all_results |>
     )
   )
 
+hits_vs_evalue_labels <- hits_vs_evalue_df |>
+  group_by(method) |>
+  filter(evalue_threshold == max(evalue_threshold)) |>
+  slice_tail(n = 1) |>
+  ungroup()
+
 hits_vs_evalue_plot <- hits_vs_evalue_df |>
   ggplot(aes(
     x = evalue_threshold,
@@ -239,10 +251,18 @@ hits_vs_evalue_plot <- hits_vs_evalue_df |>
     group = method
   )) +
   geom_line(linewidth = 0.7) +
+  ggrepel::geom_text_repel(
+    data = hits_vs_evalue_labels,
+    aes(label = method),
+    xlim = c(1.1, NA),
+    hjust = -0.05,
+    size = 2.6,
+    show.legend = FALSE
+  ) +
   #geom_point(size = 0.9) +
   scale_color_okabe_ito() +
   scale_x_log10(
-    limits = c(1e-10, 10),
+    limits = c(1e-10, 12),
     breaks = c(1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e-1, 1, 10),
     labels = c(1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e-1, 1, 10)
   ) +
@@ -251,9 +271,11 @@ hits_vs_evalue_plot <- hits_vs_evalue_df |>
     y = "Total number of hits",
     color = "Method"
   ) +
+  coord_cartesian(clip = "off") +
   theme_classic() +
   theme(
-    legend.position = "right"
+    legend.position = "none",
+    plot.margin = margin(5.5, 45, 5.5, 5.5)
   )
 
 hits_vs_evalue_plot
@@ -302,6 +324,12 @@ unique_queries_vs_evalue_df <- all_results |>
     )
   )
 
+unique_queries_vs_evalue_labels <- unique_queries_vs_evalue_df |>
+  group_by(method) |>
+  filter(evalue_threshold == max(evalue_threshold)) |>
+  slice_tail(n = 1) |>
+  ungroup()
+
 unique_queries_vs_evalue_plot <- unique_queries_vs_evalue_df |>
   ggplot(aes(
     x = evalue_threshold,
@@ -309,10 +337,17 @@ unique_queries_vs_evalue_plot <- unique_queries_vs_evalue_df |>
     color = method,
   )) +
   geom_line(linewidth = 0.7) +
+  #geom_text(
+  #  data = unique_queries_vs_evalue_labels,
+  #  aes(label = method),
+  #  hjust = -0.05,
+  #  size = 2.6,
+  #  show.legend = FALSE
+  #) +
   #geom_point(size = 0.9) +
   scale_color_okabe_ito() +
   scale_x_log10(
-    limits = c(1e-10, 10),
+    limits = c(1e-10, 12),
     breaks = c(1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e-1, 1, 10),
     labels = c(1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e-1, 1, 10)
   ) +
@@ -339,7 +374,8 @@ unique_queries_vs_evalue_plot <- unique_queries_vs_evalue_df |>
   coord_cartesian(clip = "off") +
   theme_classic() +
   theme(
-    legend.position = "right"
+    legend.position = "right",
+    #plot.margin = margin(5.5, 45, 5.5, 5.5)
   )
 
 unique_queries_vs_evalue_plot
@@ -581,22 +617,52 @@ pct_top_plot <- pairwise_comparison_plot(pair_pct_top, title = "Top hits")
 
 (free(
   (unique_hits_plot +
-    guides(
-      fill = guide_legend(
-        keyheight = unit(.5, "cm"),
-        keywidth = unit(.5, "cm")
+    scale_alpha_manual(
+      values = c(
+        "All hits" = 1,
+        "Filtered hits\n(e=<1e-3)" = 0.3
       ),
-      alpha = guide_legend(
-        keyheight = unit(.5, "cm"),
-        keywidth = unit(.5, "cm")
+      labels = c(
+        "All hits" = "All hits",
+        "Filtered hits\n(e=<1e-3)" = "Filtered hits (e=<1e-3)"
       )
     ) +
-    theme(axis.title.y = element_text(size = 8))) +
-    pct_all_plot,
+    guides(
+      fill = guide_legend(
+        keyheight = unit(.2, "cm"),
+        keywidth = unit(.2, "cm"),
+        nrow = 1
+      ),
+      alpha = guide_legend(
+        keyheight = unit(.2, "cm"),
+        keywidth = unit(.2, "cm"),
+        nrow = 1
+      )
+    ) +
+    theme(
+      axis.title.y = element_text(size = 8),
+      legend.position = "top",
+      # legend.title = element_text(vjust = 1),
+      legend.box.just = "left",
+      legend.box = "vertical",
+      legend.box.spacing = unit(1, "mm"),
+      legend.spacing = unit(1, "mm"),
+      legend.margin = margin(t = 0.1, unit = 'cm')
+    )) +
+    free(
+      hits_vs_evalue_plot +
+        guides(color = guide_legend(keywidth = unit(0.3, "cm"))) +
+        theme(
+          legend.title = element_blank(),
+          axis.title.y = element_text(size = 8),
+          axis.title.x = element_text(size = 8, vjust = 10)
+        ),
+      side = "tl"
+    ),
   side = "l"
 ) /
-  (pct_filt_plot + pct_top_plot)) +
-  plot_layout(guides = "collect") &
+  ((pct_all_plot + pct_top_plot) +
+    plot_layout(guides = "collect"))) &
   plot_annotation(
     tag_levels = "A"
   ) &
@@ -605,7 +671,7 @@ pct_top_plot <- pairwise_comparison_plot(pair_pct_top, title = "Top hits")
     plot.margin = margin(0, 2, 0, 2), # tighten outer spacing
     legend.text = element_text(size = 7),
     legend.box.just = "center",
-    axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1, size = 6),
+    axis.text.x = element_text(size = 6),
     axis.text.y = element_text(size = 6, hjust = 1),
   )
 ggsave(
