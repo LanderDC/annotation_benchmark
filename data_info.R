@@ -215,7 +215,7 @@ cdf_plot <-
   ) +
   labs(
     x = "pLDDT",
-    y = "% structures ≥ pLDDT",
+    y = "% structures ≥ pLDDT(x)",
   ) +
   theme_classic()
 cdf_plot
