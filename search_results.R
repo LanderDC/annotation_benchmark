@@ -873,12 +873,10 @@ info_bar_df <- per_method_counts |>
       non_informative = "Low information annotation"
     )
   ) |>
-  rbind(benchmark_counts) |>
   mutate(
     method = factor(
       method,
       levels = c(
-        "Original",
         "blastp",
         "diamond",
         "mmseqs2",
@@ -890,6 +888,10 @@ info_bar_df <- per_method_counts |>
     )
   )
 
+original_informative_n <- benchmark_counts |>
+  filter(info_level == "Informative annotation") |>
+  pull(n)
+
 informative_methods_plot <- info_bar_df |>
   mutate(
     info_level = factor(
@@ -898,31 +900,61 @@ informative_methods_plot <- info_bar_df |>
     )
   ) |>
   ggplot(
-    aes(x = method, y = n, fill = info_level)
+    aes(x = method, y = n, fill = method, alpha = info_level)
   ) +
-  geom_col(position = "stack", width = 0.75) +
-  geom_hline(yintercept = 11360, linetype = "dashed", linewidth = 0.4) +
+  geom_col(width = 0.75) +
+  geom_hline(
+    yintercept = original_informative_n,
+    linetype = "dashed",
+    color = "grey20",
+    linewidth = 0.4
+  ) +
+  geom_text(
+    y = original_informative_n - 500,
+    x = .5,
+    label = "Original informative proteins",
+    hjust = 0,
+    size = 2.5,
+    color = "grey20",
+    check_overlap = T,
+    inherit.aes = F
+  ) +
+  geom_hline(
+    yintercept = 11360,
+    linetype = "dashed",
+    color = "grey20",
+    linewidth = 0.4
+  ) +
   geom_text(
     y = 12000,
-    x = 2,
+    x = .5,
     label = "Total test proteins",
+    hjust = 0,
     size = 2.5,
-    check_overlap = T
+    color = "grey20",
+    check_overlap = T,
+    inherit.aes = F
   ) +
-  scale_fill_manual(
+  scale_fill_okabe_ito(guide = 'none') +
+  scale_alpha_manual(
     values = c(
-      "Informative annotation" = "#114b9a",
-      "Low information annotation" = "#c7d1e0"
-    ),
-    name = "Protein annotation"
+      "Informative annotation" = 1,
+      "Low information annotation" = 0.3
+    )
   ) +
   labs(
-    y = "# proteins with annotation",
+    y = "# proteins with\ninformative annotation",
   ) +
   guides(
-    fill = guide_legend(
+    #fill = guide_legend(
+    #  keyheight = unit(.25, "cm"),
+    #  keywidth = unit(.25, "cm"),
+    #  nrow = 2
+    #),
+    alpha = guide_legend(
       keyheight = unit(.25, "cm"),
-      keywidth = unit(.25, "cm")
+      keywidth = unit(.25, "cm"),
+      nrow = 1
     )
   ) +
   scale_y_continuous(limits = c(0, 12500), expand = c(0, 0)) +
