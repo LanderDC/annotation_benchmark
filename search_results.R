@@ -906,7 +906,7 @@ informative_methods_plot <- info_bar_df |>
   geom_hline(
     yintercept = original_informative_n,
     linetype = "dashed",
-    color = "grey20",
+    color = "grey30",
     linewidth = 0.4
   ) +
   geom_text(
@@ -915,14 +915,14 @@ informative_methods_plot <- info_bar_df |>
     label = "Original informative proteins",
     hjust = 0,
     size = 2.5,
-    color = "grey20",
+    color = "grey30",
     check_overlap = T,
     inherit.aes = F
   ) +
   geom_hline(
     yintercept = 11360,
     linetype = "dashed",
-    color = "grey20",
+    color = "grey30",
     linewidth = 0.4
   ) +
   geom_text(
@@ -931,7 +931,7 @@ informative_methods_plot <- info_bar_df |>
     label = "Total test proteins",
     hjust = 0,
     size = 2.5,
-    color = "grey20",
+    color = "grey30",
     check_overlap = T,
     inherit.aes = F
   ) +
