@@ -637,8 +637,8 @@ pct_top_plot <- pairwise_comparison_plot(pair_pct_top, title = "Top hits")
         "Filtered hits\n(e=<1e-3)" = 0.3
       ),
       labels = c(
-        "All hits" = "All hits",
-        "Filtered hits\n(e=<1e-3)" = "Filtered hits (e=<1e-3)"
+        "All hits" = "all hits",
+        "Filtered hits\n(e=<1e-3)" = "filtered hits (e=<1e-3)"
       )
     ) +
     guides(
