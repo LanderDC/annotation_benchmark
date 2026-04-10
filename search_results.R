@@ -470,7 +470,7 @@ method_order <- c(
   "Boltz-reseek"
 )
 
-rbind(pair_pct_all, pair_pct_filt, pair_pct_top) |>
+overlap_methods <- rbind(pair_pct_all, pair_pct_filt, pair_pct_top) |>
   mutate(
     method = factor(method, levels = method_order),
     method_right = glue("{method_right}\n(n={total_hits})"),
@@ -491,7 +491,7 @@ rbind(pair_pct_all, pair_pct_filt, pair_pct_top) |>
       ),
       color = shared_pct > 80
     ),
-    size = 1.5
+    size = 1.75
   ) +
   scale_color_manual(
     values = c(`TRUE` = "white", `FALSE` = "white"),
@@ -499,7 +499,7 @@ rbind(pair_pct_all, pair_pct_filt, pair_pct_top) |>
   ) +
   scale_fill_gradient(low = "#f7fbff", high = "#08306b", limits = c(0, 100)) +
   labs(
-    title = "Pairwise hit overlap across methods",
+    #title = "Pairwise hit overlap across methods",
     fill = "% shared hits"
   ) +
   guides(
@@ -521,8 +521,51 @@ rbind(pair_pct_all, pair_pct_filt, pair_pct_top) |>
     plot.title = element_text(size = 10),
     strip.text = element_text(size = 8)
   )
+
+tag_facet2 <- function(
+  p,
+  tag_pool = LETTERS,
+  x = 0,
+  y = 0.5,
+  hjust = 0,
+  vjust = 0.5,
+  fontface = 2,
+  draw = TRUE,
+  ...
+) {
+  gb <- ggplot_build(p)
+  lay <- gb$layout$layout
+
+  tags <- paste0(tag_pool[unique(lay$COL)])
+
+  tl <- lapply(
+    tags,
+    grid::textGrob,
+    x = x,
+    y = y,
+    hjust = hjust,
+    vjust = vjust,
+    gp = grid::gpar(fontface = fontface)
+  )
+
+  g <- ggplot_gtable(gb)
+  g <- gtable::gtable_add_rows(g, grid::unit(1, "line"), pos = 0)
+  lm <- unique(g$layout[grepl("panel", g$layout$name), "l"])
+  g <- gtable::gtable_add_grob(g, grobs = tl, t = 1, l = lm)
+
+  if (isTRUE(draw)) {
+    grid::grid.newpage()
+    grid::grid.draw(g)
+  }
+
+  invisible(g)
+}
+
+p <- tag_facet2(overlap_methods, draw = T)
+
 ggsave(
   "figures/search_results/hit_overlap_methods.pdf",
+  plot = p,
   dpi = 300,
   width = 9,
   height = 3
@@ -591,7 +634,7 @@ pairwise_comparison_plot <- function(
         ),
         color = shared_pct > 80
       ),
-      size = 1.5
+      size = 1.75
     ) +
     scale_color_manual(
       values = c(`TRUE` = "white", `FALSE` = "white"),
@@ -671,7 +714,7 @@ pct_top_plot <- pairwise_comparison_plot(pair_pct_top, title = "Top hits")
           axis.title.y = element_text(size = 8),
           axis.title.x = element_text(size = 8, vjust = 10)
         ),
-      side = "tl"
+      side = "tl",
     ),
   side = "l"
 ) /
@@ -704,7 +747,7 @@ benchmark_list <- fromJSON("data/benchmark_data_classified.json")
 
 benchmark_df <- tibble(
   entry = names(benchmark_list),
-  categories = map(entry, ~ benchmark_list[[.x]]$categories)
+  categories = unlist(map(entry, ~ benchmark_list[[.x]]$categories))
 )
 
 deprioritized <- c("hypothetical protein", "unknown", "other function")
@@ -743,8 +786,7 @@ benchmark_counts <- benchmark_df |>
 
 weight_expr <- function(e) ifelse(e == 0, 1000, -log10(e))
 
-# fix doesnt work
-weighted <- best_25 |>
+weighted <- filtered_results |>
   mutate(
     weight = weight_expr(evalue),
     # normalize categories to a list-column of character vectors
@@ -834,16 +876,16 @@ top_categories <- score_table |>
   }) |>
   ungroup()
 
-best_25_summary <- best_25 |>
+filtered_summary <- filtered_results |>
   left_join(top_categories, by = c("query_id", "method"))
 
-best_25_top <- best_25_summary |>
+filtered_top <- filtered_summary |>
   group_by(method, query_id) |>
   arrange(evalue, .by_group = TRUE) |>
   slice_head(n = 1) |>
   ungroup()
 
-per_method_counts <- best_25_top |>
+per_method_counts <- filtered_top |>
   mutate(
     is_informative = !str_to_lower(coalesce(
       top_category,
@@ -910,7 +952,7 @@ informative_methods_plot <- info_bar_df |>
     linewidth = 0.4
   ) +
   geom_text(
-    y = original_informative_n - 500,
+    y = original_informative_n - 600,
     x = .5,
     label = "Original informative proteins",
     hjust = 0,
@@ -987,7 +1029,7 @@ benchmark_category <- benchmark_df |>
       deprioritized
   )
 
-top_categories_df <- best_25_top |>
+top_categories_df <- filtered_top |>
   transmute(query_id, method, top_category) |>
   filter(
     !str_to_lower(coalesce(top_category, "hypothetical protein")) %in%
@@ -1067,6 +1109,189 @@ ggsave(
   units = "mm"
 )
 
+# -------------------------
+# Annotated hypothetical proteins vs original
+# -------------------------
+
+method_category_summary <- benchmark_df |>
+  rename(original_category = categories) |>
+  mutate(original_category = str_to_lower(as.character(original_category))) |>
+  left_join(filtered_top, by = join_by(entry == query_id)) |>
+  mutate(
+    top_category = str_to_lower(as.character(top_category)),
+    matches_original = !is.na(top_category) &
+      (top_category == original_category),
+    original_is_deprioritized = original_category %in% deprioritized,
+    top_is_deprioritized = top_category %in% deprioritized,
+    deprioritized_to_informative = original_is_deprioritized &
+      !is.na(top_category) &
+      !top_is_deprioritized,
+    informative_to_deprioritized = !original_is_deprioritized &
+      !is.na(top_category) &
+      top_is_deprioritized,
+    original_informative_changed = !is.na(top_category) &
+      !informative_to_deprioritized &
+      !deprioritized_to_informative &
+      (top_category != original_category),
+  ) |>
+  filter(!is.na(method)) |> # TODO: what about the proteins without hit for any method?
+  group_by(method) |>
+  summarise(
+    queries_with_hit = n_distinct(entry),
+    matched_original_category = sum(matches_original, na.rm = TRUE),
+    original_informative_changed = sum(
+      original_informative_changed,
+      na.rm = TRUE
+    ),
+    matched_original_informative = sum(
+      matches_original & !original_is_deprioritized,
+      na.rm = TRUE
+    ),
+    matched_original_deprioritized = sum(
+      matches_original & original_is_deprioritized,
+      na.rm = TRUE
+    ),
+    original_deprioritized_to_informative = sum(
+      deprioritized_to_informative,
+      na.rm = TRUE
+    ),
+    original_informative_to_deprioritized = sum(
+      informative_to_deprioritized,
+      na.rm = TRUE
+    ),
+    pct_match_among_hits = round(
+      100 * matched_original_category / queries_with_hit,
+      1
+    ),
+    pct_deprioritized_to_informative_among_hits = round(
+      100 * original_deprioritized_to_informative / queries_with_hit,
+      1
+    ),
+    pct_informative_to_deprioritized_among_hits = round(
+      100 * original_informative_to_deprioritized / queries_with_hit,
+      1
+    ),
+    .groups = "drop"
+  ) |>
+  arrange(desc(matched_original_category))
+
+annotation_diffs <- method_category_summary |>
+  select(-starts_with("pct")) |>
+  pivot_longer(cols = c(-method), names_to = "type", values_to = "queries") |>
+  mutate(
+    queries = if_else(
+      startsWith(type, "original_informative"),
+      -queries,
+      queries
+    ),
+    method = factor(
+      method,
+      levels = c(
+        "blastp",
+        "diamond",
+        "mmseqs2",
+        "ProstT5-foldseek",
+        "TEA-mmseqs2",
+        "Boltz-foldseek",
+        "Boltz-reseek"
+      )
+    ),
+    type = factor(
+      type,
+      levels = c(
+        "original_informative_to_deprioritized",
+        "original_informative_changed",
+        "matched_original_deprioritized",
+        "matched_original_informative",
+        "original_deprioritized_to_informative"
+      )
+    )
+  ) |>
+  filter(type != "queries_with_hit", type != "matched_original_category") |>
+  ggplot(aes(x = queries, y = method, fill = type)) +
+  geom_col(position = "stack") +
+  geom_vline(xintercept = 0, linewidth = .5, linetype = "dashed") +
+  scale_fill_brewer(
+    type = "div",
+    palette = "RdYlGn",
+    breaks = c(
+      "original_informative_to_deprioritized",
+      "original_informative_changed",
+      "matched_original_deprioritized",
+      "matched_original_informative",
+      "original_deprioritized_to_informative"
+    ),
+    labels = c(
+      "original_informative_to_deprioritized" = "Informative → Non-informative",
+      "original_informative_changed" = "Different Informative",
+      "matched_original_deprioritized" = "Matched Non-informative",
+      "matched_original_informative" = "Matched Informative",
+      "original_deprioritized_to_informative" = "Non-informative → Informative"
+    )
+  ) +
+  scale_y_discrete(limits = rev) +
+  scale_x_continuous(
+    breaks = seq(-9000, 9000, by = 1500),
+    labels = str_replace(as.character(seq(-9000, 9000, by = 1500)), "-", ""),
+  ) +
+  guides(
+    fill = guide_legend(
+      keyheight = unit(.25, "cm"),
+      keywidth = unit(.25, "cm"),
+      byrow = T,
+      nrow = 3
+    )
+  ) +
+  labs(x = "# test proteins") +
+  theme_bw() +
+  theme(
+    legend.title = element_blank(),
+    legend.text = element_text(size = 6),
+    legend.location = "plot",
+    legend.position = "top",
+    legend.direction = "horizontal",
+    legend.box.just = "left",
+    legend.spacing.x = unit(0, "mm"),
+    #legend.justification.top = "right",
+    #legend.margin = margin(0, 0, 0, 0),
+    panel.grid = element_blank(),
+    axis.title.x = element_text(size = 8),
+    axis.text.x = element_text(size = 7),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = 7),
+    plot.margin = margin(0, 2, 0, 2)
+    #aspect.ratio = 1 / 2
+  )
+ggsave(
+  "figures/search_results/method_annotation_differences.pdf",
+  dpi = 300,
+  width = 90,
+  height = 90,
+  units = "mm",
+  device = cairo_pdf
+)
+
+(free(
+  (informative_methods_plot / pct_category_matching) +
+    theme(axis.title.y = element_text(vjust = 0))
+) | # align y-axis title toward bottom
+  annotation_diffs) +
+  plot_layout(widths = c(1, 1), heights = c(.5, .5, 1)) +
+  plot_annotation(tag_levels = "A") &
+  theme(
+    text = element_text(size = 6),
+    plot.tag = element_text(size = 10, face = "bold"),
+    plot.margin = margin(0, 2, 0, 2) # tighten outer spacing
+  )
+
+ggsave(
+  "figures/search_results/annotation_combined.pdf",
+  dpi = 300,
+  width = 180,
+  height = 100,
+  units = "mm",
+  device = cairo_pdf
+)
 
 ## STOP
 pairwise_matches_full <- bind_rows(
