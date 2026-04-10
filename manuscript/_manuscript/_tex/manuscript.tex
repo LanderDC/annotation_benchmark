@@ -68,6 +68,7 @@
 
 
 \usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -211,6 +212,8 @@
 \usepackage{lineno}
 \linenumbers
 \linespread{1.5}
+\usepackage{pdflscape}
+\usepackage{placeins}
 \makeatletter
 \@ifpackageloaded{float}{}{\usepackage{float}}
 \floatstyle{plain}
@@ -254,6 +257,9 @@
 \newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
 \makeatother
 \makeatletter
+\usepackage{pdflscape}
+\makeatother
+\makeatletter
 \makeatother
 \makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
@@ -263,7 +269,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
-  pdftitle={Benchmarking sequence, embedding and structure based methods for eukaryotic virus protein annotation},
+  pdftitle={Benchmarking sequence{,} embedding and structure based methods for eukaryotic virus protein annotation},
   pdfauthor={Lander De Coninck; Uri Neri; Simon Roux},
   colorlinks=true,
   linkcolor={black},
@@ -320,7 +326,7 @@ Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\aut
 
   \begin{itemize}
   \tightlist
-  \item
+  \item[$\square$]
     TODO: add annotation of BFVD (eukaryotic vs prokaryotic viruses)
   \end{itemize}
 \item
@@ -329,27 +335,75 @@ Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\aut
   comparison of methods in shared hits
 \item
   comparison of functional annotation per method to original
+
+  \begin{itemize}
+  \tightlist
+  \item[$\square$]
+    TODO: check if bad annotations are from low quality structures
+  \end{itemize}
 \item
   how many are informative annotations
 
   \begin{itemize}
   \tightlist
-  \item
+  \item[$\square$]
     TODO: which conversions from hypothetical protein to informative
     (phages?)
   \end{itemize}
+\item[$\boxtimes$]
+  TODO: computational benchmark + add database sizes
+\item[$\square$]
+  TODO: check correlation between structure quality/TEA entropy and
+  correct annotation/agreement between methods
+\item[$\square$]
+  TODO: add recall, precision and F1 plots
+\item[$\square$]
+  TODO: make annotations better (local LLM, GenePT?)
+\item[$\square$]
+  TODO: do structure search of non-informative vs informative BFVD
+  entries?
+\item[$\square$]
+  TODO: look at p-value for Reseek and see if this improves annotations
 \item
-  TODO: computational benchmark
+  \st{Try out LucaVirus?}
+\item
+  \st{Also test on Nomburg dataset, should have ground truth labels (see
+  LucaVirus paper: seems to be protein names)}
+\item
+  possible explanation for bad structure results: small representation
+  of viruses in training sets due to biosafety concerns?
 \end{itemize}
 
 \section{Abstract}\label{abstract}
 
-\section{Introduction}\label{introduction}
-
 The advent of protein language models (pLMs) and structural prediction
 promises new avenues for protein annotation through structure homology.
-Here, we benchmarked four recent tools to leverage these new techniques
-for protein annotation of eukaryotic viruses.
+Earlier work (eg. Phold) has shown protein strucural homology annotation
+works well for prokaryotic viruses. To leverage these new techniques for
+protein annotation of eukaryotic viruses, we benchmarked four recent
+embedding- and structure-based methods in comparison with the gold
+standard of sequence-based annotation. We selected 10\% of the entries
+in ICTV's VMR v40.2 that did not have bacteria or archaea as designated
+host (n=1,054), and subsequently retrieved all associated proteins from
+NCBI (n=11,360). Boltz-2 structure prediction of these proteins produced
+generally high-quality models (median pLDDT 71.3). Using the structures
+and protein sequences of the entries in the Big Fantastic Virus Database
+(BFVD), we queried the VMR proteins with Blastp, Diamond, and MMseqs2
+(sequence), TEA and ProstT5-3Di (embedding) and Foldseek and Reseek
+(structure). Sequence homology-based methods showed a high overlap in
+hits, whereas the other methods had low intra- and inter-method
+agreement in hits between themselves and the sequence-based methods.
+Additionally, all methods improved the number of informative categories
+(ie. not ``hypothetical protein'') for the VMR proteins, with embedding
+and structure methods producing the largest increases. However, when
+evaluated against proteins with informative GenBank annotations as
+ground truth (n=2,938), embedding- and structure-based methods agreed
+less often with the ground truth than sequence-based methods
+(\textasciitilde67\% and \textasciitilde76\% vs \textasciitilde83\%,
+respectively). Overall, sequence homology remains the most accurate
+approach for protein annotation of eukaryotic viruses at present.
+
+\section{Introduction}\label{introduction}
 
 \section{Results \& Discussion}\label{results-discussion}
 
@@ -365,7 +419,7 @@ viruses (see Supplemental Figure~\ref{suppfig-kingdom}).
 
 Structure prediction of all 11,467 proteins from our test set with
 Boltz-2 resulted in high-quality predicted structures, with a median
-pLDDT score of 71.3 and 52.2\% of all predicted structures having a
+pLDDT score of 71.3 and 52.4\% of all predicted structures having a
 pLDDT score above 70 (see Figure~\ref{fig-overview}B). This shows that
 the structure prediction with default settings of Boltz-2 results in
 reliable structure predictions without the need for extensive
@@ -375,17 +429,17 @@ fine-tuning of parameters or MSA generation strategies.
 
 \centering{
 
-\pandocbounded{\includegraphics[keepaspectratio]{../figures/dataset_overview.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{../figures/data_info/dataset_overview.pdf}}
 
 }
 
-\caption{\label{fig-overview}A) Waffle plot showing the distribution of
-the number of proteins from the different viral Kingdoms. Each tile
-roughly corresponds to 110 proteins. B) A cumulative distribution
-function plot showing the percentage of predicted structures from the
-test set with a pLDDT score above the pLDDT score on the x-axis. The
-inset shows a violin- and boxplot with all pLDDT scores from the
-predicted structures (n=11,467).}
+\caption{\label{fig-overview}A) The distribution of the number of
+proteins from the different viral Kingdoms. Each tile roughly
+corresponds to 110 proteins. B) A cumulative distribution function plot
+showing the percentage of predicted structures from the test set with a
+pLDDT score above the pLDDT score on the x-axis. The inset shows a
+violin- and boxplot with all pLDDT scores from the predicted structures
+(n=11,467).}
 
 \end{figure}%
 
@@ -394,49 +448,64 @@ methods}\label{performance-of-the-different-methods}
 
 We started by evaluating how many of the proteins in our test set got a
 hit against the BFVD for each method (see Figure~\ref{fig-overlap}A). In
-addition, we also filtered the results of each method on an e-value
-lower than 1e-3 to see how this affected the number of hits for each
-test protein. The methods relying on structure homology clearly had a
-lower number of test proteins with hits against the BFVD compared to the
-sequence homology-based methods. In contrast, TEA had the most number of
-test proteins with a hit, almost reaching the total number of test
-proteins (n=11,318). The three sequence based methods had a comparable
-number of test proteins with a hit (blastp=11,165; mmseqs=11,135 and
-diamond=11,119). After filtering on e-value lower than 1e-3, the number
-of proteins with hits decreased only for the structural methods on
-average by 25\%. This suggests that sequence based methods are still
-more sensitive in detecting homology for eukaryotic viruses than
+addition, we also filtered the results of each method on an E-value
+lower than 1e-03 to see how this affected the number of hits for each
+test protein, which decreased the number of test proteins with a hit on
+average with 25\% for the structure methods. The methods relying on
+structure homology clearly had a lower number of test proteins with hits
+against the BFVD compared to the sequence homology-based methods. In
+contrast, TEA, as only non-protein sequence based method, had a
+comparable number of test proteins with a hit to the sequence based
+methods, almost reaching the total number of test proteins (n=11,354).
+However, analyzing the total number of hits at different E-value
+thresholds shows that TEA will result in a very high number of hits
+across all E-value thresholds, signifying a high number of false
+positives (see Figure~\ref{fig-overlap}B). A similar pattern is observed
+for the other structure based methods which at high E-values tend to
+find too many hits. Reseek was less affected by this, due to a
+combination of already calculating E-values more
+accurately\textsuperscript{1,2} and our use of a modified Reseek version
+(see \hyperref[reseek]{below}). On the other hand, the three sequence
+based methods had a similar number of test proteins with a hit
+(BLASTp=11,359; MMseqs2=11,255 and Diamond=11,224), but don't show this
+inflation of total hits at higher E-values (BLASTp has a slight increase
+towards larger E-values). This suggests that sequence based methods are
+still more sensitive in detecting homology for eukaryotic viruses than
 structure based methods, despite the promising results for
-bacteriophages\textsuperscript{1}. As the quality of our structure
+bacteriophages\textsuperscript{3}. As the quality of our structure
 predictions was rather high (see Figure~\ref{fig-overview}B), this lower
 sensitivity is likely not due to poor structure predictions.
 
 When comparing the BFVD hits yielded by all methods against each other
-(see Figure~\ref{fig-overlap}B-D), we observed as expected that the
-sequence homology-based methods had a high overlap in shared hits. This
-was true when comparing the best 25 hits for each test protein, the best
-25 hits afterwards filtered on e-value and only the top hits. In
-contrast, the embedding and structure homology based methods had low
-overlap (\textasciitilde60\%) in resulting hits with both the sequence
-based methods as each other. The percentage of overlapping hits did
-increase when only looking at the top hits but stayed well below the
-percentage of overlap between the sequence based methods. It is worth
-noting that Reseek seemed to perform worse in this metric when looking
-at the filtered results (see Figure~\ref{fig-overlap}C), however this is
-due to the large reduction in number of hits after filtering. This
-reduction is due to the more stringent e-value calculations in Reseek
-compared to Foldseek\textsuperscript{2,3}. It is worth noting that while
-ProstT5 was the worst performer across the three comparisons, TEA
-performed better in the top hits comparison and was on par with the
-structure based methods when comparing to the sequence based methods.
+(see Figure~\ref{fig-overlap}C-D and
+Supplemental Figure~\ref{suppfig-pairwise-method}), we observed as
+expected that the sequence homology-based methods had a high overlap in
+shared hits. This was true when comparing the best 25 hits for each test
+protein, the best 25 hits afterwards filtered on E-value and only the
+top hits (see Figure~\ref{fig-overlap}C-D and
+Supplemental Figure~\ref{suppfig-pairwise-method}). In contrast, the
+embedding and structure homology based methods had low intra-method
+agreement in resulting hits (\textasciitilde25\% between the embedding
+methods and \textasciitilde40-75\% for the structure methods on the best
+25 hits). The percentage of overlapping hits did increase when only
+looking at the top hits but stayed well below the percentage of overlap
+between the sequence based methods. It is worth noting that Reseek
+seemed to perform worse in this metric when looking at the filtered
+results (see Supplemental Figure~\ref{suppfig-pairwise-method}B),
+however this is due to the large reduction in number of hits after
+filtering. This reduction is due to the more stringent E-value
+calculations in Reseek compared to Foldseek\textsuperscript{1,2}.
+Notably, while ProstT5 was the worst performer across the three datasets
+compared to the sequence methods, TEA performed better in the top hits
+comparison and was on par with the structure based methods.
 
 Overall, the embedding and structure based methods, that should be
 better to detect remote homologs, had low agreement on shared hits among
 each other. And although they did find more hits for the test proteins
-on default settings (see y-axis Figure~\ref{fig-overlap}B), this was
-almost entirely removed after filtering the hits on e-value (see y-axis
+(see y-axis Figure~\ref{fig-overlap}B), this was almost entirely removed
+after filtering the hits on E-value (see y-axis
 Figure~\ref{fig-overlap}C). This effect was most pronounced for Reseek,
-which claims to calculate the most correct e-values\textsuperscript{2}
+which claims to calculate the most correct E-values\textsuperscript{1}
 and thus leaving the question if the Foldseek searches do not report too
 many false positives.
 
@@ -444,75 +513,105 @@ many false positives.
 
 \centering{
 
-\pandocbounded{\includegraphics[keepaspectratio]{../figures/hit_overlap_summary.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{../figures/search_results/hit_overlap_summary.pdf}}
 
 }
 
-\caption{\label{fig-overlap}A) Bar plot showing the number of proteins
-that got a hit against the BFVD shown per method (colored by category)
-before and after filtering the reported results on e-value lower than
-1e-3 (lighter color). B-D) Pairwise comparisons of shared hits across
-methods for the same test proteins, shown for the best 25 hits (B), the
-best 25 hits filtered for e-values lower than 1e-3 (C), and the top hits
-regardless of e-value (D). Text inside the colored tiles indicate the
-number of shared hits for the method on the x-axis compared to the
-method on the y-axis, followed by the percentage of shared hits as a
-proportion of the total hits for the method on the y-axis.}
+\caption{\label{fig-overlap}A) The number of proteins that got a hit
+against the BFVD shown per method (colored by category) before and after
+filtering the reported results on E-value lower than 1e-03 (lighter
+color). B) The total number of hits across all test proteins in function
+of the E-value for each method. C-D) Pairwise comparisons of shared hits
+across methods for the same test proteins, shown for the best 25 hits
+(C), and the top hits regardless of E-value (D). Text inside the colored
+tiles indicate the number of shared hits for the method on the x-axis
+compared to the method on the y-axis, followed by the percentage of
+shared hits as a proportion of the total hits for the method on the
+y-axis.}
 
 \end{figure}%
 
 \subsection{Functional annotation
 comparison}\label{functional-annotation-comparison}
 
-To functionally annotate our test proteins for each method, weights in
-form of the negative log e-value (or a weight of 1000 in case of an
-e-value of 0) were given to each hit. These weights were summed per
-functional category (assigned to each entry in the BFVD; see
-\hyperref[functional-classifier]{methods}) and the category with the
-largest weight was chosen as the functional category for each test
-protein. Informative categories were prioritized over uninformative
-categories (ie. ``Hypothetical Protein'', ``unknown'', ``Other
-function'') when the weight of the informative category was at least
-50\% the weight of the uninformative categories.
+Using a weighted approach, we assigned functional categories to the test
+proteins for each method based on the hits with an E-value smaller than
+1e-03 (see \hyperref[functional-category-assignment]{methods}). This
+showed that
 
 To evaluate the accuracy of the benchmarked methods, we considered the
-test proteins with an informative annotation (n=2,938) (see
-Figure~\ref{fig-informative}A) as the ground truth to compare our
-results to. All methods improved the number of informative categories
-for all test proteins (see Figure~\ref{fig-informative}A), with mostly
-the embedding and structure based methods seeming to improve the number
-of informative annotations. However, when comparing the functional
-annotations to the ``ground truth'', the embedding and structure based
-methods underperformed compared to the sequence based methods
-(\textasciitilde67\% and \textasciitilde76\% vs \textasciitilde83\%
-agreement with ground truth; see Figure~\ref{fig-informative}B).
+test proteins with an informative annotation (n=2,938) as the ground
+truth to compare our results to. All methods improved the number of
+informative categories (see Figure~\ref{fig-annotation}A), with the
+sequence based methods, together with TEA and Foldseek, improving the
+number of informative assignments the most. However, when comparing the
+functional annotations to the ``ground truth'', all embedding and
+structure based methods underperformed compared to the sequence based
+methods (maximum \textasciitilde67\% and \textasciitilde76\% vs
+\textasciitilde83\% agreement with ground truth; see
+Figure~\ref{fig-annotation}B).
 
 \begin{figure}[H]
 
 \centering{
 
-\pandocbounded{\includegraphics[keepaspectratio]{../figures/informative_and_category_agreement.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{../figures/search_results/annotation_combined.pdf}}
 
 }
 
-\caption{\label{fig-informative}A) Bar plot showing the number of
-proteins that received an informative functional annotation (i.e.~not
-``Hypothetical Protein'', ``unknown'' or ``Other Function'') for the
-original protein descriptions and after applying each method. B) Barplot
-showing the percentage of queries that have a matching functional
-category for each method compared tot the informative original
-functional categories (regarded as the ground truth).}
+\caption{\label{fig-annotation}A) The number of proteins that received
+an informative functional annotation (i.e.~not ``Hypothetical Protein'',
+``unknown'' or ``Other Function'') after applying each method. B) The
+percentage of queries that have a matching functional category for each
+method compared tot the informative original functional categories
+(regarded as the ground truth). C) Comparison of final assigned
+annotation categories compared to the original categories. Negative
+changes (ie. different informative categories or informative labels that
+changed to non-informative categories) are displayed to the left of the
+zero point, matches or category improvements (from non-informative to
+informative) are displayed on the right.}
 
 \end{figure}%
 
 \subsection{Computational
 benchmarking}\label{computational-benchmarking}
 
+All search methods were benchmarked for runtime and memory usage using
+Hyperfine\textsuperscript{4} and \texttt{nvidia-smi} for GPU memory
+consumption. As expected, the sequence-based methods were much faster
+and less memory intensive compared to the embedding and structure based
+methods (see Figure~\ref{fig-computational-benchmark} and
+Supplemental Figure~\ref{suppfig-time-increase}). Both Diamond and
+MMseqs2 finished the search of the \textgreater11,000 proteins against
+the BFVD in under 10 seconds, followed by BLASTp with a runtime of
+almost two minutes, a \textasciitilde28x time increase compared to
+MMseqs2 which was the fastest workflow.
+
+\begin{figure}[H]
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{../figures/computational_benchmark/hyperfine_time_vs_memory.pdf}}
+
+}
+
+\caption{\label{fig-computational-benchmark}Log\textsubscript{10}-transformed
+runtime in seconds of the different workflows plotted in function of the
+log\textsubscript{10}-transformed memory usage (in GiB). For multistep
+workflows the indicated time is a cumulation of all steps (arrows
+indicate directionality of workflow steps). Worklfows are colored by
+search method, CPU and GPU steps are indicated by circles and triangles
+respectively. The inset shows the difference in runtime between foldseek
+and reseek after MSA generation (ColabFold) and structure prediction
+(Boltz2).}
+
+\end{figure}%
+
 \section{Conclusion}\label{conclusion}
 
 Although new methods like pLMs and structure homology searches have
-shown great promise in detecting remote homologs\textsuperscript{2,4,5}
-including bacteriophage protein searches\textsuperscript{1}, this does
+shown great promise in detecting remote homologs\textsuperscript{1,5,6},
+including bacteriophage protein searches\textsuperscript{3}, this does
 not seem to be the case for eukaryotic virus proteins. If we consider
 that structural homology searches are most useful to find homologs with
 a clearly defined protein structure, a possible explanation could be
@@ -525,8 +624,6 @@ searches in eukaryotic virus protein annotation might be limited.
 
 \subsection{Dataset selection}\label{dataset-selection}
 
-\hl{\textbf{ADD SOFTWARE VERSIONS}}
-
 \subsubsection{Test set}\label{test-set}
 
 To benchmark different methods for eukaryotic virus protein annotation,
@@ -538,14 +635,14 @@ accession numbers (n=1,402) and downloaded all associated proteins
 
 Protein sequences that were longer than 2,500 amino acids were split
 into multiple chunks of maximum 2,500 amino acids so that structure
-prediction with Boltz-2\textsuperscript{6} would not run out of GPU
+prediction with Boltz-2\textsuperscript{7} would not run out of GPU
 memory (see \hyperref[computational-benchmarking]{below}). This resulted
 in a final test set of 11,467 protein sequences from 1,000 eukaryotic
 virus species.
 
 \subsubsection{Database}\label{database}
 
-The Big Fantastic Virus Database (BFVD)\textsuperscript{7} was used as
+The Big Fantastic Virus Database (BFVD)\textsuperscript{8} was used as
 the reference database for both sequence and structure homology-based
 annotation. The BFVD is a comprehensive database of high-quality
 predicted protein structures from the viral sequence representatives of
@@ -560,10 +657,10 @@ Functional categories for each BFVD entry were derived from protein
 names associated with the corresponding UniParc IDs (could be from
 UniProtKB/TrEMBL, RefSeq and/or GenBank) for eukaryotic viruses (also
 see \hyperref[functional-classifier]{below}) or by classifying them into
-PHROG-like\textsuperscript{8} categories with Empathi\textsuperscript{9}
-in the case of bacteriophage proteins. The distinction between
-eukaryotic virus and bacteriophage proteins was made based on the TaxID
-information from the UniParc protein ID.
+PHROG-like\textsuperscript{9} categories with
+Empathi\textsuperscript{10} in the case of bacteriophage proteins. The
+distinction between eukaryotic virus and bacteriophage proteins was made
+based on the TaxID information from the UniParc protein ID.
 
 The BFVD database was further converted into the required formats the
 search tools used in this benchmarking effort (see
@@ -578,10 +675,10 @@ Perplexity AI in deep research mode using the following prompt: ``Can
 you give me an exhaustive list of common protein functions in eukaryotic
 viruses? Use https://viralzone.expasy.org and
 https://ictv.global/report/genome as sources. Give me a machine readable
-file with all these functional categories.'' The resulting functional
+file with all functional categories.'' The resulting functional
 categories were further manually curated to ensure that they were
-mutually exclusive. The final list of functional categories is available
-in \hl{Supplementary Table 1}.
+mutually exclusive. The final list of functional categories is provided
+in Table~\ref{tbl-supp-functional-categories}.
 
 A custom python script was used to assign functional categories to BFVD
 proteins based on pattern matching. Perplexity AI was used to assign the
@@ -601,29 +698,32 @@ annotation}\label{sequence-homology-based-annotation}
 
 For sequence homology annotation, we used three state-of-the-art tools
 widely used in functional annotation pipelines and sequence similarity
-searches. As gold standard, blastp\textsuperscript{10} was used with an
-e-value cutoff of 1e-3 to align the test set amino acid sequences
-against the amino acid sequences of the BFVD entries. In addition, we
-used diamond blastp\textsuperscript{11} in sensitive mode and mmseqs2
-easy-search\textsuperscript{12} with default settings; both have a
-default e-value cutoff of 1e-3.
+searches. As gold standard, BLASTp v2.16.0+\textsuperscript{11} was used
+to align the test set amino acid sequences against the amino acid
+sequences of the BFVD entries. In addition, we used
+\texttt{diamond\ blastp} (Diamond v2.1.16)\textsuperscript{12} in
+sensitive mode and \texttt{mmseqs\ easy-search} (MMseqs2
+v18.8cc5c)\textsuperscript{13} with default settings; except for an
+E-value cutoff of 10 instead of 1e-03 to allow comparison to the other
+methods.
 
 \subsection{Protein embedding-based
 annotation}\label{protein-embedding-based-annotation}
 
 \subsubsection{ProstT5}\label{prostt5}
 
-ProstT5\textsuperscript{13} is a pLM, based on
-ProtT5-XL-U50\textsuperscript{14}, finetuned for translating amino acid
+ProstT5\textsuperscript{14} is a pLM, based on
+ProtT5-XL-U50\textsuperscript{15}, finetuned for translating amino acid
 sequences into structure representations with 3Di sequences. We used
-ProstT5 within foldseek\textsuperscript{4} using default settings to
-generate 3Di sequences for our test set and search them against the
-BFVD.
+ProstT5 within foldseek v10.941cd33\textsuperscript{5} using default
+settings of \texttt{foldseek\ createdb} to generate 3Di sequences for
+our test set and search them against the BFVD with
+\texttt{foldseek\ easy-search}.
 
 \subsubsection{TEA}\label{tea}
 
-In contrast to ProstT5, The Embedded Alphabet (TEA)\textsuperscript{5}
-uses the ESM2 pLM\textsuperscript{15} to generate embeddings for protein
+In contrast to ProstT5, The Embedded Alphabet (TEA)\textsuperscript{6}
+uses the ESM2 pLM\textsuperscript{16} to generate embeddings for protein
 sequences and converts these embeddings into TEA sequences using this
 novel structural alphabet. Despite TEA and 3Di both consisting of 20
 characters, TEA is different from 3Di in terms of the numbers and
@@ -633,9 +733,10 @@ across multiple alphabet characters.
 
 We converted both our test set and the BFVD into TEA sequences using the
 \texttt{tea\_convert} pipeline with default settings, and subsequently
-performed sequence similarity searches using mmseqs2
-easy-search\textsuperscript{12} with a custom substitution matrix
-(matcha substiution matrix provided with TEA) and gap scoring settings
+performed sequence similarity searches using
+\texttt{mmseqs\ easy-search}\textsuperscript{13} with a custom
+substitution matrix (matcha substiution matrix provided with TEA) and
+gap scoring settings
 (\texttt{-\/-comp-bias-corr\ 0\ -\/-mask\ 0\ -\/-gap-open\ 18\ -\/-gap-extend\ 3})
 to search the test set against the BFVD.
 
@@ -645,138 +746,179 @@ annotation}\label{structure-homology-based-annotation}
 \subsubsection{Structure prediction}\label{structure-prediction}
 
 For the structure prediction of our test set proteins, we relied on
-Boltz-2\textsuperscript{6} (default settings) with multiple sequence
-alignments (MSAs) generated by a local, adapted ColabFold
-installation\textsuperscript{16} (see
+Boltz v2.2.1\textsuperscript{7} (default settings) with multiple
+sequence alignments (MSAs) generated by a local, adapted ColabFold
+installation\textsuperscript{17} (see
 \url{https://github.com/gbouras13/colabfoldv}). To increase the depth
 and diversity of the MSAs, we used the default ColabFold sequence
 databases, supplemented with extra \emph{Orthornavirae}
-sequences\textsuperscript{17} and viral sequences used in the structure
-prediction for the Phold database\textsuperscript{1}. Structures were
-predicted on an NVIDIA H100 GPU with 80GB of VRAM.
+sequences\textsuperscript{18} and viral sequences used in the structure
+prediction for the Phold database\textsuperscript{3}.
 
 \subsubsection{Foldseek}\label{foldseek}
 
-Foldseek\textsuperscript{4} converts predicted protein structures into
+Foldseek\textsuperscript{5} converts predicted protein structures into
 3Di sequences and subsequently performs fast structure similarity
-searches using these 3Di sequences. Here, we used foldseek easy-search
-with default settings to search the predicted structures of our test set
-against the BFVD.
+searches using these 3Di sequences. Here, we used
+\texttt{foldseek\ easy-search} (Foldeek v10.941cd33) with default
+settings to search the predicted structures of our test set against the
+BFVD.
 
 \subsubsection{Reseek}\label{reseek}
 
-Reseek\textsuperscript{2} aligns structures in a similar way to
+Reseek\textsuperscript{1} aligns structures in a similar way to
 Foldseek, but uses a different structural alphabet consisting of
 \textasciitilde10\textsuperscript{11} states, promising better
 sensitivity for remote homologs.
 
 We used an adapted version of Reseek v2.7 in sensitive mode that
 switches the loading of the queries and database to get more accurate
-e-value calculations (see
+E-value calculations (see
 \href{https://github.com/rcedgar/reseek/issues/18}{this discussion}).
+
+\subsection{Functional category
+assignment}\label{functional-category-assignment}
+
+To functionally annotate our test proteins for each method, weights in
+form of the negative log E-value (or a weight of 1000 in case of an
+E-value of 0) were given to each hit. These weights were summed per
+functional category (assigned to each entry in the BFVD; see
+\hyperref[functional-classifier]{above}) and the category with the
+largest weight was chosen as the functional category for each test
+protein. Informative categories were prioritized over uninformative
+categories (ie. ``Hypothetical Protein'', ``unknown'', ``Other
+function'') when the weight of the informative category was at least
+50\% the weight of the uninformative categories.
 
 \subsection{Computational
 benchmarking}\label{computational-benchmarking-1}
 
-\begin{itemize}
-\tightlist
-\item
-  hyperfine
-\end{itemize}
+All steps in our analysis were benchmarked for both time and memory
+usage using hyperfine v1.20.0\textsuperscript{4}. GPU memory consumption
+was measured by sampling usage every 200 ms with nvidia-smi v580.82.07,
+recording the peak value observed after each step.
+
+All CPU analysis steps were performed on an HPC system using one IceLake
+node with 72 cores (2 Intel Xeon Platinum 8360Y CPUs@2.4 GHz; 256 GiB
+RAM), except for the MSA generation step which was performed on an
+IceLake big memory node with 72 cores (2 Intel Xeon Platinum 8360Y
+CPUs@2.4 GHz; 2048 GiB RAM). The GPU analyses were performed on one
+NVIDIA H100 SXM5 GPU (80 GiB HBM3) mounted on a node equipped with 2 AMD
+EPYC 9334 CPUs (768 GiB RAM).
+
+\subsection{Code availibility}\label{code-availibility}
+
+Code to reproduce this analysis is available on
+\href{https://github.com/LanderDC/annotation_benchmark/}{GitHub}.
+
+\subsection{Data availibility}\label{data-availibility}
+
+\hl{upload to zenodo}
+
+\section{Acknowledgements}\label{acknowledgements}
+
+LDC acknowledges support from the Research Foundation - Flanders (grants
+11L1325N and V451025N). The resources and services used in this work
+were provided by the VSC (Flemish Supercomputer Center), funded by the
+Research Foundation - Flanders (FWO) and the Flemish Government.
 
 \section{References}\label{references}
 
-\phantomsection\label{refs}
+\protect\phantomsection\label{refs}
 \begin{CSLReferences}{0}{0}
-\bibitem[\citeproctext]{ref-bourasProteinStructureinformedBacteriophage2026}
-\CSLLeftMargin{1. }%
-\CSLRightInline{Bouras, G. \emph{et al.}
-\href{https://doi.org/10.1093/nar/gkaf1448}{Protein structure-informed
-bacteriophage genome annotation with {Phold}}. \emph{Nucleic Acids
-Research} \textbf{54}, (2026).}
-
 \bibitem[\citeproctext]{ref-edgarProteinStructureAlignment2024}
-\CSLLeftMargin{2. }%
+\CSLLeftMargin{1. }%
 \CSLRightInline{Edgar, R. C.
 \href{https://doi.org/10.1093/bioinformatics/btae687}{Protein structure
 alignment by {Reseek} improves sensitivity to remote homologs}.
 \emph{Bioinformatics} \textbf{40}, btae687 (2024).}
 
 \bibitem[\citeproctext]{ref-edgarProteinStructureAlignment2025}
-\CSLLeftMargin{3. }%
+\CSLLeftMargin{2. }%
 \CSLRightInline{Edgar, R. C. \& Sahakyan, H. Protein structure alignment
 significance is often exaggerated. 2025.07.17.665375 (2025)
 doi:\href{https://doi.org/10.1101/2025.07.17.665375}{10.1101/2025.07.17.665375}.}
 
-\bibitem[\citeproctext]{ref-vankempenFastAccurateProtein2024}
+\bibitem[\citeproctext]{ref-bourasProteinStructureinformedBacteriophage2026}
+\CSLLeftMargin{3. }%
+\CSLRightInline{Bouras, G. \emph{et al.}
+\href{https://doi.org/10.1093/nar/gkaf1448}{Protein structure-informed
+bacteriophage genome annotation with {Phold}}. \emph{Nucleic Acids
+Research} \textbf{54}, (2026).}
+
+\bibitem[\citeproctext]{ref-Peter_hyperfine_2023}
 \CSLLeftMargin{4. }%
-\CSLRightInline{van Kempen, M. \emph{et al.}
+\CSLRightInline{Peter, D. Hyperfine. (2023).}
+
+\bibitem[\citeproctext]{ref-vankempenFastAccurateProtein2024}
+\CSLLeftMargin{5. }%
+\CSLRightInline{{van Kempen, M. \emph{et al.}}
 \href{https://doi.org/10.1038/s41587-023-01773-0}{Fast and accurate
 protein structure search with {Foldseek}}. \emph{Nature Biotechnology}
 \textbf{42}, 243--246 (2024).}
 
 \bibitem[\citeproctext]{ref-pantoliniRewritingProteinAlphabets2026}
-\CSLLeftMargin{5. }%
+\CSLLeftMargin{6. }%
 \CSLRightInline{Pantolini, L. \emph{et al.} Rewriting protein alphabets
 with language models. 2025.11.27.690975 (2026)
 doi:\href{https://doi.org/10.1101/2025.11.27.690975}{10.1101/2025.11.27.690975}.}
 
 \bibitem[\citeproctext]{ref-passaroBoltz2AccurateEfficient2025}
-\CSLLeftMargin{6. }%
+\CSLLeftMargin{7. }%
 \CSLRightInline{Passaro, S. \emph{et al.} Boltz-2: {Towards Accurate}
 and {Efficient Binding Affinity Prediction}. 2025.06.14.659707 (2025)
 doi:\href{https://doi.org/10.1101/2025.06.14.659707}{10.1101/2025.06.14.659707}.}
 
 \bibitem[\citeproctext]{ref-kimBFVDLargeRepository2025}
-\CSLLeftMargin{7. }%
+\CSLLeftMargin{8. }%
 \CSLRightInline{Kim, R. S., Levy Karin, E., Mirdita, M., Chikhi, R. \&
 Steinegger, M. \href{https://doi.org/10.1093/nar/gkae1119}{{BFVD}---a
 large repository of predicted viral protein structures}. \emph{Nucleic
 Acids Research} \textbf{53}, D340--D347 (2025).}
 
 \bibitem[\citeproctext]{ref-terzianPHROGFamiliesProkaryotic2021}
-\CSLLeftMargin{8. }%
+\CSLLeftMargin{9. }%
 \CSLRightInline{Terzian, P. \emph{et al.}
 \href{https://doi.org/10.1093/nargab/lqab067}{{PHROG}: Families of
 prokaryotic virus proteins clustered using remote homology}. \emph{NAR
 Genomics and Bioinformatics} \textbf{3}, lqab067 (2021).}
 
 \bibitem[\citeproctext]{ref-boulayEmpathiEmbeddingbasedPhage2025}
-\CSLLeftMargin{9. }%
+\CSLLeftMargin{10. }%
 \CSLRightInline{Boulay, A., Leprince, A., Enault, F., Rousseau, E. \&
 Galiez, C. \href{https://doi.org/10.1038/s41467-025-64177-5}{Empathi:
 Embedding-based phage protein annotation tool by hierarchical
 assignment}. \emph{Nature Communications} \textbf{16}, 9114 (2025).}
 
 \bibitem[\citeproctext]{ref-altschulBasicLocalAlignment1990}
-\CSLLeftMargin{10. }%
+\CSLLeftMargin{11. }%
 \CSLRightInline{Altschul, S. F., Gish, W., Miller, W., Myers, E. W. \&
 Lipman, D. J. \href{https://doi.org/10.1016/S0022-2836(05)80360-2}{Basic
 local alignment search tool}. \textbf{215}, 403--410 (1990).}
 
 \bibitem[\citeproctext]{ref-buchfinkSensitiveProteinAlignments2021}
-\CSLLeftMargin{11. }%
+\CSLLeftMargin{12. }%
 \CSLRightInline{Buchfink, B., Reuter, K. \& Drost, H.-G.
 \href{https://doi.org/10.1038/s41592-021-01101-x}{Sensitive protein
 alignments at tree-of-life scale using {DIAMOND}}. \emph{Nature Methods}
 \textbf{18}, 366--368 (2021).}
 
 \bibitem[\citeproctext]{ref-steineggerMMseqs2EnablesSensitive2017}
-\CSLLeftMargin{12. }%
+\CSLLeftMargin{13. }%
 \CSLRightInline{Steinegger, M. \& Söding, J.
 \href{https://doi.org/10.1038/nbt.3988}{{MMseqs2} enables sensitive
 protein sequence searching for the analysis of massive data sets}.
 \emph{Nature Biotechnology} \textbf{35}, 1026--1028 (2017).}
 
 \bibitem[\citeproctext]{ref-heinzingerBilingualLanguageModel2024}
-\CSLLeftMargin{13. }%
+\CSLLeftMargin{14. }%
 \CSLRightInline{Heinzinger, M. \emph{et al.}
 \href{https://doi.org/10.1093/nargab/lqae150}{Bilingual language model
 for protein sequence and structure}. \emph{NAR Genomics and
 Bioinformatics} \textbf{6}, lqae150 (2024).}
 
 \bibitem[\citeproctext]{ref-elnaggarProtTransUnderstandingLanguage2022}
-\CSLLeftMargin{14. }%
+\CSLLeftMargin{15. }%
 \CSLRightInline{Elnaggar, A. \emph{et al.}
 \href{https://doi.org/10.1109/TPAMI.2021.3095381}{{ProtTrans}: {Toward
 Understanding} the {Language} of {Life Through Self-Supervised
@@ -784,21 +926,21 @@ Learning}}. \emph{IEEE Transactions on Pattern Analysis and Machine
 Intelligence} \textbf{44}, 7112--7127 (2022).}
 
 \bibitem[\citeproctext]{ref-linEvolutionaryscalePredictionAtomiclevel2023}
-\CSLLeftMargin{15. }%
-\CSLRightInline{Lin, Z. \emph{et al.}
+\CSLLeftMargin{16. }%
+\CSLRightInline{{Lin, Z. \emph{et al.}}
 \href{https://doi.org/10.1126/science.ade2574}{Evolutionary-scale
 prediction of atomic-level protein structure with a language model}.
 \emph{Science} \textbf{379}, 1123--1130 (2023).}
 
 \bibitem[\citeproctext]{ref-mirditaColabFoldMakingProtein2022}
-\CSLLeftMargin{16. }%
+\CSLLeftMargin{17. }%
 \CSLRightInline{Mirdita, M. \emph{et al.}
 \href{https://doi.org/10.1038/s41592-022-01488-1}{{ColabFold}: Making
 protein folding accessible to all}. \emph{Nature Methods} \textbf{19},
 679--682 (2022).}
 
 \bibitem[\citeproctext]{ref-mutzProteinStructuromeOrthornavirae2024}
-\CSLLeftMargin{17. }%
+\CSLLeftMargin{18. }%
 \CSLRightInline{Mutz, P. \emph{et al.}
 \href{https://doi.org/10.1128/mbio.03200-24}{The protein structurome of
 {Orthornavirae} and its dark matter}. \emph{mBio} \textbf{16},
@@ -814,14 +956,130 @@ e03200--24 (2024).}
 
 \centering{
 
-\pandocbounded{\includegraphics[keepaspectratio]{../figures/kingdom_distribution.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{../figures/data_info/kingdom_distribution.pdf}}
 
 }
 
-\caption{\label{suppfig-kingdom}Bar plot showing the distribution of the
-number of genomes from the different viral Kingdoms in the test set.}
+\caption{\label{suppfig-kingdom}The distribution of the number of
+genomes from the different viral Kingdoms in the test set.}
 
 \end{suppfig}%
+
+\begin{suppfig}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{../figures/search_results/unique_queries_vs_evalue.pdf}}
+
+}
+
+\caption{\label{suppfig-query-vs-evalue}The number of test proteins with
+at least 1 hit for each method across different E-value thresholds.}
+
+\end{suppfig}%
+
+\begin{suppfig}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{../figures/search_results/hit_overlap_methods.pdf}}
+
+}
+
+\caption{\label{suppfig-pairwise-method}Pairwise comparisons of shared
+hits between search methods for (A) the best 25 hits, (B) the best 25
+hits after filtering on E-value (E \textless{} 1e-03), and (C) the top
+hits for each query.}
+
+\end{suppfig}%
+
+\begin{suppfig}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{../figures/computational_benchmark/time_fold_increase.pdf}}
+
+}
+
+\caption{\label{suppfig-time-increase}Workflow runtime increase compared
+to the fastest workflow (MMseqs2).}
+
+\end{suppfig}%
+
+\FloatBarrier
+
+\newpage{}
+
+\begin{landscape}
+
+\section{Supplementary Tables}\label{supplementary-tables}
+
+\begin{longtable}{p{3.2cm}p{4.4cm}p{10.8cm}p{4.2cm}}
+
+\caption{\label{tbl-supp-functional-categories}Final functional
+categories used for annotation, including descriptions, pattern matching
+keywords, and exclusions.}
+
+\tabularnewline
+
+\toprule
+Category & Description & Pattern matching keywords & Exclusions\\
+\midrule
+Capsid Protein & Capsid proteins forming the icosahedral or other geometric viral shell & capsid protein; major capsid protein; minor capsid protein; coat protein; vp1; vp2; vp3; vp4; vp5; vp6; vp7; l1; virion structural protein; structural protein; head protein; internal protein; capsid & nucleocapsid; nucleoprotein; nonstructural; non-structural\\
+Nucleocapsid Protein & Nucleocapsid proteins packaging and condensing the viral genome in helical or amorphous structures & nucleocapsid; nucleoprotein; np protein; n protein; core protein; ribonucleoprotein; rnp protein; virion core; core protein & None\\
+Envelope/Surface Glycoprotein & Envelope and surface glycoproteins mediating receptor binding, membrane fusion, and viral entry & envelope glycoprotein; envelope protein; spike; glycoprotein gp; glycoprotein; surface glycoprotein; gp120; gp41; hemagglutinin; neuraminidase; fusion protein; attachment glycoprotein; gn ; gc ; e1 protein; e2 protein; ha protein; na protein; f protein; spike protein; membrane glycoprotein & non-structural; nonstructural\\
+Matrix/Tegument Structural & Matrix and tegument proteins bridging capsid and envelope, involved in assembly and budding & matrix protein; tegument; m protein; vp13; vp14; vp16; ul; ul21; ul121; us protein; inner envelope; matrix & non-structural; nonstructural\\
+DNA Packaging/Capsid Maturation & Proteins involved in DNA translocation into capsids and capsid maturation (mainly dsDNA viruses) & portal; terminase; dna packaging; capsid maturation; prohead; scaffolding; head protein; head-tail; scaffold & None\\
+\addlinespace
+Tail/Baseplate Structural & Tail, baseplate, and fiber proteins for attachment and DNA injection (bacteriophage-like viruses) & tail; baseplate; tail fiber; tail spike; tail tube; tail sheath; collar; tail tip & None\\
+Occlusion Body Protein & Proteins forming occlusion bodies or inclusion bodies that protect virions (baculoviruses, poxviruses) & occlusion; polyhedrin; granulin; p10 protein; occlusion-derived; inclusion body; a-type inclusion & None\\
+RNA-Dependent RNA Polymerase (RdRp) & RNA-dependent RNA polymerases catalyzing viral RNA genome replication and transcription & rdrp; rna-dependent rna polymerase; rna dependent rna polymerase; rna directed rna polymerase; rna-directed rna polymerase; rna polymerase; pb1; pb2; pa; polymerase basic 1; polymerase basic 2; polymerase acidic; l-protein; l protein; replicase & dna polymerase; reverse transcriptase\\
+DNA Polymerase & DNA polymerases catalyzing viral DNA genome replication & dna polymerase; dna-dependent dna polymerase; dna dependent dna polymerase; dna directed dna polymerase; dna-directed dna polymerase; dna pol & reverse transcriptase; rna-dependent; replicase\\
+Reverse Transcriptase & Reverse transcriptases synthesizing DNA from RNA templates (retroviruses, pararetroviruses) & reverse transcriptase; rt protein; rna-dependent dna polymerase; rna directed dna polymerase; rna-directed dna polymerase; rna dependent dna polymerase; pol protein & None\\
+\addlinespace
+Helicase & Helicases unwinding DNA or RNA duplexes during replication and recombination & helicase; dna helicase; rna helicase & ntpase; atpase; gtpase\\
+NTPase/ATPase & NTPases and ATPases providing energy for various viral processes (not helicases or packaging) & ntpase; atpase; gtpase; adenosine triphosphatase; nucleoside triphosphatase; aaa+ atpase & helicase; terminase; packaging protein\\
+Primase/Primase-Polymerase & Primases synthesizing RNA primers for DNA replication & primase; helicase-primase; primase-polymerase & None\\
+Genome-Linked Protein (VPg/Terminal) & Proteins covalently linked to viral genome termini, serving as primers & vpg; genome-linked; terminal protein; genome linked & None\\
+mRNA Capping/Methyltransferase & Enzymes catalyzing mRNA cap synthesis and methylation & methyltransferase; mtase; capping enzyme; guanylyltransferase; n7-methyltransferase; 2'-o-methyltransferase; methylase; mrna cap & histone\\
+\addlinespace
+Nuclease (Endo/Exonuclease) & Nucleases involved in genome processing, recombination, or cap-snatching & nuclease; endonuclease; exonuclease; dnase; rnase; ribonuclease & None\\
+Replication Cofactor/Processivity Factor & Cofactors stabilizing polymerase complexes and enhancing processivity & processivity; replication cofactor; polymerase cofactor; replication accessory; vp35; replication associated & None\\
+Viral Protease & Viral proteases cleaving polyproteins into mature functional proteins & protease; proteinase; peptidase; 3clpro; mpro; plpro; papain-like; chymotrypsin & None\\
+Polyprotein Precursor & Polyprotein precursors encoding multiple proteins cleaved post-translationally & polyprotein; orf1a; orf1ab; precursor protein; gag-pol; gag protein; gag-pol; gag & None\\
+Transcriptional Regulator/Transactivator & Proteins regulating viral and host transcription & transcription; transactivator; transcriptional; tat protein; ie protein; immediate-early; early protein; late protein; vltf; e1a; e2a & None\\
+\addlinespace
+RNA-Binding Regulatory Protein & RNA-binding proteins regulating RNA stability, translation, and packaging & rna-binding; rna binding; rnp; ribonucleoprotein; zinc finger; znf; zccch & None\\
+RNA Export/Splicing Regulator & Proteins regulating RNA nuclear export and splicing (retroviruses, nuclear DNA viruses) & rev protein; export; splicing; nuclear export & None\\
+Assembly/Morphogenesis Factor & Proteins coordinating virion assembly, morphogenesis, and budding & assembly; morphogenesis; budding; nsm protein; virion assembly; maturation protein & None\\
+Innate Immune/Interferon Antagonist & Proteins antagonizing innate immunity, particularly interferon pathways & ns1; nss; v protein; c protein; interferon; ifn antagonist; stat; irf; immune evasion; nef; vpu; vif; vpr & None\\
+Apoptosis/Cell-Cycle Modulator & Viral proteins modulating host apoptosis and cell-cycle pathways & apoptosis; bcl-2; cell cycle; v-cyclin; anti-apoptotic & None\\
+\addlinespace
+Cytokine/Receptor Mimic or Modulator & Viral mimics of cytokines or receptors, or proteins modulating cytokine signaling & cytokine; interleukin; chemokine; tnf; receptor; il-; v-il; decoy receptor; chemokine receptor; g-protein coupled receptor; secreted protein; secreted immunomodulatory & None\\
+Host Shutoff/Translation Inhibitor & Proteins inhibiting host mRNA translation or transcription & host shutoff; shutoff; translation inhibitor; nsp1 & None\\
+Virion Release/Budding Facilitator & Proteins facilitating virion release and budding from cells & release; budding; egress; late domain; tetherin antagonist & None\\
+Movement Protein & Proteins mediating cell-to-cell movement in plant viruses & movement protein; mp protein; plasmodesmata & None\\
+Integrase/Recombinase & Enzymes integrating viral DNA into host genome or mediating recombination & integrase; int protein; recombinase; integration & None\\
+\addlinespace
+Episome Maintenance/Replication Origin Binding & Proteins maintaining episomal viral genomes and ensuring replication/segregation & ebna1; episome; origin binding; replication origin; partitioning & None\\
+Membrane Remodeling/Replication Organelle & Proteins inducing membrane vesicles and replication organelles & ns4a; ns4b; membrane remodeling; replication complex; vesicle & None\\
+Viroporin/Ion Channel & Small membrane proteins forming ion channels & viroporin; ion channel; m2 protein; channel & None\\
+Nucleotide Metabolism Enzyme & Enzymes modulating dNTP pools for viral DNA replication & ribonucleotide reductase; dutpase; thymidine kinase; thymidylate; nucleotide kinase; deoxynucleoside; deoxyribonucleoside; rnr & None\\
+Viral Kinase/Phosphoprotein & Viral kinases phosphorylating viral/host proteins; phosphoproteins regulating replication & kinase; phosphoprotein; serine/threonine; tyrosine kinase; phospho protein; protein kinase & None\\
+\addlinespace
+Ligase & Viral ligases joining DNA or RNA molecules & ligase; dna ligase; rna ligase & ubiquitin ligase; e3 ubiquitin\\
+Ubiquitin/SUMO Pathway Protein & Proteins modulating ubiquitin or SUMO pathways & ubiquitin; e3 ubiquitin ligase; deubiquitinase; sumo; isg15 & None\\
+Other Viral Enzyme & Other viral enzymes (lipases, esterases, deaminases, etc.) & lipase; esterase; phospholipase; deaminase; transferase; amidotransferase; aminotransferase; oxidoreductase; hydrolase; lyase; isomerase & methyltransferase; polymerase; transferase rna; transferase dna\\
+Viroplasm/Viral Factory Protein & Proteins forming viral replication factories or viroplasms & viroplasm; viral factory; inclusion; replication factory & a-type inclusion\\
+Accessory/Virulence Factor & Accessory proteins modulating virulence, host range, or tissue tropism & accessory; virulence; pathogenicity; host range & None\\
+\addlinespace
+Non-Structural Protein (General) & General non-structural proteins with diverse or unclear roles & non-structural; nonstructural; ns protein; nsp & None\\
+Hypothetical Protein & Proteins with unknown or uncharacterized function & uncharacterized; hypothetical; unknown; putative protein; orf protein; predicted protein & None\\
+\bottomrule
+
+\end{longtable}
+
+\end{landscape}
 
 
 

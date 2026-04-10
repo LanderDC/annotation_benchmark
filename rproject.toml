@@ -24,4 +24,5 @@ dependencies = [
     "ggpubr",
     "ggokabeito",
     "ggtext",
+    "kableExtra",
 ]

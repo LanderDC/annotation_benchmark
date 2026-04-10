@@ -17,3 +17,6 @@ db/
 # tests to use different pLM (LucaVirus)
 # for TEA conversion
 scripts/pLM/tea_*.py
+
+/.quarto/
+**/*.quarto_ipynb
