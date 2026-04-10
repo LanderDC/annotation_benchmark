@@ -19,7 +19,7 @@ method_cols <- c(
 
 input_json <- "results/hyperfine/hyperfine_combined.json"
 
-output_plot <- "figures/computational_benchmark/hyperfine_time_vs_memory_gb.pdf"
+output_plot <- "figures/computational_benchmark/hyperfine_time_vs_memory.pdf"
 output_plot_workflow <- "figures/computational_benchmark/time_fold_increase.pdf"
 
 `%||%` <- function(x, y) {
@@ -233,7 +233,7 @@ p <- ggplot(
   labs(
     #title = "Hyperfine benchmark: cumulative runtime vs memory usage",
     x = "Cumulative time (seconds)",
-    y = "Memory usage (GB)"
+    y = "Memory usage (GiB)"
   ) +
   theme_bw(base_size = 12) +
   theme(
