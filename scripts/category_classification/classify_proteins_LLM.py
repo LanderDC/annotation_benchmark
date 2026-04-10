@@ -3,24 +3,37 @@
 Protein Name Functional Classifier
 ===================================
 Classifies protein names into predefined functional categories using a local
-open-source LLM via Ollama (default model: gemma3:12b).
+open-source LLM via HuggingFace Transformers.
 
 Requirements:
-    pip install ollama tqdm
+    pip install transformers torch accelerate tqdm
 
 Usage:
-    1. Start Ollama:       ollama serve
-    2. Pull the model:     ollama pull gemma3:12b
-    3. Run the script:
-         python classify_proteins.py \
-             --proteins proteins.json \
-             --categories categories.json \
-             --output results.json \
-             [--model gemma3:12b] \
-             [--batch-size 10] \
-             [--temperature 0.1] \
-             [--max-retries 3] \
-             [--workers 4]
+    python classify_proteins.py \
+        --proteins proteins.json \
+        --categories categories.json \
+        --output results.json \
+        [--model google/gemma-4-31b-it] \
+        [--batch-size 10] \
+        [--temperature 0.1] \
+        [--max-new-tokens 4096] \
+        [--device auto]
+
+SLURM example:
+    #!/bin/bash
+    #SBATCH --job-name=protein_classify
+    #SBATCH --gres=gpu:1
+    #SBATCH --mem=32G
+    #SBATCH --cpus-per-task=4
+    #SBATCH --time=04:00:00
+
+    module load cuda
+    source ~/myenv/bin/activate
+    python classify_proteins.py \\
+        --proteins proteins.json \\
+        --categories categories.json \\
+        --output results.json \\
+        --model google/gemma-4-31b-it
 """
 
 import argparse
@@ -29,20 +42,28 @@ import logging
 import re
 import sys
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
 try:
-    import ollama
+    import torch
 except ImportError:
-    print("ERROR: 'ollama' package not found. Install with: pip install ollama")
+    print("ERROR: 'torch' not found. Install with: pip install torch")
+    sys.exit(1)
+
+try:
+    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+except ImportError:
+    print(
+        "ERROR: 'transformers' not found. Install with: "
+        "pip install transformers accelerate"
+    )
     sys.exit(1)
 
 try:
     from tqdm import tqdm
 except ImportError:
-    print("ERROR: 'tqdm' package not found. Install with: pip install tqdm")
+    print("ERROR: 'tqdm' not found. Install with: pip install tqdm")
     sys.exit(1)
 
 # ---------------------------------------------------------------------------
@@ -112,6 +133,90 @@ Rules:
 
 
 # ---------------------------------------------------------------------------
+# Model loading
+# ---------------------------------------------------------------------------
+
+
+def load_model(
+    model_name: str,
+    device: str = "auto",
+    quantize: str | None = None,
+    hf_token: str | None = None,
+):
+    """
+    Load a HuggingFace causal LM and its tokenizer.
+
+    Parameters
+    ----------
+    model_name : str
+        HuggingFace model ID, e.g. "google/gemma-4-31b-it".
+    device : str
+        "auto", "cuda", "cpu", or a specific device like "cuda:0".
+    quantize : str or None
+        "4bit" or "8bit" for bitsandbytes quantisation (reduces VRAM usage).
+    hf_token : str or None
+        HuggingFace access token for gated models (e.g. Gemma).
+
+    Returns
+    -------
+    model, tokenizer
+    """
+    logger.info(f"Loading tokenizer for {model_name}...")
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name,
+        token=hf_token,
+    )
+
+    # --- Quantisation config -----------------------------------------------
+    quant_config = None
+    if quantize == "4bit":
+        logger.info("Using 4-bit quantisation (bitsandbytes)")
+        try:
+            quant_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.float16,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_quant_type="nf4",
+            )
+        except Exception:
+            logger.error(
+                "4-bit quantisation requires bitsandbytes: " "pip install bitsandbytes"
+            )
+            sys.exit(1)
+    elif quantize == "8bit":
+        logger.info("Using 8-bit quantisation (bitsandbytes)")
+        try:
+            quant_config = BitsAndBytesConfig(load_in_8bit=True)
+        except Exception:
+            logger.error(
+                "8-bit quantisation requires bitsandbytes: " "pip install bitsandbytes"
+            )
+            sys.exit(1)
+
+    # --- Load model --------------------------------------------------------
+    logger.info(f"Loading model {model_name} (this may take a few minutes)...")
+    load_kwargs: dict[str, Any] = {
+        "token": hf_token,
+        "torch_dtype": torch.float16,
+    }
+    if quant_config:
+        load_kwargs["quantization_config"] = quant_config
+        load_kwargs["device_map"] = "auto"
+    elif device == "auto":
+        load_kwargs["device_map"] = "auto"
+    else:
+        load_kwargs["device_map"] = device
+
+    model = AutoModelForCausalLM.from_pretrained(model_name, **load_kwargs)
+
+    logger.info("Model loaded successfully")
+    if hasattr(model, "hf_device_map"):
+        logger.info(f"Device map: {model.hf_device_map}")
+
+    return model, tokenizer
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -139,16 +244,13 @@ def extract_json_from_response(text: str) -> Any:
     Robustly extract JSON from an LLM response that may contain markdown
     fences, preamble text, or trailing commentary.
     """
-    # Strip markdown code fences if present
     text = re.sub(r"```(?:json)?", "", text).strip()
 
-    # Try parsing the whole thing first
     try:
         return json.loads(text)
     except json.JSONDecodeError:
         pass
 
-    # Try to find a JSON array
     match = re.search(r"\[.*\]", text, re.DOTALL)
     if match:
         try:
@@ -156,7 +258,6 @@ def extract_json_from_response(text: str) -> Any:
         except json.JSONDecodeError:
             pass
 
-    # Try to find a JSON object
     match = re.search(r"\{.*\}", text, re.DOTALL)
     if match:
         try:
@@ -177,37 +278,73 @@ def validate_categories(assigned: list[str], valid_categories: set[str]) -> list
 
 
 # ---------------------------------------------------------------------------
-# LLM interaction
+# LLM generation
 # ---------------------------------------------------------------------------
 
 
-def query_ollama(
-    model: str,
+def build_chat_prompt(
+    tokenizer,
+    system_prompt: str,
+    user_prompt: str,
+) -> str:
+    """
+    Build a prompt string using the tokenizer's chat template if available,
+    otherwise fall back to a simple format.
+    """
+    messages = [
+        {"role": "user", "content": f"{system_prompt}\n\n{user_prompt}"},
+    ]
+
+    # Many instruction-tuned models have a chat template
+    if hasattr(tokenizer, "chat_template") and tokenizer.chat_template:
+        try:
+            return tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+        except Exception:
+            pass
+
+    # Fallback for models without chat templates
+    return (
+        f"### System:\n{system_prompt}\n\n### User:\n{user_prompt}\n\n### Assistant:\n"
+    )
+
+
+def generate_response(
+    model,
+    tokenizer,
     system_prompt: str,
     user_prompt: str,
     temperature: float = 0.1,
-    max_retries: int = 3,
+    max_new_tokens: int = 4096,
 ) -> str:
-    """Send a prompt to Ollama and return the response text with retries."""
-    for attempt in range(1, max_retries + 1):
-        try:
-            response = ollama.chat(
-                model=model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                options={"temperature": temperature, "num_predict": 4096},
-            )
-            return response["message"]["content"].strip()
-        except Exception as e:
-            logger.warning(
-                f"Ollama request failed (attempt {attempt}/{max_retries}): {e}"
-            )
-            if attempt < max_retries:
-                time.sleep(2**attempt)
-            else:
-                raise
+    """Generate a response from the model."""
+    prompt = build_chat_prompt(tokenizer, system_prompt, user_prompt)
+
+    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+
+    gen_kwargs = {
+        "max_new_tokens": max_new_tokens,
+        "do_sample": temperature > 0,
+        "pad_token_id": tokenizer.eos_token_id,
+    }
+    if temperature > 0:
+        gen_kwargs["temperature"] = temperature
+        gen_kwargs["top_p"] = 0.9
+
+    with torch.no_grad():
+        output_ids = model.generate(**inputs, **gen_kwargs)
+
+    # Decode only the newly generated tokens
+    new_tokens = output_ids[0, inputs["input_ids"].shape[1] :]
+    response = tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+
+    return response
+
+
+# ---------------------------------------------------------------------------
+# Classification functions
+# ---------------------------------------------------------------------------
 
 
 def classify_single_protein(
@@ -215,9 +352,10 @@ def classify_single_protein(
     protein_names: list[str],
     categories_list: list[str],
     valid_categories: set[str],
-    model: str,
+    model,
+    tokenizer,
     temperature: float,
-    max_retries: int,
+    max_new_tokens: int,
 ) -> dict:
     """Classify a single protein and return a result dict."""
     categories_str = "\n".join(f"  - {c}" for c in categories_list)
@@ -229,7 +367,9 @@ def classify_single_protein(
         protein_names=names_str,
     )
 
-    raw = query_ollama(model, SYSTEM_PROMPT, prompt, temperature, max_retries)
+    raw = generate_response(
+        model, tokenizer, SYSTEM_PROMPT, prompt, temperature, max_new_tokens
+    )
     parsed = extract_json_from_response(raw)
 
     if parsed and isinstance(parsed, dict) and "categories" in parsed:
@@ -244,9 +384,10 @@ def classify_batch(
     batch: list[tuple[str, list[str]]],
     categories_list: list[str],
     valid_categories: set[str],
-    model: str,
+    model,
+    tokenizer,
     temperature: float,
-    max_retries: int,
+    max_new_tokens: int,
 ) -> list[dict]:
     """Classify a batch of proteins in a single LLM call."""
     categories_str = "\n".join(f"  - {c}" for c in categories_list)
@@ -262,11 +403,12 @@ def classify_batch(
         proteins_block=proteins_block,
     )
 
-    raw = query_ollama(model, SYSTEM_PROMPT, prompt, temperature, max_retries)
+    raw = generate_response(
+        model, tokenizer, SYSTEM_PROMPT, prompt, temperature, max_new_tokens
+    )
     parsed = extract_json_from_response(raw)
 
     results = []
-    accession_set = {acc for acc, _ in batch}
 
     if parsed and isinstance(parsed, list):
         parsed_map = {}
@@ -282,7 +424,7 @@ def classify_batch(
                     {
                         "accession": accession,
                         "categories": parsed_map[accession],
-                        "raw_response": None,  # shared batch response
+                        "raw_response": None,
                     }
                 )
             else:
@@ -296,12 +438,12 @@ def classify_batch(
                     categories_list,
                     valid_categories,
                     model,
+                    tokenizer,
                     temperature,
-                    max_retries,
+                    max_new_tokens,
                 )
                 results.append(result)
     else:
-        # Batch parse failed — fall back to individual classification
         logger.warning(
             "Batch response could not be parsed. Falling back to per-protein "
             "classification for this batch."
@@ -313,8 +455,9 @@ def classify_batch(
                 categories_list,
                 valid_categories,
                 model,
+                tokenizer,
                 temperature,
-                max_retries,
+                max_new_tokens,
             )
             results.append(result)
 
@@ -330,11 +473,13 @@ def run_classification(
     proteins_path: str,
     categories_path: str,
     output_path: str,
-    model: str = "gemma3:12b",
+    model_name: str = "google/gemma-4-31b-it",
     batch_size: int = 10,
     temperature: float = 0.1,
-    max_retries: int = 3,
-    workers: int = 1,
+    max_new_tokens: int = 4096,
+    device: str = "auto",
+    quantize: str | None = None,
+    hf_token: str | None = None,
 ) -> None:
     """Run the full classification pipeline."""
 
@@ -346,25 +491,22 @@ def run_classification(
     logger.info(f"Loading categories from {categories_path}")
     categories_raw = load_json(categories_path)
 
-    # categories.json may be a list of strings or a dict with a key holding a
-    # list.  Handle both gracefully.
     if isinstance(categories_raw, list):
         categories_list: list[str] = categories_raw
     elif isinstance(categories_raw, dict):
-        # Try common key names
+        categories_list = None
         for key in ("categories", "functional_categories", "classes"):
             if key in categories_raw and isinstance(categories_raw[key], list):
                 categories_list = categories_raw[key]
                 break
-        else:
-            # Use all values that are strings, or flatten first list found
+        if categories_list is None:
             for v in categories_raw.values():
                 if isinstance(v, list):
                     categories_list = v
                     break
-            else:
-                logger.error("Cannot determine category list from categories JSON.")
-                sys.exit(1)
+        if categories_list is None:
+            logger.error("Cannot determine category list from categories JSON.")
+            sys.exit(1)
     else:
         logger.error("categories.json must be a list or a dict.")
         sys.exit(1)
@@ -372,18 +514,8 @@ def run_classification(
     valid_categories = set(categories_list)
     logger.info(f"Using {len(categories_list)} predefined categories")
 
-    # --- Verify model is available -----------------------------------------
-    logger.info(f"Checking that model '{model}' is available in Ollama...")
-    try:
-        available = ollama.list()
-        model_names = [m.model for m in available.models]
-        if not any(model in name for name in model_names):
-            logger.warning(f"Model '{model}' not found locally. Attempting to pull...")
-            ollama.pull(model)
-    except Exception as e:
-        logger.error(f"Could not connect to Ollama: {e}")
-        logger.error("Make sure Ollama is running ('ollama serve').")
-        sys.exit(1)
+    # --- Load model --------------------------------------------------------
+    model, tokenizer = load_model(model_name, device, quantize, hf_token)
 
     # --- Prepare batches ---------------------------------------------------
     protein_items: list[tuple[str, list[str]]] = [
@@ -403,46 +535,23 @@ def run_classification(
     all_results: dict[str, list[str]] = {}
     errors: list[str] = []
 
-    def process_batch(batch):
-        return classify_batch(
-            batch,
-            categories_list,
-            valid_categories,
-            model,
-            temperature,
-            max_retries,
-        )
-
-    if workers <= 1:
-        # Sequential processing
-        for batch in tqdm(batches, desc="Classifying", unit="batch"):
-            try:
-                results = process_batch(batch)
-                for r in results:
-                    all_results[r["accession"]] = r["categories"]
-            except Exception as e:
-                for acc, _ in batch:
-                    errors.append(acc)
-                logger.error(f"Batch failed: {e}")
-    else:
-        # Parallel processing (useful if running multiple Ollama instances or
-        # the model is fast enough to benefit from request pipelining)
-        with ThreadPoolExecutor(max_workers=workers) as executor:
-            futures = {
-                executor.submit(process_batch, batch): batch for batch in batches
-            }
-            with tqdm(total=len(batches), desc="Classifying", unit="batch") as pbar:
-                for future in as_completed(futures):
-                    batch = futures[future]
-                    try:
-                        results = future.result()
-                        for r in results:
-                            all_results[r["accession"]] = r["categories"]
-                    except Exception as e:
-                        for acc, _ in batch:
-                            errors.append(acc)
-                        logger.error(f"Batch failed: {e}")
-                    pbar.update(1)
+    for batch in tqdm(batches, desc="Classifying", unit="batch"):
+        try:
+            results = classify_batch(
+                batch,
+                categories_list,
+                valid_categories,
+                model,
+                tokenizer,
+                temperature,
+                max_new_tokens,
+            )
+            for r in results:
+                all_results[r["accession"]] = r["categories"]
+        except Exception as e:
+            for acc, _ in batch:
+                errors.append(acc)
+            logger.error(f"Batch failed: {e}")
 
     # --- Build output ------------------------------------------------------
     output_data = {}
@@ -466,7 +575,6 @@ def run_classification(
     if errors:
         logger.warning(f"{len(errors)} proteins encountered errors: {errors}")
 
-    # Optional: compute agreement with existing labels if present
     if any(info.get("categories") for info in proteins_data.values()):
         compute_agreement(output_data)
 
@@ -526,68 +634,89 @@ def compute_agreement(output_data: dict) -> None:
 def main():
     parser = argparse.ArgumentParser(
         description="Classify protein names into functional categories using "
-        "a local LLM via Ollama.",
+        "a HuggingFace Transformers LLM.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
     parser.add_argument(
         "--proteins",
         required=True,
-        help="Path to JSON file with protein data (see script header for format).",
+        help="Path to JSON file with protein data.",
     )
     parser.add_argument(
         "--categories",
         required=True,
-        help="Path to JSON file with the list of predefined functional categories.",
+        help="Path to JSON file with predefined functional categories.",
     )
     parser.add_argument(
         "--output",
         default="classification_results.json",
-        help="Path for the output JSON file (default: classification_results.json).",
+        help="Path for the output JSON (default: classification_results.json).",
     )
     parser.add_argument(
         "--model",
-        default="gemma3:12b",
-        help="Ollama model to use (default: gemma3:12b). "
-        "Other good options: mistral, llama3, deepseek-r1.",
+        default="google/gemma-4-31b-it",
+        help="HuggingFace model ID (default: google/gemma-4-31b-it). "
+        "Other good options: mistralai/Mistral-7B-Instruct-v0.3, "
+        "meta-llama/Llama-3.1-8B-Instruct, "
+        "deepseek-ai/DeepSeek-R1-Distill-Llama-8B.",
     )
     parser.add_argument(
         "--batch-size",
         type=int,
         default=10,
-        help="Number of proteins per LLM call (default: 10). "
-        "Use 1 for maximum reliability, higher for speed.",
+        help="Proteins per LLM call (default: 10). Use 1 for max reliability.",
     )
     parser.add_argument(
         "--temperature",
         type=float,
         default=0.1,
-        help="LLM sampling temperature (default: 0.1). Lower = more deterministic.",
+        help="Sampling temperature (default: 0.1).",
     )
     parser.add_argument(
-        "--max-retries",
+        "--max-new-tokens",
         type=int,
-        default=3,
-        help="Max retries per LLM call on failure (default: 3).",
+        default=4096,
+        help="Max new tokens to generate per call (default: 4096).",
     )
     parser.add_argument(
-        "--workers",
-        type=int,
-        default=1,
-        help="Number of parallel worker threads (default: 1).",
+        "--device",
+        default="auto",
+        help="Device: 'auto', 'cuda', 'cuda:0', 'cpu' (default: auto).",
+    )
+    parser.add_argument(
+        "--quantize",
+        choices=["4bit", "8bit"],
+        default=None,
+        help="Quantise the model to reduce VRAM. Requires bitsandbytes.",
+    )
+    parser.add_argument(
+        "--hf-token",
+        default=None,
+        help="HuggingFace access token for gated models (e.g. Gemma). "
+        "Can also set HF_TOKEN env var.",
     )
 
     args = parser.parse_args()
+
+    # Allow token from environment
+    hf_token = args.hf_token
+    if hf_token is None:
+        import os
+
+        hf_token = os.environ.get("HF_TOKEN")
 
     run_classification(
         proteins_path=args.proteins,
         categories_path=args.categories,
         output_path=args.output,
-        model=args.model,
+        model_name=args.model,
         batch_size=args.batch_size,
         temperature=args.temperature,
-        max_retries=args.max_retries,
-        workers=args.workers,
+        max_new_tokens=args.max_new_tokens,
+        device=args.device,
+        quantize=args.quantize,
+        hf_token=hf_token,
     )
 
 
