@@ -750,7 +750,12 @@ benchmark_df <- tibble(
   categories = unlist(map(entry, ~ benchmark_list[[.x]]$categories))
 )
 
-deprioritized <- c("hypothetical protein", "unknown", "other function")
+deprioritized <- c(
+  "hypothetical protein",
+  "unknown",
+  "other function",
+  "other viral enzyme"
+)
 
 benchmark_counts <- benchmark_df |>
   mutate(
@@ -1050,7 +1055,7 @@ pairwise_matches <- top_categories_df |>
   filter(top_category == top_category_right) |>
   count(method, method_right, name = "matching_queries")
 
-pct_category_matching <- pairwise_matches |>
+pct_category_matching_df <- pairwise_matches |>
   filter(method_right == "original", method != "original") |>
   select(-method_right) |>
   mutate(
@@ -1061,7 +1066,9 @@ pct_category_matching <- pairwise_matches |>
       1
     ),
     method = factor(method, levels = method_order)
-  ) |>
+  )
+
+pct_category_matching <- pct_category_matching_df |>
   ggplot(aes(method, pct_matching, fill = method)) +
   geom_col(width = .8) +
   labs(y = "% matching informative\ntop categories vs original") +
@@ -1113,7 +1120,7 @@ ggsave(
 # Annotated hypothetical proteins vs original
 # -------------------------
 
-method_category_summary <- benchmark_df |>
+method_categories <- benchmark_df |>
   rename(original_category = categories) |>
   mutate(original_category = str_to_lower(as.character(original_category))) |>
   left_join(filtered_top, by = join_by(entry == query_id)) |>
@@ -1133,7 +1140,9 @@ method_category_summary <- benchmark_df |>
       !informative_to_deprioritized &
       !deprioritized_to_informative &
       (top_category != original_category),
-  ) |>
+  )
+
+method_category_summary <- method_categories |>
   filter(!is.na(method)) |> # TODO: what about the proteins without hit for any method?
   group_by(method) |>
   summarise(
@@ -1292,6 +1301,28 @@ ggsave(
   units = "mm",
   device = cairo_pdf
 )
+
+
+inf_not_seq <- method_categories |>
+  group_by(entry) |>
+  filter(
+    !any(method %in% c("blastp", "mmseqs2", "diamond")) &
+      (original_category %in% deprioritized) &
+      (!top_category %in% deprioritized)
+  ) |>
+  ungroup()
+
+inf_not_seq |>
+  filter(method != "TEA-mmseqs2" & !is.na(method)) |>
+  select(entry, subject_id, original_category, top_category, method) |>
+  knitr::kable()
+
+inf_not_seq |>
+  filter(method != "TEA-mmseqs2" & !is.na(method)) |>
+  pull(entry) |>
+  unique() |>
+  length()
+
 
 ## STOP
 pairwise_matches_full <- bind_rows(
