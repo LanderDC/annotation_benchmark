@@ -198,7 +198,7 @@ def load_model(
     logger.info(f"Loading model {model_name} (this may take a few minutes)...")
     load_kwargs: dict[str, Any] = {
         "token": hf_token,
-        "torch_dtype": torch.float16,
+        "dtype": torch.float16,
     }
     if quant_config:
         load_kwargs["quantization_config"] = quant_config
