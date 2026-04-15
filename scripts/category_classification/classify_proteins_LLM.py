@@ -41,7 +41,6 @@ import json
 import logging
 import re
 import sys
-import time
 from pathlib import Path
 from typing import Any
 
@@ -84,8 +83,8 @@ SYSTEM_PROMPT = """\
 You are an expert molecular biologist specializing in protein function annotation.
 Your task is to classify proteins into functional categories based on their names.
 You must be precise, conservative, and only assign categories that are clearly
-supported by the protein name(s). If a protein is uncharacterized or hypothetical,
-include the appropriate category for that. A protein can belong to multiple categories.
+supported by the protein name(s). If a protein is uncharacterized or hypothetical, put it 
+in the Hypothetical Protein category. A protein can belong to multiple categories.
 Respond ONLY with valid JSON — no commentary, no markdown fences."""
 
 SINGLE_PROTEIN_PROMPT = """\
@@ -95,6 +94,9 @@ Given the following predefined functional categories:
 Classify the protein with accession "{accession}" based on its name(s):
 {protein_names}
 
+Taxonomy:
+{taxonomy}
+
 Respond with a JSON object in exactly this format:
 {{"accession": "{accession}", "categories": ["Category1", "Category2"]}}
 
@@ -102,8 +104,7 @@ Rules:
 - Choose ONLY from the predefined categories listed above.
 - Assign every category that applies; a protein may belong to multiple categories.
 - If the protein is described as "uncharacterized", "hypothetical", or "putative"
-  with no other functional clue, include "Hypothetical Protein" if it is one of the
-  predefined categories.
+  with no other functional clue, assign it to "Hypothetical Protein".
 - Do NOT invent new categories.
 - Output ONLY the JSON object, nothing else."""
 
@@ -111,7 +112,8 @@ BATCH_PROTEIN_PROMPT = """\
 Given the following predefined functional categories:
 {categories}
 
-Classify each of the following proteins based on their name(s).
+Classify each of the following proteins based on their name(s) and
+their taxonomy.
 
 Proteins:
 {proteins_block}
@@ -126,8 +128,7 @@ Rules:
 - Choose ONLY from the predefined categories listed above.
 - Assign every category that applies; a protein may belong to multiple categories.
 - If the protein is described as "uncharacterized", "hypothetical", or "putative"
-  with no other functional clue, include "Hypothetical Protein" if it is one of the
-  predefined categories.
+  with no other functional clue, assign it to "Hypothetical Protein".
 - Do NOT invent new categories.
 - Output ONLY the JSON array, nothing else."""
 
@@ -277,6 +278,13 @@ def validate_categories(assigned: list[str], valid_categories: set[str]) -> list
     return validated
 
 
+def format_taxonomy(taxonomy: list[str] | None) -> str:
+    """Format taxonomy lines for the prompt."""
+    if not taxonomy:
+        return '  - "Unknown"'
+    return "\n".join(f'  - "{rank}"' for rank in taxonomy)
+
+
 # ---------------------------------------------------------------------------
 # LLM generation
 # ---------------------------------------------------------------------------
@@ -350,6 +358,7 @@ def generate_response(
 def classify_single_protein(
     accession: str,
     protein_names: list[str],
+    taxonomy: list[str] | None,
     categories_list: list[str],
     valid_categories: set[str],
     model,
@@ -360,10 +369,12 @@ def classify_single_protein(
     """Classify a single protein and return a result dict."""
     categories_str = "\n".join(f"  - {c}" for c in categories_list)
     names_str = "\n".join(f'  - "{n}"' for n in protein_names)
+    taxonomy_str = format_taxonomy(taxonomy)
 
     prompt = SINGLE_PROTEIN_PROMPT.format(
         categories=categories_str,
         accession=accession,
+        taxonomy=taxonomy_str,
         protein_names=names_str,
     )
 
@@ -381,7 +392,7 @@ def classify_single_protein(
 
 
 def classify_batch(
-    batch: list[tuple[str, list[str]]],
+    batch: list[tuple[str, list[str], list[str] | None]],
     categories_list: list[str],
     valid_categories: set[str],
     model,
@@ -393,9 +404,12 @@ def classify_batch(
     categories_str = "\n".join(f"  - {c}" for c in categories_list)
 
     proteins_lines = []
-    for accession, names in batch:
+    for accession, names, taxonomy in batch:
         names_joined = "; ".join(f'"{n}"' for n in names)
-        proteins_lines.append(f'  Accession "{accession}": [{names_joined}]')
+        taxonomy_joined = " > ".join(taxonomy) if taxonomy else "Unknown"
+        proteins_lines.append(
+            f'  Accession "{accession}": names=[{names_joined}] | taxonomy="{taxonomy_joined}"'
+        )
     proteins_block = "\n".join(proteins_lines)
 
     prompt = BATCH_PROTEIN_PROMPT.format(
@@ -418,7 +432,7 @@ def classify_batch(
                 cats = validate_categories(item.get("categories", []), valid_categories)
                 parsed_map[acc] = cats
 
-        for accession, names in batch:
+        for accession, names, taxonomy in batch:
             if accession in parsed_map:
                 results.append(
                     {
@@ -435,6 +449,7 @@ def classify_batch(
                 result = classify_single_protein(
                     accession,
                     names,
+                    taxonomy,
                     categories_list,
                     valid_categories,
                     model,
@@ -448,10 +463,11 @@ def classify_batch(
             "Batch response could not be parsed. Falling back to per-protein "
             "classification for this batch."
         )
-        for accession, names in batch:
+        for accession, names, taxonomy in batch:
             result = classify_single_protein(
                 accession,
                 names,
+                taxonomy,
                 categories_list,
                 valid_categories,
                 model,
@@ -518,11 +534,21 @@ def run_classification(
     model, tokenizer = load_model(model_name, device, quantize, hf_token)
 
     # --- Prepare batches ---------------------------------------------------
-    protein_items: list[tuple[str, list[str]]] = [
-        (acc, info["protein_names"]) for acc, info in proteins_data.items()
-    ]
+    protein_items: list[tuple[str, list[str], list[str] | None]] = []
+    for accession, info in proteins_data.items():
+        protein_names = info.get("protein_names")
+        if protein_names is None:
+            protein_names = info.get("protein", [])
+        if isinstance(protein_names, str):
+            protein_names = [protein_names]
 
-    batches: list[list[tuple[str, list[str]]]] = [
+        taxonomy = info.get("taxonomy", [])
+        if isinstance(taxonomy, str):
+            taxonomy = [taxonomy]
+
+        protein_items.append((accession, protein_names, taxonomy))
+
+    batches: list[list[tuple[str, list[str], list[str] | None]]] = [
         protein_items[i : i + batch_size]
         for i in range(0, len(protein_items), batch_size)
     ]
@@ -556,9 +582,14 @@ def run_classification(
     # --- Build output ------------------------------------------------------
     output_data = {}
     for accession, info in proteins_data.items():
+        protein_names = info.get("protein_names")
+        if protein_names is None:
+            protein_names = info.get("protein", [])
+
         output_data[accession] = {
-            "protein_names": info["protein_names"],
+            "protein_names": protein_names,
             "taxid": info.get("taxid"),
+            "taxonomy": info.get("taxonomy", []),
             "original_categories": info.get("categories", []),
             "predicted_categories": all_results.get(accession, []),
         }
