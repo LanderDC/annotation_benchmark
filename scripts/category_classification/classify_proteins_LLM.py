@@ -228,7 +228,7 @@ def load_model(
         model_device = str(model.device).lower()
         using_gpu = "cuda" in model_device or "mps" in model_device
 
-    print(f"Running on {'GPU' if using_gpu else 'CPU'}")
+    logger.info(f"Running on {'GPU' if using_gpu else 'CPU'}")
 
     return model, tokenizer
 
