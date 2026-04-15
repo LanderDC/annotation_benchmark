@@ -1,0 +1,714 @@
+[
+  {
+    "process": "Viral replication/transcription",
+    "Activity": "Polymerase/Transcriptase",
+    "Enzyme/Protein": "RNA dependent RNA polymerase (RNA replicase)",
+    "ViralZone pages": "10557",
+    "Rhea": "Rhea:21248",
+    "Antiviral": "Nucleoside inhibitor"
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Polymerase",
+    "Enzyme/Protein": "DNA dependent DNA polymerase (DNA replicase)",
+    "ViralZone pages": "10597",
+    "Rhea": "Rhea:22508",
+    "Antiviral": "Nucleoside inhibitor"
+  },
+  {
+    "process": "Viral replication/transcription",
+    "Activity": "Polymerase/Transcriptase",
+    "Enzyme/Protein": "RNA dependent DNA polymerase (Reverse transcriptase)",
+    "ViralZone pages": "10598; 10998",
+    "Rhea": "Rhea:22508; Rhea:21248",
+    "Antiviral": "Nucleoside-RT inhibitors, Non-Nucleoside-RT inhibitors"
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Initiation",
+    "Enzyme/Protein": "Primase",
+    "ViralZone pages": "10997",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Initiation",
+    "Enzyme/Protein": "Protein-primed initiation of DNA replication",
+    "ViralZone pages": "10537",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Initiation",
+    "Enzyme/Protein": "Protein-primed initiation of RNA replication (=VPG capping)",
+    "ViralZone pages": "10178",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Initiation",
+    "Enzyme/Protein": "Cress-type Endonuclease",
+    "ViralZone pages": "10817",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Initiation",
+    "Enzyme/Protein": "Ribozyme Endonuclease",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Elongation",
+    "Enzyme/Protein": "RNA-DNA duplex dependent endoribonuclease (RNase H)",
+    "ViralZone pages": "10599",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Topology",
+    "Enzyme/Protein": "DNA topoisomerase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Topology",
+    "Enzyme/Protein": "DNA ligase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Topology",
+    "Enzyme/Protein": "Helicase",
+    "ViralZone pages": "11224",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Topology",
+    "Enzyme/Protein": "Holliday junction resolvase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Topology",
+    "Enzyme/Protein": "Integrase",
+    "ViralZone pages": "10600",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Topology",
+    "Enzyme/Protein": "Transposase (DDE recombinase)",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Nucleotide metabolism",
+    "Enzyme/Protein": "Thymidine kinase",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:19129",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Nucleotide metabolism",
+    "Enzyme/Protein": "Thymidylate synthase",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:12104",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Nucleotide metabolism",
+    "Enzyme/Protein": "Thymidylate kinase",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:13517",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Nucleotide metabolism",
+    "Enzyme/Protein": "dUTP diphosphatase",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:10248",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Nucleotide metabolism",
+    "Enzyme/Protein": "dihydrofolate reductase",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:15009",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Nucleotide metabolism",
+    "Enzyme/Protein": "Ribonucleotide reductase",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:23252",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Regulation",
+    "Enzyme/Protein": "E3 SUMO-protein ligase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Transcriptase",
+    "Enzyme/Protein": "Proofreading exoribonuclease (ExoN)",
+    "ViralZone pages": "10398",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "Cell-type capping",
+    "ViralZone pages": "10162",
+    "Rhea": "Rhea:67004",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "Triphosphatase",
+    "ViralZone pages": "11245",
+    "Rhea": "Rhea:67008",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "GTase",
+    "ViralZone pages": "11265",
+    "Rhea": "Rhea:67020",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "N7-MTase",
+    "ViralZone pages": "11285",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "2'O Mtase",
+    "ViralZone pages": "11286",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "Alpha type capping",
+    "ViralZone pages": "10161",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "Nido-type capping",
+    "ViralZone pages": "10163",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "Mononega-type capping",
+    "ViralZone pages": "10179",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "VPG capping",
+    "ViralZone pages": "10178",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "Cap snatching",
+    "ViralZone pages": "839",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "Toti-type cap snatching",
+    "ViralZone pages": "10180",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Viral mRNA capping",
+    "Enzyme/Protein": "FAD capping",
+    "ViralZone pages": "10657",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "PolyAdenylation",
+    "Enzyme/Protein": "Poly(A) polymerase",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:11332",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "PolyAdenylation",
+    "Enzyme/Protein": "RNA polymerase stuttering",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:11332",
+    "Antiviral": ""
+  },
+  {
+    "process": "Protein",
+    "Activity": "Proteases",
+    "Enzyme/Protein": "Cys/Ser-proteases",
+    "ViralZone pages": "10438",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Protein",
+    "Activity": "Proteases",
+    "Enzyme/Protein": "Asp-proteases",
+    "ViralZone pages": "10439",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Protein",
+    "Activity": "Proteases",
+    "Enzyme/Protein": "Metallo-proteases",
+    "ViralZone pages": "10440",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Protein",
+    "Activity": "Proteases",
+    "Enzyme/Protein": "Asparagine-proteases",
+    "ViralZone pages": "10437",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Protein",
+    "Activity": "Post translational modification",
+    "Enzyme/Protein": "Beta-1,6-N-acetyl-glucosaminyl transferase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Protein",
+    "Activity": "Post translational modification",
+    "Enzyme/Protein": "Peptide N-myristoyl transferase",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:15521",
+    "Antiviral": ""
+  },
+  {
+    "process": "Protein",
+    "Activity": "Post translational modification",
+    "Enzyme/Protein": "thiol oxidase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Exit",
+    "Activity": "Budding",
+    "Enzyme/Protein": "Phospholipase",
+    "ViralZone pages": "10637",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Exit",
+    "Activity": "Virion release",
+    "Enzyme/Protein": "Neuraminidase",
+    "ViralZone pages": "10557",
+    "Rhea": "",
+    "Antiviral": "Neuraminidase inhibitors"
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "Polyuridine endonuclease",
+    "ViralZone pages": "10399",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "Viral ADP-Ribosylhydrolase",
+    "ViralZone pages": "11305",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "Asparagine deaminase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "Ser/Thr kinase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "Tyr kinase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "Ubiquitin transferase=Ubiquitin-conjugating enzyme E2",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "ubiquitinyl hydrolase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "Tyr/ser/thr phosphatase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "2',3'-cGAMP endonuclease",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:59473",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "3 beta-hydroxysteroid dehydrogenase/Delta 5-->4-isomerase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "ADP-ribose hydrolase",
+    "ViralZone pages": "",
+    "Rhea": "Rhea:24076",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Host shut off",
+    "Enzyme/Protein": "mRNA-decapping",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Other to be classified",
+    "Activity": "Host shut off",
+    "Enzyme/Protein": "Trans-prenyltransferase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Other to be classified",
+    "Activity": "Host shut off",
+    "Enzyme/Protein": "Deoxyuridine 5'-triphosphate nucleotidohydrolase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Other to be classified",
+    "Activity": "Host shut off",
+    "Enzyme/Protein": "Ribonucleoside-diphosphate reductase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Other to be classified",
+    "Activity": "Host shut off",
+    "Enzyme/Protein": "FAD-linked sulfhydryl oxidase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Other to be classified",
+    "Activity": "Host shut off",
+    "Enzyme/Protein": "Nucleoside triphosphatase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Other to be classified",
+    "Activity": "Host shut off",
+    "Enzyme/Protein": "Alkaline nuclease",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Other to be classified",
+    "Activity": "Host shut off",
+    "Enzyme/Protein": "ADP-ribose hydrolase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Other to be classified",
+    "Activity": "Host shut off",
+    "Enzyme/Protein": "dUTP nucleo-tidohydrolase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Other to be classified",
+    "Activity": "Host shut off",
+    "Enzyme/Protein": "Uracyl-DNA glycosidase",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Unknown",
+    "Activity": "Unknown",
+    "Enzyme/Protein": "Hypothetical protein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Structural",
+    "Activity": "Structural",
+    "Enzyme/Protein": "Capsid protein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Structural",
+    "Activity": "Structural",
+    "Enzyme/Protein": "Nucleocapsid protein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Structural",
+    "Activity": "Structural",
+    "Enzyme/Protein": "Surface glycoprotein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Structural",
+    "Activity": "Structural",
+    "Enzyme/Protein": "Envelope glycoprotein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Structural",
+    "Activity": "Structural",
+    "Enzyme/Protein": "Matrix protein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Structural",
+    "Activity": "Structural",
+    "Enzyme/Protein": "Tegument protein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Structural",
+    "Activity": "Structural",
+    "Enzyme/Protein": "Occlusion Body Protein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral replication",
+    "Activity": "Polymerase stabilization",
+    "Enzyme/Protein": "Replication cofactor",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Polyprotein",
+    "Activity": "Polyprotein",
+    "Enzyme/Protein": "Polyprotein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Regulation",
+    "Enzyme/Protein": "Transactivator protein (Tat)",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Protein",
+    "Activity": "Post translational modification",
+    "Enzyme/Protein": "RNA-binding regulatory protein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral transcription",
+    "Activity": "Regulation",
+    "Enzyme/Protein": "RNA export/splicing regulator",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Virion assembly",
+    "Activity": "Assembly",
+    "Enzyme/Protein": "Assemly factor",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Apoptosis modulator",
+    "Enzyme/Protein": "vCyclin",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Apoptosis modulator",
+    "Enzyme/Protein": "Apoptosis/cell-cycle modulator",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Apoptosis modulator",
+    "Enzyme/Protein": "vBcl-2",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Exit",
+    "Activity": "Ion-channel",
+    "Enzyme/Protein": "Viroporin",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "Interferon antagonist",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Exit",
+    "Activity": "Budding",
+    "Enzyme/Protein": "Virion release facilitator",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Exit",
+    "Activity": "Virion release",
+    "Enzyme/Protein": "Movement protein",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  },
+  {
+    "process": "Viral-Host modulation",
+    "Activity": "Anti-viral evasion",
+    "Enzyme/Protein": "Cytokine modulator",
+    "ViralZone pages": "",
+    "Rhea": "",
+    "Antiviral": ""
+  }
+]
