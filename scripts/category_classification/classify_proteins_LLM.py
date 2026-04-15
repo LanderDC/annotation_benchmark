@@ -214,6 +214,22 @@ def load_model(
     if hasattr(model, "hf_device_map"):
         logger.info(f"Device map: {model.hf_device_map}")
 
+    using_gpu = False
+    if hasattr(model, "hf_device_map") and model.hf_device_map:
+        for mapped_device in model.hf_device_map.values():
+            if isinstance(mapped_device, int):
+                using_gpu = True
+                break
+            mapped_device_str = str(mapped_device).lower()
+            if "cuda" in mapped_device_str or "mps" in mapped_device_str:
+                using_gpu = True
+                break
+    elif hasattr(model, "device"):
+        model_device = str(model.device).lower()
+        using_gpu = "cuda" in model_device or "mps" in model_device
+
+    print(f"Running on {'GPU' if using_gpu else 'CPU'}")
+
     return model, tokenizer
 
 
