@@ -285,6 +285,71 @@ def format_taxonomy(taxonomy: list[str] | None) -> str:
     return "\n".join(f'  - "{rank}"' for rank in taxonomy)
 
 
+def normalize_categories(categories_raw: Any) -> list[str]:
+    """Normalize category inputs into a deduplicated list of category names."""
+    categories_list: list[str] | None = None
+
+    if isinstance(categories_raw, list):
+        if all(isinstance(item, str) for item in categories_raw):
+            categories_list = categories_raw
+        elif all(isinstance(item, dict) for item in categories_raw):
+            candidate_keys = (
+                "Enzyme/Protein",
+                "category",
+                "name",
+                "Activity",
+                "process",
+            )
+            extracted: list[str] = []
+            for item in categories_raw:
+                for key in candidate_keys:
+                    value = item.get(key)
+                    if isinstance(value, str) and value.strip():
+                        extracted.append(value.strip())
+                        break
+            if extracted:
+                categories_list = extracted
+    elif isinstance(categories_raw, dict):
+        for key in ("categories", "functional_categories", "classes"):
+            value = categories_raw.get(key)
+            if isinstance(value, list):
+                categories_raw = value
+                break
+        else:
+            for value in categories_raw.values():
+                if isinstance(value, list):
+                    categories_raw = value
+                    break
+            else:
+                categories_raw = None
+
+        if isinstance(categories_raw, list):
+            return normalize_categories(categories_raw)
+
+    if not categories_list:
+        logger.error(
+            "Cannot determine category list from categories JSON. "
+            "Expected a list of strings, a list of objects, or a dict containing a list."
+        )
+        sys.exit(1)
+
+    seen: set[str] = set()
+    deduped: list[str] = []
+    for category in categories_list:
+        if not isinstance(category, str):
+            continue
+        cat = category.strip()
+        if cat and cat not in seen:
+            seen.add(cat)
+            deduped.append(cat)
+
+    if not deduped:
+        logger.error("No valid category names could be extracted from categories JSON.")
+        sys.exit(1)
+
+    return deduped
+
+
 # ---------------------------------------------------------------------------
 # LLM generation
 # ---------------------------------------------------------------------------
@@ -506,26 +571,7 @@ def run_classification(
 
     logger.info(f"Loading categories from {categories_path}")
     categories_raw = load_json(categories_path)
-
-    if isinstance(categories_raw, list):
-        categories_list: list[str] = categories_raw
-    elif isinstance(categories_raw, dict):
-        categories_list = None
-        for key in ("categories", "functional_categories", "classes"):
-            if key in categories_raw and isinstance(categories_raw[key], list):
-                categories_list = categories_raw[key]
-                break
-        if categories_list is None:
-            for v in categories_raw.values():
-                if isinstance(v, list):
-                    categories_list = v
-                    break
-        if categories_list is None:
-            logger.error("Cannot determine category list from categories JSON.")
-            sys.exit(1)
-    else:
-        logger.error("categories.json must be a list or a dict.")
-        sys.exit(1)
+    categories_list = normalize_categories(categories_raw)
 
     valid_categories = set(categories_list)
     logger.info(f"Using {len(categories_list)} predefined categories")
@@ -575,7 +621,7 @@ def run_classification(
             for r in results:
                 all_results[r["accession"]] = r["categories"]
         except Exception as e:
-            for acc, _ in batch:
+            for acc, _, _ in batch:
                 errors.append(acc)
             logger.error(f"Batch failed: {e}")
 
