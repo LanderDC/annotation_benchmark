@@ -80,12 +80,22 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 SYSTEM_PROMPT = """\
-You are an expert molecular biologist specializing in protein function annotation.
-Your task is to classify proteins into functional categories based on their names.
-You must be precise, conservative, and only assign categories that are clearly
-supported by the protein name(s). If a protein is uncharacterized or hypothetical, put it 
-in the Hypothetical Protein category. A protein can belong to multiple categories.
-Respond ONLY with valid JSON — no commentary, no markdown fences."""
+You are an expert molecular biologist in virology specializing in protein function annotation.
+
+Your task is to classify proteins into functional categories based on their names. 
+In addition to the protein name itself, you MUST also consider the virus taxonomy (e.g., family, genus, or type of virus) to infer likely protein function. 
+Different virus groups often use distinct naming conventions and encode proteins with characteristic functions, so use this contextual information to guide your classification.
+On the other hand, different virus groups may also use similar names for proteins with different functions.
+
+Be precise and conservative: only assign functional categories that are clearly supported by the protein name and are biologically plausible given the virus type. 
+Avoid over-interpreting ambiguous names.
+
+If a protein is labeled as "hypothetical", "uncharacterized", or provides no clear functional indication even when considering the virus taxonomy, classify it under "Hypothetical Protein".
+
+A protein may belong to multiple categories if justified.
+
+Respond ONLY with valid JSON — no commentary, no markdown fences.
+"""
 
 SINGLE_PROTEIN_PROMPT = """\
 Given the following predefined functional categories:
@@ -120,7 +130,7 @@ Proteins:
 
 Respond with a JSON array of objects, one per protein, in exactly this format:
 [
-  {{"accession": "XXXXX", "categories": ["Category1", "Category2"]}},
+  {{"accession": {"XXXXX"}, "categories": ["Category1", "Category2"]}},
   ...
 ]
 
@@ -592,10 +602,16 @@ def run_classification(
     valid_categories = set(categories_list)
     logger.info(f"Using {len(categories_list)} predefined categories")
 
+    if batch_size != 1:
+        logger.info(
+            "Single-prompt mode is enabled for maximum accuracy; "
+            f"ignoring --batch-size={batch_size} and using per-protein inference."
+        )
+
     # --- Load model --------------------------------------------------------
     model, tokenizer = load_model(model_name, device, quantize, hf_token)
 
-    # --- Prepare batches ---------------------------------------------------
+    # --- Prepare proteins --------------------------------------------------
     protein_items: list[tuple[str, list[str], list[str] | None]] = []
     for accession, info in proteins_data.items():
         protein_names = info.get("protein_names")
@@ -610,23 +626,22 @@ def run_classification(
 
         protein_items.append((accession, protein_names, taxonomy))
 
-    batches: list[list[tuple[str, list[str], list[str] | None]]] = [
-        protein_items[i : i + batch_size]
-        for i in range(0, len(protein_items), batch_size)
-    ]
     logger.info(
-        f"Split {len(protein_items)} proteins into {len(batches)} batches "
-        f"(batch_size={batch_size})"
+        f"Prepared {len(protein_items)} proteins for single-prompt classification"
     )
 
     # --- Classify ----------------------------------------------------------
     all_results: dict[str, list[str]] = {}
     errors: list[str] = []
 
-    for batch in tqdm(batches, desc="Classifying", unit="batch"):
+    for accession, protein_names, taxonomy in tqdm(
+        protein_items, desc="Classifying", unit="protein"
+    ):
         try:
-            results = classify_batch(
-                batch,
+            result = classify_single_protein(
+                accession,
+                protein_names,
+                taxonomy,
                 categories_list,
                 valid_categories,
                 model,
@@ -634,12 +649,10 @@ def run_classification(
                 temperature,
                 max_new_tokens,
             )
-            for r in results:
-                all_results[r["accession"]] = r["categories"]
+            all_results[result["accession"]] = result["categories"]
         except Exception as e:
-            for acc, _, _ in batch:
-                errors.append(acc)
-            logger.error(f"Batch failed: {e}")
+            errors.append(accession)
+            logger.error(f"Classification failed for {accession}: {e}")
 
     # --- Build output ------------------------------------------------------
     output_data = {}
