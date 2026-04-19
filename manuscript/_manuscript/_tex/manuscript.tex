@@ -209,6 +209,20 @@
 % \if@iicol
 %   \geometry{text={174mm,240mm}}
 % \fi
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
 \usepackage{lineno}
 \linenumbers
 \linespread{1.5}
@@ -289,7 +303,7 @@ Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\aut
 % affil setup
 \affil[1]{\orgname{KU Leuven}%
 , \orgdiv{Microbiology, Immunology and Transplantation}%
-, \orggroup{Clincial and Epidemiological Virology}%
+, \orggroup{Clinical and Epidemiological Virology}%
 , \orgaddress{%
   \street{Herestraat 49, box 1040}%
   , \city{Leuven}%
@@ -346,9 +360,8 @@ Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\aut
 
   \begin{itemize}
   \tightlist
-  \item[$\square$]
+  \item[$\boxtimes$]
     TODO: which conversions from hypothetical protein to informative
-    (phages?)
   \end{itemize}
 \item[$\boxtimes$]
   TODO: computational benchmark + add database sizes
@@ -356,14 +369,16 @@ Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\aut
   TODO: check correlation between structure quality/TEA entropy and
   correct annotation/agreement between methods
 \item[$\square$]
-  TODO: add recall, precision and F1 plots
+  TODO: add recall, precision and F1 plots -\textgreater{} see also
+  Figure 3C
 \item[$\square$]
   TODO: make annotations better (local LLM, GenePT?)
 \item[$\square$]
   TODO: do structure search of non-informative vs informative BFVD
   entries?
-\item[$\square$]
+\item[$\boxtimes$]
   TODO: look at p-value for Reseek and see if this improves annotations
+  -\textgreater{} still very lenient (p\textless0.05)
 \item
   \st{Try out LucaVirus?}
 \item
@@ -389,7 +404,7 @@ NCBI (n=11,360). Boltz-2 structure prediction of these proteins produced
 generally high-quality models (median pLDDT 71.3). Using the structures
 and protein sequences of the entries in the Big Fantastic Virus Database
 (BFVD), we queried the VMR proteins with Blastp, Diamond, and MMseqs2
-(sequence), TEA and ProstT5-3Di (embedding) and Foldseek and Reseek
+(sequence); TEA and ProstT5-3Di (embedding); and Foldseek and Reseek
 (structure). Sequence homology-based methods showed a high overlap in
 hits, whereas the other methods had low intra- and inter-method
 agreement in hits between themselves and the sequence-based methods.
@@ -398,7 +413,7 @@ Additionally, all methods improved the number of informative categories
 and structure methods producing the largest increases. However, when
 evaluated against proteins with informative GenBank annotations as
 ground truth (n=2,938), embedding- and structure-based methods agreed
-less often with the ground truth than sequence-based methods
+less often with the ``ground truth'' than sequence-based methods
 (\textasciitilde67\% and \textasciitilde76\% vs \textasciitilde83\%,
 respectively). Overall, sequence homology remains the most accurate
 approach for protein annotation of eukaryotic viruses at present.
@@ -446,68 +461,61 @@ violin- and boxplot with all pLDDT scores from the predicted structures
 \subsection{Performance of the different
 methods}\label{performance-of-the-different-methods}
 
-We started by evaluating how many of the proteins in our test set got a
-hit against the BFVD for each method (see Figure~\ref{fig-overlap}A). In
-addition, we also filtered the results of each method on an E-value
-lower than 1e-03 to see how this affected the number of hits for each
-test protein, which decreased the number of test proteins with a hit on
-average with 25\% for the structure methods. The methods relying on
-structure homology clearly had a lower number of test proteins with hits
-against the BFVD compared to the sequence homology-based methods. In
-contrast, TEA, as only non-protein sequence based method, had a
-comparable number of test proteins with a hit to the sequence based
+We started by evaluating how many of the proteins in our test produced
+at least one match against the BFVD for each method (see
+Figure~\ref{fig-overlap}A). In addition, we also filtered the results of
+each method on an E-value lower than 1e-03 to see how this affected the
+number of hits for each test protein. This decreased the number of test
+proteins with a hit on average with 25\% for the structure methods. The
+methods relying on structure homology clearly had less matches compared
+to the sequence homology-based methods. This suggests that sequence
+based methods are still more sensitive in detecting homology for
+eukaryotic viruses than structure based methods, despite the promising
+results for bacteriophages\textsuperscript{1}. As the quality of our
+structure predictions was rather high (see Figure~\ref{fig-overview}B),
+this lower sensitivity is likely not due to poor structure predictions.
+In contrast, TEA, as only non-protein sequence based method, had a
+comparable number of test proteins with a match to the sequence based
 methods, almost reaching the total number of test proteins (n=11,354).
 However, analyzing the total number of hits at different E-value
-thresholds shows that TEA will result in a very high number of hits
+thresholds shows that TEA will result in a very high number of matches
 across all E-value thresholds, signifying a high number of false
 positives (see Figure~\ref{fig-overlap}B). A similar pattern is observed
-for the other structure based methods which at high E-values tend to
-find too many hits. Reseek was less affected by this, due to a
-combination of already calculating E-values more
-accurately\textsuperscript{1,2} and our use of a modified Reseek version
-(see \hyperref[reseek]{below}). On the other hand, the three sequence
-based methods had a similar number of test proteins with a hit
-(BLASTp=11,359; MMseqs2=11,255 and Diamond=11,224), but don't show this
-inflation of total hits at higher E-values (BLASTp has a slight increase
-towards larger E-values). This suggests that sequence based methods are
-still more sensitive in detecting homology for eukaryotic viruses than
-structure based methods, despite the promising results for
-bacteriophages\textsuperscript{3}. As the quality of our structure
-predictions was rather high (see Figure~\ref{fig-overview}B), this lower
-sensitivity is likely not due to poor structure predictions.
+for the other structure based methods, which tend to find too many hits
+at high E-values. Reseek was less affected by this, due to a combination
+of already calculating E-values more accurately\textsuperscript{2,3} and
+our use of a modified Reseek version (see \hyperref[reseek]{below}). On
+the other hand, the three sequence based methods had a similar number of
+test proteins with a hit (BLASTp=11,359; MMseqs2=11,255 and
+Diamond=11,224), but don't show this inflation of total hits at higher
+E-values (BLASTp has a slight increase towards larger E-values).
 
-When comparing the BFVD hits yielded by all methods against each other
-(see Figure~\ref{fig-overlap}C-D and
+When comparing the BFVD matches yielded by all methods against each
+other (see Figure~\ref{fig-overlap}C-D and
 Supplemental Figure~\ref{suppfig-pairwise-method}), we observed as
 expected that the sequence homology-based methods had a high overlap in
 shared hits. This was true when comparing the best 25 hits for each test
-protein, the best 25 hits afterwards filtered on E-value and only the
-top hits (see Figure~\ref{fig-overlap}C-D and
+protein (only the comparison of diamond and mmseqs2 against blastp had a
+low overlap because of the higher amount of hits for blastp), the best
+25 hits afterwards filtered on E-value and only the top hits (see
+Figure~\ref{fig-overlap}C-D and
 Supplemental Figure~\ref{suppfig-pairwise-method}). In contrast, the
 embedding and structure homology based methods had low intra-method
 agreement in resulting hits (\textasciitilde25\% between the embedding
 methods and \textasciitilde40-75\% for the structure methods on the best
 25 hits). The percentage of overlapping hits did increase when only
-looking at the top hits but stayed well below the percentage of overlap
+looking at the top hits, but stayed well below the percentage of overlap
 between the sequence based methods. It is worth noting that Reseek
 seemed to perform worse in this metric when looking at the filtered
 results (see Supplemental Figure~\ref{suppfig-pairwise-method}B),
-however this is due to the large reduction in number of hits after
+however this is due to the large reduction in number of matches after
 filtering. This reduction is due to the more stringent E-value
-calculations in Reseek compared to Foldseek\textsuperscript{1,2}.
+calculations in Reseek compared to Foldseek\textsuperscript{2,3}.
 Notably, while ProstT5 was the worst performer across the three datasets
 compared to the sequence methods, TEA performed better in the top hits
-comparison and was on par with the structure based methods.
-
-Overall, the embedding and structure based methods, that should be
-better to detect remote homologs, had low agreement on shared hits among
-each other. And although they did find more hits for the test proteins
-(see y-axis Figure~\ref{fig-overlap}B), this was almost entirely removed
-after filtering the hits on E-value (see y-axis
-Figure~\ref{fig-overlap}C). This effect was most pronounced for Reseek,
-which claims to calculate the most correct E-values\textsuperscript{1}
-and thus leaving the question if the Foldseek searches do not report too
-many false positives.
+comparison and was on par with the structure based methods. Overall, the
+embedding and structure based methods, that should be better to detect
+remote homologs, had low agreement on shared hits among each other.
 
 \begin{figure}[H]
 
@@ -536,20 +544,40 @@ comparison}\label{functional-annotation-comparison}
 
 Using a weighted approach, we assigned functional categories to the test
 proteins for each method based on the hits with an E-value smaller than
-1e-03 (see \hyperref[functional-category-assignment]{methods}). This
-showed that
-
-To evaluate the accuracy of the benchmarked methods, we considered the
-test proteins with an informative annotation (n=2,938) as the ground
-truth to compare our results to. All methods improved the number of
-informative categories (see Figure~\ref{fig-annotation}A), with the
-sequence based methods, together with TEA and Foldseek, improving the
-number of informative assignments the most. However, when comparing the
-functional annotations to the ``ground truth'', all embedding and
+1e-03 (see \hyperref[functional-category-assignment]{methods}). To
+evaluate the accuracy of the benchmarked methods, we considered the test
+proteins with an originally informative annotation (n=2,938) as the
+ground truth to compare our results to. All methods improved the number
+of informative categories (see Figure~\ref{fig-annotation}A), with the
+sequence based methods, together with TEA and Boltz-Foldseek, improving
+the number of informative assignments the most. However, when comparing
+the functional annotations to the ``ground truth'', all embedding and
 structure based methods underperformed compared to the sequence based
-methods (maximum \textasciitilde67\% and \textasciitilde76\% vs
-\textasciitilde83\% agreement with ground truth; see
+methods (maximum \textasciitilde67\% and \textasciitilde78\% vs
+\textasciitilde84\% agreement with ground truth; see
 Figure~\ref{fig-annotation}B).
+
+Although TEA made the largest improvements in assigning previous
+uninformative proteins to informative categories, it also showed the
+greatest inconsistencies between assigned informative categories that
+were already informative in the original test set (see
+Figure~\ref{fig-annotation}C). In addition, it also has 387 queries that
+were changed from an informative function to a non-informative one,
+which is almost double the amount compared to blastp which had the
+second highest informative-to-uninformative reassignments (see
+Figure~\ref{fig-annotation}C and Table~\ref{tbl-assigned-categories}).
+The same applies to the number of test proteins that originally had an
+informative category, but was assigned a different category with TEA
+(n=2723). Furthermore, due to the likely high number of false positives
+in TEA hits (see Figure~\ref{fig-overlap}B), we concluded that the TEA
+uninformative-to-informative assignments lacked reliability.
+
+Of note, Boltz structure prediction combined with Foldseek structure
+comparison did assign more informative categories than the
+sequence-based methods to originally non-informative proteins (n=1,571
+vs \textasciitilde1400; see Table~\ref{tbl-assigned-categories}).
+However, this method did retrieve less test proteins with hits against
+the BFVD.
 
 \begin{figure}[H]
 
@@ -573,11 +601,45 @@ informative) are displayed on the right.}
 
 \end{figure}%
 
+\begin{table}
+
+\caption{\label{tbl-assigned-categories}Information on changes in final
+category assignments.}
+
+\centering{
+
+\begin{tabular}{lrrrrrrr}
+\toprule
+method & \makecell[r]{Queries\\assigned} & \makecell[r]{Complete\\match} & \makecell[r]{Informative\\mismatch} & \makecell[r]{Informative\\match} & \makecell[r]{Uninformative\\match} & \makecell[r]{Informative\\reassignment} & \makecell[r]{Uninformative\\reassignment}\\
+\midrule
+blastp & 11177 & 8352 & 1216 & 2331 & 6021 & 1399 & 210\\
+diamond & 11119 & 8300 & 1206 & 2332 & 5968 & 1412 & 201\\
+mmseqs2 & 11135 & 8314 & 1213 & 2335 & 5979 & 1408 & 200\\
+ProstT5-foldseek & 7366 & 4923 & 916 & 1810 & 3113 & 1371 & 156\\
+TEA-mmseqs2 & 11318 & 5703 & 2725 & 1881 & 3822 & 2503 & 387\\
+\addlinespace
+Boltz-foldseek & 8889 & 6112 & 1054 & 2176 & 3936 & 1571 & 152\\
+Boltz-reseek & 7065 & 5119 & 723 & 1996 & 3123 & 1089 & 134\\
+\bottomrule
+\end{tabular}
+
+}
+
+\end{table}%
+
+\begin{itemize}
+\tightlist
+\item
+  TODO: add that only 18 non-informative proteins got an informative
+  functional annotation with structure methods (not TEA) compared to the
+  sequence methods (make overlap figures with structures)
+\end{itemize}
+
 \subsection{Computational
 benchmarking}\label{computational-benchmarking}
 
 All search methods were benchmarked for runtime and memory usage using
-Hyperfine\textsuperscript{4} and \texttt{nvidia-smi} for GPU memory
+Hyperfine\textsuperscript{4}, and \texttt{nvidia-smi} for GPU memory
 consumption. As expected, the sequence-based methods were much faster
 and less memory intensive compared to the embedding and structure based
 methods (see Figure~\ref{fig-computational-benchmark} and
@@ -585,7 +647,21 @@ Supplemental Figure~\ref{suppfig-time-increase}). Both Diamond and
 MMseqs2 finished the search of the \textgreater11,000 proteins against
 the BFVD in under 10 seconds, followed by BLASTp with a runtime of
 almost two minutes, a \textasciitilde28x time increase compared to
-MMseqs2 which was the fastest workflow.
+MMseqs2 which was the fastest workflow. The embedding methods took 52
+and 93 times longer than MMseqs2 for TEA and the ProstT5 workflow,
+respectively. Sequence-based methods were generally compatible with
+consumer-grade hardware. In contrast, the TEA workflow using the full
+precision ESM2 model required substantially greater GPU VRAM,
+necessitating specialized hardware, whereas ProstT5 operated within the
+memory constraints of consumer-grade GPUs. The structural workflows, by
+contrast, required over 20,000-fold more runtime than the sequence-based
+tools (see Supplemental Figure~\ref{suppfig-time-increase}) and demanded
+substantial computational resources, exceeding 400 GiB of system memory
+(CPU) and approximately 80 GiB of GPU memory (see
+Figure~\ref{fig-computational-benchmark}). Furthermore, the Reseek
+structural comparison incurred an additional two-hour runtime, whereas
+the Foldseek-based structural comparison completed in approximately two
+minutes.
 
 \begin{figure}[H]
 
@@ -599,7 +675,7 @@ MMseqs2 which was the fastest workflow.
 runtime in seconds of the different workflows plotted in function of the
 log\textsubscript{10}-transformed memory usage (in GiB). For multistep
 workflows the indicated time is a cumulation of all steps (arrows
-indicate directionality of workflow steps). Worklfows are colored by
+indicate directionality of workflow steps). Workflows are colored by
 search method, CPU and GPU steps are indicated by circles and triangles
 respectively. The inset shows the difference in runtime between foldseek
 and reseek after MSA generation (ColabFold) and structure prediction
@@ -610,8 +686,8 @@ and reseek after MSA generation (ColabFold) and structure prediction
 \section{Conclusion}\label{conclusion}
 
 Although new methods like pLMs and structure homology searches have
-shown great promise in detecting remote homologs\textsuperscript{1,5,6},
-including bacteriophage protein searches\textsuperscript{3}, this does
+shown great promise in detecting remote homologs\textsuperscript{2,5,6},
+including bacteriophage protein searches\textsuperscript{1}, this does
 not seem to be the case for eukaryotic virus proteins. If we consider
 that structural homology searches are most useful to find homologs with
 a clearly defined protein structure, a possible explanation could be
@@ -619,6 +695,12 @@ that most structural proteins (eg. capsid proteins) are already well
 annotated in sequence databases compared to more globular, complex
 proteins, and therefore the advantage of using structural homology
 searches in eukaryotic virus protein annotation might be limited.
+
+\begin{itemize}
+\tightlist
+\item
+  considerably higher runtime for little reward
+\end{itemize}
 
 \section{Material and Methods}\label{material-and-methods}
 
@@ -753,7 +835,7 @@ installation\textsuperscript{17} (see
 and diversity of the MSAs, we used the default ColabFold sequence
 databases, supplemented with extra \emph{Orthornavirae}
 sequences\textsuperscript{18} and viral sequences used in the structure
-prediction for the Phold database\textsuperscript{3}.
+prediction for the Phold database\textsuperscript{1}.
 
 \subsubsection{Foldseek}\label{foldseek}
 
@@ -766,7 +848,7 @@ BFVD.
 
 \subsubsection{Reseek}\label{reseek}
 
-Reseek\textsuperscript{1} aligns structures in a similar way to
+Reseek\textsuperscript{2} aligns structures in a similar way to
 Foldseek, but uses a different structural alphabet consisting of
 \textasciitilde10\textsuperscript{11} states, promising better
 sensitivity for remote homologs.
@@ -803,8 +885,8 @@ node with 72 cores (2 Intel Xeon Platinum 8360Y CPUs@2.4 GHz; 256 GiB
 RAM), except for the MSA generation step which was performed on an
 IceLake big memory node with 72 cores (2 Intel Xeon Platinum 8360Y
 CPUs@2.4 GHz; 2048 GiB RAM). The GPU analyses were performed on one
-NVIDIA H100 SXM5 GPU (80 GiB HBM3) mounted on a node equipped with 2 AMD
-EPYC 9334 CPUs (768 GiB RAM).
+NVIDIA H100 SXM5 GPU (80 GiB HBM3), mounted on a node equipped with 2
+AMD EPYC 9334 CPUs (768 GiB RAM).
 
 \subsection{Code availibility}\label{code-availibility}
 
@@ -826,25 +908,25 @@ Research Foundation - Flanders (FWO) and the Flemish Government.
 
 \protect\phantomsection\label{refs}
 \begin{CSLReferences}{0}{0}
-\bibitem[\citeproctext]{ref-edgarProteinStructureAlignment2024}
+\bibitem[\citeproctext]{ref-bourasProteinStructureinformedBacteriophage2026}
 \CSLLeftMargin{1. }%
+\CSLRightInline{Bouras, G. \emph{et al.}
+\href{https://doi.org/10.1093/nar/gkaf1448}{Protein structure-informed
+bacteriophage genome annotation with {Phold}}. \emph{Nucleic Acids
+Research} \textbf{54}, (2026).}
+
+\bibitem[\citeproctext]{ref-edgarProteinStructureAlignment2024}
+\CSLLeftMargin{2. }%
 \CSLRightInline{Edgar, R. C.
 \href{https://doi.org/10.1093/bioinformatics/btae687}{Protein structure
 alignment by {Reseek} improves sensitivity to remote homologs}.
 \emph{Bioinformatics} \textbf{40}, btae687 (2024).}
 
 \bibitem[\citeproctext]{ref-edgarProteinStructureAlignment2025}
-\CSLLeftMargin{2. }%
+\CSLLeftMargin{3. }%
 \CSLRightInline{Edgar, R. C. \& Sahakyan, H. Protein structure alignment
 significance is often exaggerated. 2025.07.17.665375 (2025)
 doi:\href{https://doi.org/10.1101/2025.07.17.665375}{10.1101/2025.07.17.665375}.}
-
-\bibitem[\citeproctext]{ref-bourasProteinStructureinformedBacteriophage2026}
-\CSLLeftMargin{3. }%
-\CSLRightInline{Bouras, G. \emph{et al.}
-\href{https://doi.org/10.1093/nar/gkaf1448}{Protein structure-informed
-bacteriophage genome annotation with {Phold}}. \emph{Nucleic Acids
-Research} \textbf{54}, (2026).}
 
 \bibitem[\citeproctext]{ref-Peter_hyperfine_2023}
 \CSLLeftMargin{4. }%
