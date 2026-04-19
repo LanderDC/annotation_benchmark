@@ -1184,6 +1184,9 @@ method_category_summary <- method_categories |>
   ) |>
   arrange(desc(matched_original_category))
 
+method_category_summary |>
+  write_tsv("results/category_assignment_results.tsv")
+
 annotation_diffs <- method_category_summary |>
   select(-starts_with("pct")) |>
   pivot_longer(cols = c(-method), names_to = "type", values_to = "queries") |>
@@ -1285,7 +1288,6 @@ ggsave(
     theme(axis.title.y = element_text(vjust = 0))
 ) | # align y-axis title toward bottom
   annotation_diffs) +
-  plot_layout(widths = c(1, 1), heights = c(.5, .5, 1)) +
   plot_annotation(tag_levels = "A") &
   theme(
     text = element_text(size = 6),
@@ -1317,11 +1319,21 @@ inf_not_seq |>
   select(entry, subject_id, original_category, top_category, method) |>
   knitr::kable()
 
-inf_not_seq |>
+inf_not_seq_acc <- inf_not_seq |>
   filter(method != "TEA-mmseqs2" & !is.na(method)) |>
   pull(entry) |>
-  unique() |>
-  length()
+  unique()
+
+inf_not_seq_subj <- inf_not_seq |>
+  filter(method != "TEA-mmseqs2" & !is.na(method)) |>
+  pull(subject_id) |>
+  unique()
+
+
+plddt_df |>
+  mutate(accession = stringr::str_extract(id, "^[^_]+")) |>
+  filter(accession %in% inf_not_seq_acc) |>
+  select(-accession)
 
 
 ## STOP
