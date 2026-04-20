@@ -956,15 +956,17 @@ informative_methods_plot <- info_bar_df |>
     color = "grey30",
     linewidth = 0.4
   ) +
-  geom_text(
-    y = original_informative_n - 600,
+  annotate(
+    geom = "label",
+    y = original_informative_n - 800,
     x = .5,
     label = "Original informative proteins",
     hjust = 0,
     size = 2.5,
     color = "grey30",
-    check_overlap = T,
-    inherit.aes = F
+    fill = "white",
+    border.color = NA,
+    alpha = .5
   ) +
   geom_hline(
     yintercept = 11360,
@@ -972,15 +974,16 @@ informative_methods_plot <- info_bar_df |>
     color = "grey30",
     linewidth = 0.4
   ) +
-  geom_text(
+  annotate(
+    geom = "label",
     y = 12000,
     x = .5,
     label = "Total test proteins",
     hjust = 0,
     size = 2.5,
     color = "grey30",
-    check_overlap = T,
-    inherit.aes = F
+    fill = NA,
+    border.color = NA,
   ) +
   scale_fill_okabe_ito(guide = 'none') +
   scale_alpha_manual(
