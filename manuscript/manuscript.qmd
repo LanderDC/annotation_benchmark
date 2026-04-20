@@ -38,33 +38,23 @@ crossref:
       key: suppfig
       latex-env: suppfig
       latex-list-of-description: Supplementary Figure
+abstract: |
+  The advent of protein language models and structural prediction promises new avenues for protein annotation  through structure homology. Earlier work (eg. Phold) has shown protein strucural homology annotation works well for  prokaryotic viruses. To leverage these new techniques for protein annotation of eukaryotic viruses, we benchmarked four  recent embedding- and structure-based methods in comparison with the gold standard of sequence-based annotation. We  selected 10% of the entries in ICTV's VMR v40.2 that did not have bacteria or archaea as designated host (n=1,054), and  subsequently retrieved all associated proteins from NCBI (n=11,360). Boltz-2 structure prediction of these proteins  produced generally high-quality models (median pLDDT 71.3). Using the structures and protein sequences of the entries in   the Big Fantastic Virus Database, we queried the VMR proteins with BLASTp, Diamond, and MMseqs2 (sequence); TEA  and ProstT5-3Di (embedding); and Foldseek and Reseek (structure). Sequence homology-based methods showed a high overlap  in hits, whereas the other methods had low intra- and inter-method agreement in hits between themselves and the  sequence-based methods. Additionally, all methods improved the number of informative categories (ie. not “hypothetical   protein”) for the VMR proteins, with embedding and structure methods producing the largest increases. However, when   evaluated against proteins with informative GenBank annotations as ground truth (n=2,938), embedding- and   structure-based methods agreed less often with the "ground truth" than sequence-based methods (~67% and ~76% vs ~83%,   respectively). Overall, sequence homology remains the most accurate approach for protein annotation of eukaryotic   viruses at present.
 ---
 
-# Outline (to delete)
-- general overview of data and structures
-  - [ ] TODO: add annotation of BFVD (eukaryotic vs prokaryotic viruses)
-- performance of methods in hits
-- comparison of methods in shared hits
-- comparison of functional annotation per method to original
-  - [ ] TODO: check if bad annotations are from low quality structures
-- how many are informative annotations
-  - [x] TODO: which conversions from hypothetical protein to informative
-- [x] TODO: computational benchmark + add database sizes
-- [ ] TODO: check correlation between structure quality/TEA entropy and correct annotation/agreement between methods
-- [ ] TODO: add recall, precision and F1 plots -> see also Figure 3C
-- [ ] TODO: make annotations better (local LLM, GenePT?)
-- [ ] TODO: do structure search of non-informative vs informative BFVD entries?
-- [x] TODO: look at p-value for Reseek and see if this improves annotations -> still very lenient (p<0.05)
-- ~~Try out LucaVirus?~~
-- ~~Also test on Nomburg dataset, should have ground truth labels (see LucaVirus paper: seems to be protein names)~~
-- possible explanation for bad structure results: small representation of viruses in training sets due to biosafety concerns?
-
-# Abstract
-The advent of protein language models (pLMs) and structural prediction promises new avenues for protein annotation through structure homology. Earlier work (eg. Phold) has shown protein strucural homology annotation works well for prokaryotic viruses. To leverage these new techniques for protein annotation of eukaryotic viruses, we benchmarked four recent embedding- and structure-based methods in comparison with the gold standard of sequence-based annotation. We selected 10% of the entries in ICTV's VMR v40.2 that did not have bacteria or archaea as designated host (n=1,054), and subsequently retrieved all associated proteins from NCBI (n=11,360). Boltz-2 structure prediction of these proteins produced generally high-quality models (median pLDDT 71.3). Using the structures and protein sequences of the entries in the Big Fantastic Virus Database (BFVD), we queried the VMR proteins with Blastp, Diamond, and MMseqs2 (sequence); TEA and ProstT5-3Di (embedding); and Foldseek and Reseek (structure). Sequence homology-based methods showed a high overlap in hits, whereas the other methods had low intra- and inter-method agreement in hits between themselves and the sequence-based methods. Additionally, all methods improved the number of informative categories (ie. not “hypothetical protein”) for the VMR proteins, with embedding and structure methods producing the largest increases. However, when evaluated against proteins with informative GenBank annotations as ground truth (n=2,938), embedding- and structure-based methods agreed less often with the "ground truth" than sequence-based methods (~67% and ~76% vs ~83%, respectively). Overall, sequence homology remains the most accurate approach for protein annotation of eukaryotic viruses at present.
-
 # Introduction
+The current increase in metagenomic sequencing experiments is providing researchers with a steady stream of new viral genomes. A large problem that remains for computational biologists is the annotation of these genomes with functionally relevant labels for the predicted proteins. As annotating all these genomes through experimental evidence is an unfeasible task, researchers transfer annotations of annotated genomes to these novel genomes. The established gold standard for performing this task has been the use of the BLAST suite or comparable sequence alignment tools, such as Diamond and MMSeqs2 [@altschulBasicLocalAlignment1990; @buchfinkFastSensitiveProtein2014; @steineggerMMseqs2EnablesSensitive2017]. However, this approach reaches it limits when newly discovered sequences diverge too much from (experimentally validated) annotated genomes. 
 
+To address this issue, novel methods rely on protein structure information, which should be more conserved than the sequence level because the 3D topology of a protein is vital for its function. Phold @bourasProteinStructureinformedBacteriophage2026, for example, cleverly uses structural information to increase the amount of annotated proteins in bacteriophage genomes.  Phold either takes user-provided structure predictions or uses ProstT5 @heinzingerBilingualLanguageModel2024, a protein language model (pLM), to convert amino acid sequences into 3Di sequences, which contain the structural alphabet used by Foldseek @vankempenFastAccurateProtein2024 to find structural homologs. In addition, a similar approach was developed by the same authors to increase the annotation rate in bacterial genomes @bourasBaktfoldSensitiveProtein2026.
 
+In addition to bacteriophages, also less studied eukaryotic viruses (e.g. insect viruses, nematode viruses and plant viruses) might benefit from such an approach to bring a more functional understanding to metagenomic discoveries of these viruses. For example, the *Chrysoviridae* is a viral family known to infect fungi, plants and probably insects, it has four dsRNA segments encoding four proteins. Two of these proteins have a known function, an RNA-dependent RNA polymerase and a capsid protein, while the other two proteins have no known function @kotta-loizouICTVVirusTaxonomy2020. Therefore, we benchmarked seven approaches for functional annotation: BLASTp, Diamond and MMseqs2 as gold standard sequence alignment; ProstT5 3Di conversion with Foldseek alignment, and ESM2 to The Embedded Alphabet (TEA) conversion with MMseqs2 alignment as pLM approaches; and finally, structure prediction of viral proteins with structure alignment using Foldseek or Reseek. 
+
+The pLM approaches both convert the amino acid sequences into new 2D sequences representing structural information, but differ in the structural alphabet they use (3Di and TEA). Pantolini *et al* claim that their structural alphabet has a high association with secondary structural elements, similar to 3Di, but has better representation of helices and loops by multiple characters in TEA, compared to an overrepresentation of these structural elements by 3Di-v and 3Di-d, respectively @pantoliniRewritingProteinAlphabets2026. 
+
+Additionally, we also predicted the structures of 11,467 proteins with Boltz-2 @passaroBoltz2AccurateEfficient2025 and compared these structures with both Foldseek and Reseek. The latter claiming to improve sensitivity to remote homologs, compared to the widely used Foldseek @edgarProteinStructureAlignment2024.
+
+For our benchmarking, we picked the Big Fantastic Virus Database (BFVD), which contains 351,242 high quality predicted viral protein structures, as the reference database @kimBFVDLargeRepository2025. This ensured that each annotation method was compared to the same viral proteins.
+ 
 # Results & Discussion
 ## Dataset overview
 Our test set of protein sequences consisted of 1,054 different viral entries taken at random from ICTV's VMR data (n=1,000 distinct species). These test dataset viruses covered all eukaryotic viral Kingdoms, with the majority of proteins originating from *Orthornavirae* (RNA viruses) and *Bamfordvirae* (dsDNA viruses) (see [@fig-overview]A), despite the latter only representing 43 viruses (see [@suppfig-kingdom]). 
@@ -89,7 +79,7 @@ Of note, Boltz structure prediction combined with Foldseek did assign more infor
 
 - TODO: add that only 18 non-informative proteins got an informative functional annotation with structure methods (not TEA) compared to the sequence methods (make overlap figures with structures)
 
-![A) The number of proteins that received an informative functional annotation (i.e. not "Hypothetical Protein", "unknown" or "Other Function") after applying each method. B) The percentage of queries that have a matching functional category for each method compared tot the informative original functional categories (regarded as the ground truth). C) Comparison of final assigned annotation categories compared to the original categories. Negative changes (ie. different informative categories or informative labels that changed to non-informative categories) are displayed to the left of the zero point, matches or category improvements (from non-informative to informative) are displayed on the right.](../figures/search_results/annotation_combined.pdf){#fig-annotation}
+![A) The number of proteins that received an informative functional annotation (i.e. not "Hypothetical Protein", "unknown" or "Other Function") after applying each method. Colored by method, light shades indicate non-informative proteins, dark shade indicates informative protein assignments. B) The percentage of queries that have a matching functional category for each method compared tot the informative original functional categories (regarded as the ground truth). C) Comparison of final assigned annotation categories compared to the original categories. Negative changes (ie. different informative categories or informative labels that changed to non-informative categories) are displayed to the left of the zero point, matches or category improvements (from non-informative to informative) are displayed on the right.](../figures/search_results/annotation_combined.pdf){#fig-annotation}
 
 
 ```{r}
@@ -101,6 +91,14 @@ Of note, Boltz structure prediction combined with Foldseek did assign more infor
 assigned_categories_path <- "../results/category_assignment_results.tsv"
 assigned_categories <- readr::read_tsv(assigned_categories_path) |>
   dplyr::select(
+    method,
+    queries_with_hit,
+    matched_original_category,
+    matched_original_informative,
+    matched_original_deprioritized,
+    original_informative_changed,
+    original_deprioritized_to_informative,
+    original_informative_to_deprioritized,
     -pct_match_among_hits,
     -pct_deprioritized_to_informative_among_hits,
     -pct_informative_to_deprioritized_among_hits
@@ -175,7 +173,7 @@ To benchmark different methods for eukaryotic virus protein annotation, we selec
 Protein sequences that were longer than 2,500 amino acids were split into multiple chunks of maximum 2,500 amino acids so that structure prediction with Boltz-2 @passaroBoltz2AccurateEfficient2025 would not run out of GPU memory (see [below](#computational-benchmarking)). This resulted in a final test set of 11,467 protein sequences from 1,000 eukaryotic virus species.
 
 ### Database
-The Big Fantastic Virus Database (BFVD) @kimBFVDLargeRepository2025 was used as the reference database for both sequence and structure homology-based annotation. The BFVD is a comprehensive database of high-quality predicted protein structures from the viral sequence representatives of the UniRef30 clusters. UniRef30 is a UniProt database that clusters protein sequences at 30% sequence identity and selects a representative sequence for each cluster, these representatives thus have a UniProt accession. Since a substantial amount of BFVD's included proteins are no longer available in UniProtKB as they are not part of reference proteomes, we converted their UniProt accessions to UniParc IDs. 
+The BFVD @kimBFVDLargeRepository2025 was used as the reference database for both sequence and structure homology-based annotation. The BFVD is a comprehensive database of high-quality predicted protein structures from the viral sequence representatives of the UniRef30 clusters. UniRef30 is a UniProt database that clusters protein sequences at 30% sequence identity and selects a representative sequence for each cluster, these representatives thus have a UniProt accession. Since a substantial amount of BFVD's included proteins are no longer available in UniProtKB as they are not part of reference proteomes, we converted their UniProt accessions to UniParc IDs. 
 
 Functional categories for each BFVD entry were derived from protein names associated with the corresponding UniParc IDs (could be from UniProtKB/TrEMBL, RefSeq and/or GenBank) for eukaryotic viruses (also see [below](#functional-classifier)) or by classifying them into PHROG-like @terzianPHROGFamiliesProkaryotic2021 categories with Empathi @boulayEmpathiEmbeddingbasedPhage2025 in the case of bacteriophage proteins. The distinction between eukaryotic virus and bacteriophage proteins was made based on the TaxID information from the UniParc protein ID. 
 
@@ -196,7 +194,7 @@ For sequence homology annotation, we used three state-of-the-art tools widely us
 ProstT5 @heinzingerBilingualLanguageModel2024 is a pLM, based on ProtT5-XL-U50 @elnaggarProtTransUnderstandingLanguage2022, finetuned for translating amino acid sequences into structure representations with 3Di sequences. We used ProstT5 within foldseek v10.941cd33 @vankempenFastAccurateProtein2024 using default settings of `foldseek createdb` to generate 3Di sequences for our test set and search them against the BFVD with `foldseek easy-search`.
 
 ### TEA
-In contrast to ProstT5, The Embedded Alphabet (TEA) @pantoliniRewritingProteinAlphabets2026 uses the ESM2 pLM @linEvolutionaryscalePredictionAtomiclevel2023 to generate embeddings for protein sequences and converts these embeddings into TEA sequences using this novel structural alphabet. Despite TEA and 3Di both consisting of 20 characters, TEA is different from 3Di in terms of the numbers and distribution these TEA characters map to secondary structural elements, promising a better representation of different structural elements across multiple alphabet characters. 
+In contrast to ProstT5, TEA @pantoliniRewritingProteinAlphabets2026 uses the ESM2 pLM @linEvolutionaryscalePredictionAtomiclevel2023 to generate embeddings for protein sequences and converts these embeddings into TEA sequences using this novel structural alphabet. Despite TEA and 3Di both consisting of 20 characters, TEA is different from 3Di in terms of the numbers and distribution these TEA characters map to secondary structural elements, promising a better representation of different structural elements across multiple alphabet characters. 
 
 We converted both our test set and the BFVD into TEA sequences using the `tea_convert` pipeline with default settings, and subsequently performed sequence similarity searches using `mmseqs easy-search` @steineggerMMseqs2EnablesSensitive2017 with a custom substitution matrix (matcha substiution matrix provided with TEA) and gap scoring settings (`--comp-bias-corr 0 --mask 0 --gap-open 18 --gap-extend 3`) to search the test set against the BFVD.
 

@@ -1,0 +1,18 @@
+- general overview of data and structures
+  - [ ] TODO: add annotation of BFVD (eukaryotic vs prokaryotic viruses)
+  - [ ] TODO: add schematic for pipeline
+- performance of methods in hits
+- comparison of methods in shared hits
+- comparison of functional annotation per method to original
+  - [ ] TODO: check if bad annotations are from low quality structures
+- how many are informative annotations
+  - [x] TODO: which conversions from hypothetical protein to informative
+- [x] TODO: computational benchmark + add database sizes
+- [ ] TODO: check correlation between structure quality/TEA entropy and correct annotation/agreement between methods
+- [ ] TODO: add recall, precision and F1 plots -> see also Figure 3C
+- [ ] TODO: make annotations better (local LLM, GenePT?)
+- [ ] TODO: do structure search of non-informative vs informative BFVD entries?
+- [x] TODO: look at p-value for Reseek and see if this improves annotations -> still very lenient (p<0.05)
+- ~~Try out LucaVirus?~~
+- ~~Also test on Nomburg dataset, should have ground truth labels (see LucaVirus paper: seems to be protein names)~~
+- possible explanation for bad structure results: small representation of viruses in training sets due to biosafety concerns?
