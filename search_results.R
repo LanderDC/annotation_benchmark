@@ -1284,7 +1284,9 @@ ggsave(
 )
 
 (free(
-  (informative_methods_plot / pct_category_matching) +
+  (informative_methods_plot /
+    pct_category_matching +
+    theme(plot.tag.position = c(0.02, 1.3))) +
     theme(axis.title.y = element_text(vjust = 0))
 ) | # align y-axis title toward bottom
   annotation_diffs) +
