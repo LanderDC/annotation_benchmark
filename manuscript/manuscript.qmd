@@ -77,6 +77,7 @@ Although TEA made the largest improvements in assigning previous uninformative p
 
 Of note, Boltz structure prediction combined with Foldseek did assign more informative categories than the sequence-based methods to originally non-informative proteins (n=1,571 vs ~1400; see @tbl-assigned-categories). However, this method retrieved less test proteins with hits against the BFVD.
 
+- add the number of original informative proteins
 - TODO: add that only 18 non-informative proteins got an informative functional annotation with structure methods (not TEA) compared to the sequence methods (make overlap figures with structures)
 
 ![A) The number of proteins that received an informative functional annotation (i.e. not "Hypothetical Protein", "unknown" or "Other Function") after applying each method. Colored by method, light shades indicate non-informative proteins, dark shade indicates informative protein assignments. B) The percentage of queries that have a matching functional category for each method compared tot the informative original functional categories (regarded as the ground truth). C) Comparison of final assigned annotation categories compared to the original categories. Negative changes (ie. different informative categories or informative labels that changed to non-informative categories) are displayed to the left of the zero point, matches or category improvements (from non-informative to informative) are displayed on the right.](../figures/search_results/annotation_combined.pdf){#fig-annotation}
@@ -93,7 +94,7 @@ assigned_categories <- readr::read_tsv(assigned_categories_path) |>
   dplyr::select(
     method,
     queries_with_hit,
-    matched_original_category,
+    -matched_original_category,
     matched_original_informative,
     matched_original_deprioritized,
     original_informative_changed,
@@ -105,7 +106,6 @@ assigned_categories <- readr::read_tsv(assigned_categories_path) |>
   ) |>
   dplyr::rename(
     `Queries assigned` = queries_with_hit,
-    `Complete match` = matched_original_category,
     `Informative match` = matched_original_informative,
     `Uninformative match` = matched_original_deprioritized,
     `Informative mismatch` = original_informative_changed,

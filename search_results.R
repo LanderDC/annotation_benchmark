@@ -1136,7 +1136,9 @@ method_categories <- benchmark_df |>
     informative_to_deprioritized = !original_is_deprioritized &
       !is.na(top_category) &
       top_is_deprioritized,
-    original_informative_changed = !is.na(top_category) &
+    both_deprioritized = original_is_deprioritized & top_is_deprioritized,
+    original_informative_changed = !(original_category %in% deprioritized) &
+      !is.na(top_category) &
       !informative_to_deprioritized &
       !deprioritized_to_informative &
       (top_category != original_category),
@@ -1156,10 +1158,7 @@ method_category_summary <- method_categories |>
       matches_original & !original_is_deprioritized,
       na.rm = TRUE
     ),
-    matched_original_deprioritized = sum(
-      matches_original & original_is_deprioritized,
-      na.rm = TRUE
-    ),
+    matched_original_deprioritized = sum(both_deprioritized, na.rm = TRUE),
     original_deprioritized_to_informative = sum(
       deprioritized_to_informative,
       na.rm = TRUE
@@ -1243,8 +1242,15 @@ annotation_diffs <- method_category_summary |>
   ) +
   scale_y_discrete(limits = rev) +
   scale_x_continuous(
-    breaks = seq(-9000, 9000, by = 1500),
-    labels = str_replace(as.character(seq(-9000, 9000, by = 1500)), "-", ""),
+    limits = c(-1000, NA),
+    breaks = c(-1000, seq(0, 12000, by = 2000)),
+    labels = str_replace(
+      as.character(
+        c(-1000, seq(0, 12000, by = 2000))
+      ),
+      "-",
+      ""
+    ),
   ) +
   guides(
     fill = guide_legend(
@@ -1255,6 +1261,7 @@ annotation_diffs <- method_category_summary |>
     )
   ) +
   labs(x = "# test proteins") +
+  coord_cartesian(clip = "off") +
   theme_bw() +
   theme(
     legend.title = element_blank(),
