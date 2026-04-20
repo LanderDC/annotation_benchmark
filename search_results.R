@@ -1316,7 +1316,6 @@ ggsave(
   device = cairo_pdf
 )
 
-
 inf_not_seq <- method_categories |>
   group_by(entry) |>
   filter(
