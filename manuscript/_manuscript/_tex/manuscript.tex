@@ -571,25 +571,25 @@ second highest informative-to-uninformative reassignments (see
 Figure~\ref{fig-annotation}C and Table~\ref{tbl-assigned-categories}).
 The same applies to the number of test proteins that originally had an
 informative category, but was assigned a different category with TEA
-(n=2723). Furthermore, due to the likely high number of false positives
+(n=522). Furthermore, due to the likely high number of false positives
 in TEA hits (see Figure~\ref{fig-overlap}B), we concluded that the TEA
 uninformative-to-informative assignments lacked reliability.
 
 Of note, Boltz structure prediction combined with Foldseek did assign
 more informative categories than the sequence-based methods to
-originally non-informative proteins (n=1,571 vs \textasciitilde1400; see
-Table~\ref{tbl-assigned-categories}). However, this method retrieved
+originally non-informative proteins (n=1,571 vs \textasciitilde1,400;
+see Table~\ref{tbl-assigned-categories}). However, this method retrieved
 less test proteins with hits against the BFVD.
 
 \begin{itemize}
 \tightlist
 \item
-  add the number of original informative proteins
-\item
   TODO: add that \textasciitilde150 hypothetical proteins got an
   informative functional annotation with Boltz-foldseek method compared
   to the sequence methods (make superpose figures with structures but
   filter first on true hypothetical)
+\item
+  TODO: look at which taxonomies benefit most from structure methods
 \end{itemize}
 
 \begin{figure}[H]
@@ -695,8 +695,8 @@ and reseek after MSA generation (ColabFold) and structure prediction
 Although new methods like pLMs and structure homology searches have
 shown great promise in detecting remote
 homologs\textsuperscript{6,9,11}, including bacteriophage protein
-searches\textsuperscript{4}, this does not seem to be the case for
-eukaryotic virus proteins. If we consider that structural homology
+searches\textsuperscript{4}, \hl{this does not seem to be the case for
+eukaryotic virus proteins}. If we consider that structural homology
 searches are most useful to find homologs with a clearly defined protein
 structure, a possible explanation could be that most structural proteins
 (eg. capsid proteins) are already well annotated in sequence databases
@@ -706,6 +706,16 @@ annotation might be limited.
 
 \begin{itemize}
 \tightlist
+\item
+  structure search is compatible with sequence search but retrieves
+  little extra proteins (might be because of less virus proteins in
+  training data)
+\item
+  different conformational state predictions might hamper homolog
+  detection (?)
+\item
+  add note on latest papers showing decreased performance of pLMs for
+  viruses (eg. mutation scanning)
 \item
   considerably higher runtime for little reward
 \end{itemize}

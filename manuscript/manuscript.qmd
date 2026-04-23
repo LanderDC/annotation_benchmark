@@ -165,7 +165,8 @@ All search methods were benchmarked for runtime and memory usage using Hyperfine
 Although new methods like pLMs and structure homology searches have shown great promise in detecting remote homologs [@edgarProteinStructureAlignment2024; @vankempenFastAccurateProtein2024; @pantoliniRewritingProteinAlphabets2026], including bacteriophage protein searches @bourasProteinStructureinformedBacteriophage2026, [this does not seem to be the case for eukaryotic virus proteins]{.mark}. If we consider that structural homology searches are most useful to find homologs with a clearly defined protein structure, a possible explanation could be that most structural proteins (eg. capsid proteins) are already well annotated in sequence databases compared to more globular, complex proteins, and therefore the advantage of using structural homology searches in eukaryotic virus protein annotation might be limited. 
 
 - structure search is compatible with sequence search but retrieves little extra proteins (might be because of less virus proteins in training data)
-- 
+- different conformational state predictions might hamper homolog detection (?)
+- add note on latest papers showing decreased performance of pLMs for viruses (eg. mutation scanning)
 - considerably higher runtime for little reward
 
 
