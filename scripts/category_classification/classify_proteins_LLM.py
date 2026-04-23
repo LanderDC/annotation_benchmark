@@ -333,12 +333,21 @@ def extract_json_from_response(text: str) -> Any:
     return None
 
 
-def validate_categories(assigned: list[str], valid_categories: set[str]) -> list[str]:
+def validate_categories(
+    assigned: list[str],
+    valid_categories: set[str],
+    accession: str | None = None,
+) -> list[str]:
     """Filter out any categories not in the predefined set."""
     validated = [c for c in assigned if c in valid_categories]
     invalid = [c for c in assigned if c not in valid_categories]
     if invalid:
-        logger.warning(f"Removed invalid categories: {invalid}")
+        if accession:
+            logger.warning(
+                f"Removed invalid categories for accession {accession}: {invalid}"
+            )
+        else:
+            logger.warning(f"Removed invalid categories: {invalid}")
     return validated
 
 
@@ -513,7 +522,9 @@ def classify_single_protein(
     parsed = extract_json_from_response(raw)
 
     if parsed and isinstance(parsed, dict) and "categories" in parsed:
-        cats = validate_categories(parsed["categories"], valid_categories)
+        cats = validate_categories(
+            parsed["categories"], valid_categories, accession=accession
+        )
         return {"accession": accession, "categories": cats, "raw_response": raw}
 
     logger.warning(f"Failed to parse response for {accession}. Raw: {raw[:200]}...")
@@ -558,7 +569,11 @@ def classify_batch(
         for item in parsed:
             if isinstance(item, dict) and "accession" in item:
                 acc = item["accession"]
-                cats = validate_categories(item.get("categories", []), valid_categories)
+                cats = validate_categories(
+                    item.get("categories", []),
+                    valid_categories,
+                    accession=acc,
+                )
                 parsed_map[acc] = cats
 
         for accession, names, taxonomy in batch:
