@@ -39,6 +39,7 @@ SLURM example:
 import argparse
 import json
 import logging
+import os
 import re
 import sys
 from pathlib import Path
@@ -261,9 +262,46 @@ def load_json(path: str | Path) -> Any:
 def save_json(data: Any, path: str | Path) -> None:
     """Save data to a JSON file."""
     path = Path(path)
-    with open(path, "w", encoding="utf-8") as fh:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    with open(tmp_path, "w", encoding="utf-8") as fh:
         json.dump(data, fh, indent=2, ensure_ascii=False)
+    os.replace(tmp_path, path)
     logger.info(f"Results saved to {path}")
+
+
+def coerce_protein_fields(info: dict) -> tuple[list[str], list[str] | None]:
+    """Normalize protein names and taxonomy fields for prompting/output."""
+    protein_names = info.get("protein_names")
+    if protein_names is None:
+        protein_names = info.get("protein", [])
+    if isinstance(protein_names, str):
+        protein_names = [protein_names]
+    if protein_names is None:
+        protein_names = []
+
+    taxonomy = info.get("taxonomy", [])
+    if isinstance(taxonomy, str):
+        taxonomy = [taxonomy]
+
+    return protein_names, taxonomy
+
+
+def load_existing_output(path: str | Path) -> dict[str, dict]:
+    """Load an existing output JSON if present, otherwise return an empty dict."""
+    path = Path(path)
+    if not path.exists():
+        return {}
+
+    data = load_json(path)
+    if not isinstance(data, dict):
+        logger.warning(
+            f"Existing output at {path} is not a JSON object; ignoring for resume."
+        )
+        return {}
+
+    logger.info(f"Loaded {len(data)} existing records from {path} for resume")
+    return data
 
 
 def extract_json_from_response(text: str) -> Any:
@@ -582,6 +620,7 @@ def run_classification(
     output_path: str,
     model_name: str = "google/gemma-4-31b-it",
     batch_size: int = 10,
+    save_every: int = 1000,
     temperature: float = 0.1,
     max_new_tokens: int = 4096,
     device: str = "auto",
@@ -602,6 +641,10 @@ def run_classification(
     valid_categories = set(categories_list)
     logger.info(f"Using {len(categories_list)} predefined categories")
 
+    if save_every < 1:
+        logger.error("--save-every must be >= 1")
+        sys.exit(1)
+
     if batch_size != 1:
         logger.info(
             "Single-prompt mode is enabled for maximum accuracy; "
@@ -611,32 +654,28 @@ def run_classification(
     # --- Load model --------------------------------------------------------
     model, tokenizer = load_model(model_name, device, quantize, hf_token)
 
-    # --- Prepare proteins --------------------------------------------------
-    protein_items: list[tuple[str, list[str], list[str] | None]] = []
-    for accession, info in proteins_data.items():
-        protein_names = info.get("protein_names")
-        if protein_names is None:
-            protein_names = info.get("protein", [])
-        if isinstance(protein_names, str):
-            protein_names = [protein_names]
-
-        taxonomy = info.get("taxonomy", [])
-        if isinstance(taxonomy, str):
-            taxonomy = [taxonomy]
-
-        protein_items.append((accession, protein_names, taxonomy))
-
-    logger.info(
-        f"Prepared {len(protein_items)} proteins for single-prompt classification"
-    )
+    # --- Resume state ------------------------------------------------------
+    output_data = load_existing_output(output_path)
+    processed_accessions = {
+        acc for acc, info in output_data.items() if isinstance(info, dict)
+    }
+    if processed_accessions:
+        logger.info(
+            f"Resuming run: skipping {len(processed_accessions)} already-saved proteins"
+        )
 
     # --- Classify ----------------------------------------------------------
-    all_results: dict[str, list[str]] = {}
     errors: list[str] = []
+    newly_processed = 0
+    total = len(proteins_data)
 
-    for accession, protein_names, taxonomy in tqdm(
-        protein_items, desc="Classifying", unit="protein"
+    for accession, info in tqdm(
+        proteins_data.items(), desc="Classifying", unit="protein", total=total
     ):
+        if accession in processed_accessions:
+            continue
+
+        protein_names, taxonomy = coerce_protein_fields(info)
         try:
             result = classify_single_protein(
                 accession,
@@ -649,35 +688,47 @@ def run_classification(
                 temperature,
                 max_new_tokens,
             )
-            all_results[result["accession"]] = result["categories"]
+
+            output_data[result["accession"]] = {
+                "protein_names": protein_names,
+                "taxid": info.get("taxid"),
+                "taxonomy": taxonomy if taxonomy is not None else [],
+                "original_categories": info.get("categories", []),
+                "predicted_categories": result["categories"],
+            }
+            newly_processed += 1
+
+            if newly_processed % save_every == 0:
+                logger.info(
+                    f"Checkpoint: saving after {newly_processed} newly processed proteins"
+                )
+                save_json(output_data, output_path)
         except Exception as e:
             errors.append(accession)
             logger.error(f"Classification failed for {accession}: {e}")
 
-    # --- Build output ------------------------------------------------------
-    output_data = {}
+    # --- Build complete output snapshot -----------------------------------
     for accession, info in proteins_data.items():
-        protein_names = info.get("protein_names")
-        if protein_names is None:
-            protein_names = info.get("protein", [])
-
+        if accession in output_data:
+            continue
+        protein_names, taxonomy = coerce_protein_fields(info)
         output_data[accession] = {
             "protein_names": protein_names,
             "taxid": info.get("taxid"),
-            "taxonomy": info.get("taxonomy", []),
+            "taxonomy": taxonomy if taxonomy is not None else [],
             "original_categories": info.get("categories", []),
-            "predicted_categories": all_results.get(accession, []),
+            "predicted_categories": [],
         }
 
     save_json(output_data, output_path)
 
     # --- Summary -----------------------------------------------------------
-    total = len(proteins_data)
     classified = sum(1 for v in output_data.values() if v["predicted_categories"])
     logger.info(
         f"Classification complete: {classified}/{total} proteins received "
         f"at least one category."
     )
+    logger.info(f"Newly processed in this run: {newly_processed}")
     if errors:
         logger.warning(f"{len(errors)} proteins encountered errors: {errors}")
 
@@ -774,6 +825,15 @@ def main():
         help="Proteins per LLM call (default: 10). Use 1 for max reliability.",
     )
     parser.add_argument(
+        "--save-every",
+        type=int,
+        default=1000,
+        help=(
+            "Save progress to --output after every N newly processed proteins "
+            "(default: 1000)."
+        ),
+    )
+    parser.add_argument(
         "--temperature",
         type=float,
         default=0.1,
@@ -808,8 +868,6 @@ def main():
     # Allow token from environment
     hf_token = args.hf_token
     if hf_token is None:
-        import os
-
         hf_token = os.environ.get("HF_TOKEN")
 
     run_classification(
@@ -818,6 +876,7 @@ def main():
         output_path=args.output,
         model_name=args.model,
         batch_size=args.batch_size,
+        save_every=args.save_every,
         temperature=args.temperature,
         max_new_tokens=args.max_new_tokens,
         device=args.device,
