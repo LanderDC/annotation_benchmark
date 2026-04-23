@@ -339,18 +339,19 @@ Using the structures and protein sequences of the entries in the Big
 Fantastic Virus Database, we queried the VMR proteins with BLASTp,
 Diamond, and MMseqs2 (sequence); TEA and ProstT5-3Di (embedding); and
 Foldseek and Reseek (structure). Sequence homology-based methods showed
-a high overlap in hits, whereas the other methods had low intra- and
-inter-method agreement in hits between themselves and the sequence-based
-methods. Additionally, all methods improved the number of informative
-categories (ie. not ``hypothetical protein'') for the VMR proteins, with
-embedding and structure methods producing the largest increases.
-However, when evaluated against proteins with informative GenBank
-annotations as ground truth (n=2,938), embedding- and structure-based
-methods agreed less often with the ``ground truth'' than sequence-based
-methods (\textasciitilde67\% and \textasciitilde76\% vs
-\textasciitilde83\%, respectively). Overall, sequence homology remains
+a high overlap in identical hits, whereas the other methods had low
+intra- and inter-method agreement in hits between themselves and the
+sequence-based methods. Additionally, all methods improved the number of
+informative categories (ie. not ``hypothetical protein'') for the VMR
+proteins, with embedding and structure methods producing the largest
+increases. However, when evaluated against proteins with informative
+GenBank annotations as ground truth (n=2,791), embedding- and
+structure-based methods agreed less often with the ``ground truth'' than
+sequence-based methods (\textasciitilde67\% and \textasciitilde78\% vs
+\textasciitilde84\%, respectively). Overall, sequence homology remains
 the most accurate approach for protein annotation of eukaryotic viruses
-at present.}
+at present, although for a minority of ``hypothetical proteins''
+structure homology could help resolve functional annotation.}
 
 % keywords
 
@@ -380,10 +381,13 @@ information to increase the amount of annotated proteins in
 bacteriophage genomes. Phold either takes user-provided structure
 predictions or uses ProstT5\textsuperscript{5}, a protein language model
 (pLM), to convert amino acid sequences into 3Di sequences, which contain
-the structural alphabet used by Foldseek\textsuperscript{6} to find
-structural homologs. In addition, a similar approach was developed by
-the same authors to increase the annotation rate in bacterial
-genomes\textsuperscript{7}.
+the structural alphabet introduced by Foldseek\textsuperscript{6} to
+find structural homologs. Benchmarking showed that Phold improved the
+annotation of select set of bacteriophage proteins from
+\textasciitilde35\% to \textasciitilde50\% with both ProstT5 and protein
+structures\textsuperscript{4}. In addition, a similar approach was
+developed by the same authors to increase the annotation rate in
+bacterial genomes\textsuperscript{7}.
 
 In addition to bacteriophages, also less studied eukaryotic viruses
 (e.g.~insect viruses, nematode viruses and plant viruses) might benefit
@@ -400,14 +404,14 @@ ESM2 to The Embedded Alphabet (TEA) conversion with MMseqs2 alignment as
 pLM approaches; and finally, structure prediction of viral proteins with
 structure alignment using Foldseek or Reseek.
 
-The pLM approaches both convert the amino acid sequences into new 2D
-sequences representing structural information, but differ in the
-structural alphabet they use (3Di and TEA). Pantolini \emph{et al} claim
-that their structural alphabet has a high association with secondary
-structural elements, similar to 3Di, but has better representation of
-helices and loops by multiple characters in TEA, compared to an
-overrepresentation of these structural elements by 3Di-v and 3Di-d,
-respectively\textsuperscript{9}.
+The pLM approaches both convert the amino acid sequences into new
+1-dimensional sequences representing structural information, but differ
+in the structural alphabet they use (3Di and TEA). Pantolini \emph{et
+al} claim that their structural alphabet has a high association with
+secondary structural elements, similar to 3Di, but has better
+representation of helices and loops by multiple characters in TEA,
+compared to an overrepresentation of these structural elements by 3Di-v
+and 3Di-d, respectively\textsuperscript{9}.
 
 Additionally, we also predicted the structures of 11,467 proteins with
 Boltz-2\textsuperscript{10} and compared these structures with both
@@ -448,13 +452,12 @@ fine-tuning of parameters or MSA generation strategies.
 
 }
 
-\caption{\label{fig-overview}A) The distribution of the number of
-proteins from the different viral Kingdoms. Each tile roughly
-corresponds to 110 proteins. B) A cumulative distribution function plot
-showing the percentage of predicted structures from the test set with a
-pLDDT score above the pLDDT score on the x-axis. The inset shows a
-violin- and boxplot with all pLDDT scores from the predicted structures
-(n=11,467).}
+\caption{\label{fig-overview}A) Test protein distribution from the
+different viral Kingdoms. Each tile roughly corresponds to 110 proteins.
+B) A cumulative distribution function plot showing the percentage of
+predicted structures from the test set with a pLDDT score above the
+pLDDT score on the x-axis. The inset shows a violin- and boxplot with
+all pLDDT scores from the predicted structures (n=11,467).}
 
 \end{figure}%
 
@@ -494,10 +497,10 @@ When comparing the BFVD matches yielded by all methods against each
 other (see Figure~\ref{fig-overlap}C-D and
 Supplemental Figure~\ref{suppfig-pairwise-method}), we observed as
 expected that the sequence homology-based methods had a high overlap in
-shared hits. This was true when comparing the best 25 hits for each test
-protein (only the comparison of diamond and mmseqs2 against blastp had a
-low overlap because of the higher amount of hits for blastp), the best
-25 hits afterwards filtered on E-value and only the top hits (see
+identical hits. This was true when comparing the best 25 hits for each
+test protein (only the comparison of diamond and mmseqs2 against blastp
+had a low overlap because of the higher amount of hits for blastp), the
+best 25 hits afterwards filtered on E-value and only the top hits (see
 Figure~\ref{fig-overlap}C-D and
 Supplemental Figure~\ref{suppfig-pairwise-method}). In contrast, the
 embedding and structure homology based methods had low intra-method
@@ -583,9 +586,10 @@ less test proteins with hits against the BFVD.
 \item
   add the number of original informative proteins
 \item
-  TODO: add that only 18 non-informative proteins got an informative
-  functional annotation with structure methods (not TEA) compared to the
-  sequence methods (make overlap figures with structures)
+  TODO: add that \textasciitilde150 hypothetical proteins got an
+  informative functional annotation with Boltz-foldseek method compared
+  to the sequence methods (make superpose figures with structures but
+  filter first on true hypothetical)
 \end{itemize}
 
 \begin{figure}[H]
@@ -621,7 +625,7 @@ category assignments.}
 
 \begin{tabular}{lrrrrrr}
 \toprule
-method & \makecell[r]{Queries\\assigned} & \makecell[r]{Informative\\match} & \makecell[r]{Uninformative\\match} & \makecell[r]{Informative\\mismatch} & \makecell[r]{Informative\\reassignment} & \makecell[r]{Uninformative\\reassignment}\\
+method & \makecell[r]{Queries\\assigned} & \makecell[r]{Informative\\match} & \makecell[r]{Uninformative\\match} & \makecell[r]{Informative\\mismatch} & \makecell[r]{Uninformative\\to informative} & \makecell[r]{Informative to\\uninformative}\\
 \midrule
 blastp & 11177 & 2331 & 7003 & 234 & 1399 & 210\\
 diamond & 11119 & 2332 & 6938 & 236 & 1412 & 201\\
