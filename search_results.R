@@ -1319,9 +1319,23 @@ ggsave(
 inf_not_seq <- method_categories |>
   group_by(entry) |>
   filter(
-    !any(method %in% c("blastp", "mmseqs2", "diamond")) &
-      (original_category %in% deprioritized) &
-      (!top_category %in% deprioritized)
+    # keep entries where Boltz-foldseek is deprioritized -> informative
+    any(
+      method == "Boltz-foldseek" &
+        deprioritized_to_informative
+    ),
+    # drop entries where any sequence method gives an informative top category
+    !any(
+      method %in%
+        c("blastp", "mmseqs2", "diamond") &
+        !is.na(top_category) &
+        !top_category %in% deprioritized
+    )
+  ) |>
+  filter(
+    method == "Boltz-foldseek",
+    deprioritized_to_informative,
+    original_category == "hypothetical protein"
   ) |>
   ungroup()
 
