@@ -333,14 +333,68 @@ def extract_json_from_response(text: str) -> Any:
     return None
 
 
+def repair_category_name(category: str, valid_categories: set[str]) -> str | None:
+    """Attempt to repair near-valid category names to a canonical valid category."""
+    candidate = category.strip()
+    if not candidate:
+        return None
+
+    if candidate in valid_categories:
+        return candidate
+
+    open_count = candidate.count("(")
+    close_count = candidate.count(")")
+    if open_count > close_count:
+        balanced = candidate + (")" * (open_count - close_count))
+        if balanced in valid_categories:
+            return balanced
+
+    if candidate.endswith(")"):
+        truncated = candidate.rstrip(")")
+        if truncated in valid_categories:
+            return truncated
+    else:
+        appended = candidate + ")"
+        if appended in valid_categories:
+            return appended
+
+    return None
+
+
 def validate_categories(
     assigned: list[str],
     valid_categories: set[str],
     accession: str | None = None,
 ) -> list[str]:
     """Filter out any categories not in the predefined set."""
-    validated = [c for c in assigned if c in valid_categories]
-    invalid = [c for c in assigned if c not in valid_categories]
+    validated: list[str] = []
+    invalid: list[str] = []
+    repaired_pairs: list[tuple[str, str]] = []
+
+    for category in assigned:
+        repaired = repair_category_name(category, valid_categories)
+        if repaired is not None:
+            validated.append(repaired)
+            if repaired != category:
+                repaired_pairs.append((category, repaired))
+        else:
+            invalid.append(category)
+
+    deduped_validated: list[str] = []
+    seen: set[str] = set()
+    for category in validated:
+        if category not in seen:
+            seen.add(category)
+            deduped_validated.append(category)
+
+    if repaired_pairs:
+        if accession:
+            logger.info(
+                f"\nRepaired category names for accession {accession}: {repaired_pairs}"
+            )
+        else:
+            logger.info(f"\nRepaired category names: {repaired_pairs}")
+
     if invalid:
         if accession:
             logger.warning(
@@ -348,7 +402,7 @@ def validate_categories(
             )
         else:
             logger.warning(f"\nRemoved invalid categories: {invalid}")
-    return validated
+    return deduped_validated
 
 
 def format_taxonomy(taxonomy: list[str] | None) -> str:
