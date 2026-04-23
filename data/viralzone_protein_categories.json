@@ -530,7 +530,7 @@
   {
     "process": "Other to be classified",
     "Activity": "Host shut off",
-    "Enzyme/Protein": "Uracyl-DNA glycosidase",
+    "Enzyme/Protein": "Uracil-DNA glycosylase",
     "ViralZone pages": "",
     "Rhea": "",
     "Antiviral": ""
@@ -562,15 +562,15 @@
   {
     "process": "Structural",
     "Activity": "Structural",
-    "Enzyme/Protein": "Surface glycoprotein",
+    "Enzyme/Protein": "Surface/envelope glycoprotein",
     "ViralZone pages": "",
     "Rhea": "",
     "Antiviral": ""
   },
   {
-    "process": "Structural",
-    "Activity": "Structural",
-    "Enzyme/Protein": "Envelope glycoprotein",
+    "process": "Entry",
+    "Activity": "Fusion",
+    "Enzyme/Protein": "Fusion glycoprotein",
     "ViralZone pages": "",
     "Rhea": "",
     "Antiviral": ""
@@ -618,7 +618,7 @@
   {
     "process": "Viral transcription",
     "Activity": "Regulation",
-    "Enzyme/Protein": "Transactivator protein (Tat)",
+    "Enzyme/Protein": "Transactivator protein",
     "ViralZone pages": "",
     "Rhea": "",
     "Antiviral": ""
