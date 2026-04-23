@@ -1,4 +1,4 @@
-```{mermaid}
+```mermaid
 flowchart TD
     A([🚀 Start]) --> B[Read command-line arguments\nproteins, categories, output, model, etc.]
     B --> C[Load proteins JSON file]
