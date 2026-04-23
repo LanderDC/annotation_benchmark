@@ -344,10 +344,10 @@ def validate_categories(
     if invalid:
         if accession:
             logger.warning(
-                f"Removed invalid categories for accession {accession}: {invalid}"
+                f"\nRemoved invalid categories for accession {accession}: {invalid}"
             )
         else:
-            logger.warning(f"Removed invalid categories: {invalid}")
+            logger.warning(f"\nRemoved invalid categories: {invalid}")
     return validated
 
 
@@ -715,12 +715,12 @@ def run_classification(
 
             if newly_processed % save_every == 0:
                 logger.info(
-                    f"Checkpoint: saving after {newly_processed} newly processed proteins"
+                    f"\nCheckpoint: saving after {newly_processed} newly processed proteins"
                 )
                 save_json(output_data, output_path)
         except Exception as e:
             errors.append(accession)
-            logger.error(f"Classification failed for {accession}: {e}")
+            logger.error(f"\nClassification failed for {accession}: {e}")
 
     # --- Build complete output snapshot -----------------------------------
     for accession, info in proteins_data.items():
