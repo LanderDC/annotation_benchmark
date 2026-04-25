@@ -283,7 +283,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
-  pdftitle={Benchmarking sequence{,} embedding and structure based methods for eukaryotic virus protein annotation},
+  pdftitle={Benchmarking sequence{,} embedding and structure-based methods for eukaryotic virus protein annotation},
   pdfauthor={Lander De Coninck; Uri Neri; Susie Grigson; Simon Roux},
   colorlinks=true,
   linkcolor={black},
@@ -293,9 +293,9 @@
   pdfcreator={LaTeX via pandoc}}
 
 
-\title[Benchmarking sequence, embedding and structure based methods for
+\title[Benchmarking sequence, embedding and structure-based methods for
 eukaryotic virus protein annotation]{Benchmarking sequence, embedding
-and structure based methods for eukaryotic virus protein annotation}
+and structure-based methods for eukaryotic virus protein annotation}
 
 % author setup
 \author*[1]{\fnm{Lander} \sur{De
@@ -464,7 +464,9 @@ the underlying reference.
 
 \section{Results}\label{results}
 
-\subsection{Dataset overview}\label{dataset-overview}
+\subsection{Boltz-2 generates high-quality viral protein structures
+without parameter
+fine-tuning}\label{boltz-2-generates-high-quality-viral-protein-structures-without-parameter-fine-tuning}
 
 Our test set of protein sequences consisted of 1,054 different viral
 entries taken at random from ICTV's VMR data (n=1,000 distinct species).
@@ -499,8 +501,10 @@ all pLDDT scores from the predicted structures (n=11,467).}
 
 \end{figure}%
 
-\subsection{Performance of the different
-methods}\label{performance-of-the-different-methods}
+\subsection{Sequence homology methods demonstrate superior sensitivity
+and reproducibility over structure-informed approaches in eukaryotic
+virus
+annotation}\label{sequence-homology-methods-demonstrate-superior-sensitivity-and-reproducibility-over-structure-informed-approaches-in-eukaryotic-virus-annotation}
 
 We started by evaluating how many of the proteins in our test produced
 at least one match against the BFVD for each method (see
@@ -509,54 +513,56 @@ each method on an E-value lower than 1e-03 to see how this affected the
 number of hits for each test protein. This decreased the number of test
 proteins with a hit on average with 25\% for the structure methods. The
 methods relying on structure homology clearly had less matches compared
-to the sequence homology-based methods. This suggests that sequence
-based methods are still more sensitive in detecting homology for
-eukaryotic viruses than structure based methods, despite the promising
-results for bacteriophages\textsuperscript{15}. As the quality of our
-structure predictions was rather high (see Figure~\ref{fig-overview}B),
-this lower sensitivity is likely not due to poor structure predictions.
-In contrast, TEA, as only non-protein sequence based method, had a
-comparable number of test proteins with a match to the sequence based
-methods, almost reaching the total number of test proteins (n=11,354).
-However, analyzing the total number of hits at different E-value
-thresholds shows that TEA will result in a very high number of matches
-across all E-value thresholds, signifying a high number of false
-positives (see Figure~\ref{fig-overlap}B). A similar pattern is observed
-for the other structure based methods, which tend to find too many hits
-at high E-values. Reseek was less affected by this, due to a combination
-of already calculating E-values more accurately\textsuperscript{12,19}
-and our use of a modified Reseek version (see \hyperref[reseek]{below}).
-On the other hand, the three sequence based methods had a similar number
-of test proteins with a hit (BLASTp=11,359; MMseqs2=11,255 and
-Diamond=11,224), but don't show this inflation of total hits at higher
-E-values (BLASTp has a slight increase towards larger E-values).
+to the sequence homology-based methods. This suggests that
+sequence-based methods are still more sensitive in detecting homology
+for eukaryotic viruses than structure-based methods, despite the
+promising results for bacteriophages\textsuperscript{15}. As the quality
+of our structure predictions was rather high (see
+Figure~\ref{fig-overview}B), this lower sensitivity is likely not due to
+poor structure predictions. In contrast, TEA, as only non-protein
+sequence-based method, had a comparable number of test proteins with a
+match to the sequence-based methods, almost reaching the total number of
+test proteins (n=11,354). However, analyzing the total number of hits at
+different E-value thresholds shows that TEA will result in a very high
+number of matches across all E-value thresholds, signifying a high
+number of false positives (see Figure~\ref{fig-overlap}B). A similar
+pattern is observed for the other structure-based methods, which tend to
+find too many hits at high E-values. Reseek was less affected by this,
+due to a combination of already calculating E-values more
+accurately\textsuperscript{12,19} and our use of a modified Reseek
+version (see \hyperref[reseek]{below}). On the other hand, the three
+sequence-based methods had a similar number of test proteins with a hit
+(BLASTp=11,359; MMseqs2=11,255 and Diamond=11,224), but don't show this
+inflation of total hits at higher E-values (BLASTp has a slight increase
+towards larger E-values).
 
 When comparing the BFVD matches yielded by all methods against each
 other (see Figure~\ref{fig-overlap}C-D and
-Supplemental Figure~\ref{suppfig-pairwise-method}), we observed as
-expected that the sequence homology-based methods had a high overlap in
-identical hits. This was true when comparing the best 25 hits for each
-test protein (only the comparison of diamond and mmseqs2 against blastp
-had a low overlap because of the higher amount of hits for blastp), the
-best 25 hits afterwards filtered on E-value and only the top hits (see
+Supplemental Figure~\ref{suppfig-pairwise-method}), we observed that the
+sequence homology-based methods had a high overlap in identical hits.
+This was true when comparing the best 25 hits for each test protein
+(only the comparison of diamond and mmseqs2 against blastp had a low
+overlap because of the higher amount of hits for blastp), the best 25
+hits afterwards filtered on E-value and only the top hits (see
 Figure~\ref{fig-overlap}C-D and
 Supplemental Figure~\ref{suppfig-pairwise-method}). In contrast, the
-embedding and structure homology based methods had low intra-method
+embedding and structure homology-based methods had low intra-method
 agreement in resulting hits (\textasciitilde25\% between the embedding
 methods and \textasciitilde40-75\% for the structure methods on the best
 25 hits). The percentage of overlapping hits did increase when only
-looking at the top hits, but stayed well below the percentage of overlap
-between the sequence based methods. It is worth noting that Reseek
-seemed to perform worse in this metric when looking at the filtered
-results (see Supplemental Figure~\ref{suppfig-pairwise-method}B),
-however this is due to the large reduction in number of matches after
-filtering. This reduction is due to the more stringent E-value
-calculations in Reseek compared to Foldseek\textsuperscript{12,19}.
-Notably, while ProstT5 was the worst performer across the three datasets
-compared to the sequence methods, TEA performed better in the top hits
-comparison and was on par with the structure based methods. Overall, the
-embedding and structure based methods, that should be better to detect
-remote homologs, had low agreement on shared hits among each other.
+taking the top hits into account, but stayed well below the percentage
+of overlap between the sequence-based methods. It is worth noting that
+Reseek seemed to perform worse in this metric when looking at the
+filtered results (see
+Supplemental Figure~\ref{suppfig-pairwise-method}B), however this is due
+to the large reduction in number of matches after filtering. This
+reduction is due to the more stringent E-value calculations in Reseek
+compared to Foldseek\textsuperscript{12,19}. Notably, while ProstT5 was
+the worst performer across the three datasets compared to the sequence
+methods, TEA performed better in the top hits comparison and was on par
+with the structure-based methods. Overall, the embedding and
+structure-based methods, that should be better to detect remote
+homologs, had low agreement on shared hits among each other.
 
 \begin{figure}[H]
 
@@ -580,8 +586,9 @@ y-axis.}
 
 \end{figure}%
 
-\subsection{Functional annotation
-comparison}\label{functional-annotation-comparison}
+\subsection{Sequence-based methods retain better accuracy in functional
+category assignment while structural approaches slightly improve novel
+annotations}\label{sequence-based-methods-retain-better-accuracy-in-functional-category-assignment-while-structural-approaches-slightly-improve-novel-annotations}
 
 Using a weighted approach, we assigned functional categories to the test
 proteins for each method based on the hits with an E-value smaller than
@@ -590,10 +597,10 @@ evaluate the accuracy of the benchmarked methods, we considered the test
 proteins with an originally informative annotation (n=2,938) as the
 ground truth to compare our results to. All methods improved the number
 of informative categories (see Figure~\ref{fig-annotation}A), with the
-sequence based methods, together with TEA and Boltz-Foldseek, improving
+sequence-based methods, together with TEA and Boltz-Foldseek, improving
 the number of informative assignments the most. However, when comparing
 the functional annotations to the ``ground truth'', all embedding and
-structure based methods underperformed compared to the sequence based
+structure-based methods underperformed compared to the sequence-based
 methods (maximum \textasciitilde67\% and \textasciitilde78\% vs
 \textasciitilde84\% agreement with ground truth; see
 Figure~\ref{fig-annotation}B).
@@ -686,7 +693,7 @@ benchmarking}\label{computational-benchmarking}
 All search methods were benchmarked for runtime and memory usage using
 Hyperfine\textsuperscript{20}, and \texttt{nvidia-smi} for GPU memory
 consumption. As expected, the sequence-based methods were much faster
-and less memory intensive compared to the embedding and structure based
+and less memory intensive compared to the embedding and structure-based
 methods (see Figure~\ref{fig-computational-benchmark} and
 Supplemental Figure~\ref{suppfig-time-increase}). Both Diamond and
 MMseqs2 finished the search of the \textgreater11,000 proteins against
