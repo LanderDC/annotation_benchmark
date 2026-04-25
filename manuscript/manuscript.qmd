@@ -7,7 +7,6 @@ format:
   nature-pdf:
     notebook-view: false
     notebook-links: false
-    pdf-engine: lualatex
     journal: 
       cite-style: sn-nature
     cite-method: citeproc
@@ -23,12 +22,14 @@ format:
             \linespread{1.5}
             \usepackage{pdflscape}
             \usepackage{placeins}
+    mermaid-format: png
   docx:
     reference-doc: custom-reference-doc.docx
     filters:
         - authors-block
     notebook-view: false
     notebook-links: false
+    mermaid-format: png
 csl: _extensions/christopherkenny/nature/csl/nature.csl
 notes-after-punctuation: false
 execute:
@@ -51,13 +52,15 @@ To address this issue, novel methods rely on protein structure information, whic
 
 In addition to bacteriophages, also less studied eukaryotic viruses (e.g. insect viruses, nematode viruses and plant viruses) might benefit from such an approach to bring a more functional understanding to metagenomic discoveries of these viruses. For example, the *Chrysoviridae* is a viral family known to infect fungi, plants and probably insects, it has four dsRNA segments encoding four proteins. Two of these proteins have a known function, an RNA-dependent RNA polymerase and a capsid protein, while the other two proteins have no known function @kotta-loizouICTVVirusTaxonomy2020. Therefore, we benchmarked seven approaches for functional annotation: BLASTp, Diamond and MMseqs2 as gold standard sequence alignment; ProstT5 3Di conversion with Foldseek alignment, and ESM2 to The Embedded Alphabet (TEA) conversion with MMseqs2 alignment as pLM approaches; and finally, structure prediction of viral proteins with structure alignment using Foldseek or Reseek.
 
-The pLM approaches both convert the amino acid sequences into new 1-dimensional sequences representing structural information, but differ in the structural alphabet they use (3Di and TEA). Pantolini *et al* claim that their structural alphabet has a high association with secondary structural elements, similar to 3Di, but has better representation of helices and loops by multiple characters in TEA, compared to an overrepresentation of these structural elements by 3Di-v and 3Di-d, respectively @pantoliniRewritingProteinAlphabets2026. 
+The pLM approaches both convert the amino acid sequences into new 1-dimensional sequences representing structural information, but differ in the structural alphabet they use (3Di and TEA). Pantolini *et al.* claim that their structural alphabet has a high association with secondary structural elements, similar to 3Di, but has better representation of helices and loops by multiple characters in TEA, compared to an overrepresentation of these structural elements by 3Di-v and 3Di-d, respectively @pantoliniRewritingProteinAlphabets2026. 
 
 Additionally, we also predicted the structures of 11,467 proteins with Boltz-2 @passaroBoltz2AccurateEfficient2025 and compared these structures with both Foldseek and Reseek. The latter claiming to improve sensitivity to remote homologs, compared to the widely used Foldseek @edgarProteinStructureAlignment2024.
 
 For our benchmarking, we picked the Big Fantastic Virus Database (BFVD), which contains 351,242 high quality predicted viral protein structures, as the reference database @kimBFVDLargeRepository2025. This ensured that each annotation method was compared to the same viral proteins.
+
+- add why selection of test proteins (test methods on relatively well known viruses)
  
-# Results & Discussion
+# Results
 ## Dataset overview
 Our test set of protein sequences consisted of 1,054 different viral entries taken at random from ICTV's VMR data (n=1,000 distinct species). These test dataset viruses covered all eukaryotic viral Kingdoms, with the majority of proteins originating from *Orthornavirae* (RNA viruses) and *Bamfordvirae* (dsDNA viruses) (see [@fig-overview]A), despite the latter only representing 43 viruses (see [@suppfig-kingdom]). 
 
@@ -161,14 +164,19 @@ All search methods were benchmarked for runtime and memory usage using Hyperfine
 
 ![Log~10~-transformed runtime in seconds of the different workflows plotted in function of the log~10~-transformed memory usage (in GiB). For multistep workflows the indicated time is a cumulation of all steps (arrows indicate directionality of workflow steps). Workflows are colored by search method, CPU and GPU steps are indicated by circles and triangles respectively. The inset shows the difference in runtime between foldseek and reseek after MSA generation (ColabFold) and structure prediction (Boltz2).](../figures/computational_benchmark/hyperfine_time_vs_memory.pdf){#fig-computational-benchmark}
 
-# Conclusion
+# Discussion
 Although new methods like pLMs and structure homology searches have shown great promise in detecting remote homologs [@edgarProteinStructureAlignment2024; @vankempenFastAccurateProtein2024; @pantoliniRewritingProteinAlphabets2026], including bacteriophage protein searches @bourasProteinStructureinformedBacteriophage2026, [this does not seem to be the case for eukaryotic virus proteins]{.mark}. If we consider that structural homology searches are most useful to find homologs with a clearly defined protein structure, a possible explanation could be that most structural proteins (eg. capsid proteins) are already well annotated in sequence databases compared to more globular, complex proteins, and therefore the advantage of using structural homology searches in eukaryotic virus protein annotation might be limited. 
 
 - structure search is compatible with sequence search but retrieves little extra proteins (might be because of less virus proteins in training data)
 - different conformational state predictions might hamper homolog detection (?)
+- lack of virus representation in training data is a hurdle for the pLMs
 - add note on latest papers showing decreased performance of pLMs for viruses (eg. mutation scanning)
 - considerably higher runtime for little reward
 
+Limitations:
+- polyproteins: cutting in pieces, not real function (collection of proteins with different functions)
+- classification (eg. nsp5), proteins same name different function -> finetune LLM on scientific papers
+- DB problem which is too limited (larger db might give better results)
 
 # Material and Methods
 ## Dataset selection
@@ -246,6 +254,92 @@ LDC acknowledges support from the Research Foundation - Flanders (grants 11L1325
 ![Pairwise comparisons of shared hits between search methods for (A) the best 25 hits, (B) the best 25 hits after filtering on E-value (E < 1e-03), and (C) the top hits for each query.](../figures/search_results/hit_overlap_methods.pdf){#suppfig-pairwise-method fig-pos='H'}
 
 ![Workflow runtime increase compared to the fastest workflow (MMseqs2).](../figures/computational_benchmark/time_fold_increase.pdf){#suppfig-time-increase fig-pos='H'}
+
+```{=latex}
+\clearpage
+\newgeometry{left=1.3cm,right=1.3cm,top=0cm,bottom=0cm}
+```
+
+::: {#suppfig-method-diagram}
+
+```{mermaid}
+%%| fig-width: 7
+%%| fig-height: 9
+%%| out-width: 100%
+---
+config:
+  theme: neutral
+  themeVariables:
+    fontSize: 12
+---
+flowchart TD
+    A[Goal<br/>Annotate proteins from eukaryotic viruses] --> B[Test set selection from ICTV VMR v40.2]
+    B --> B1[Keep entries with no bacteria/archaea as host<br/>1,054 entries; 1,000 species]
+    B1 --> B2[Download associated proteins from GenBank<br/>11,360 proteins]
+    B2 --> B3[Split proteins longer than 2,500 aa<br/>for structure-prediction memory limits]
+    B3 --> B4[Final test set: 11,467 protein sequences]
+
+    A --> C[Reference database: BFVD]
+    C --> C1[BFVD contains viral proteins + predicted structures]
+    C1 --> C2[Map UniProt accessions to UniParc when needed]
+    C2 --> C3[Assign functional categories to BFVD entries]
+    C3 --> C4[Eukaryotic-virus proteins: custom name-based classifier]
+    C3 --> C5[Bacteriophage proteins: Empathi PHROG-like classes]
+
+    B4 --> D[Run homology searches against BFVD]
+    C4 --> D
+    C5 --> D
+
+    D --> E{Method family}
+
+    E --> E1[Sequence methods]
+    E1 --> E11[BLASTp]
+    E1 --> E12[DIAMOND blastp sensitive]
+    E1 --> E13[MMseqs2 easy-search]
+
+    E --> F1[Embedding methods]
+    F1 --> F11[ProstT5: protein sequence -> 3Di sequence]
+    F11 --> F12[Search with Foldseek easy-search]
+    F1 --> F21[TEA: protein sequence -> TEA sequence using ESM2]
+    F21 --> F22[Search with MMseqs2 + TEA scoring settings]
+
+    E --> G1[Structure methods]
+    G1 --> G11[Predict structures with Boltz-2]
+    G11 --> G12[MSA from adapted ColabFold + viral additions]
+    G12 --> G13[Search predicted structures with Foldseek]
+    G12 --> G14[Search predicted structures with adapted Reseek]
+
+    E11 --> H[Per-method hit list for each test protein]
+    E12 --> H
+    E13 --> H
+    F12 --> H
+    F22 --> H
+    G13 --> H
+    G14 --> H
+
+    H --> I[Filter hits by E-value < 1e-03 for category assignment]
+    I --> J["Convert each hit to a category score<br/>weight = -log(E-value), or 1000 when E-value = 0"]
+    J --> K[Sum scores per category for each test protein]
+    K --> L[Choose category with highest total score]
+    L --> M[Priority rule: if best informative category >= 50% of best uninformative score,<br/>keep informative category]
+    M --> N[Final functional assignment per test protein, per method]
+
+    subgraph U[Uninformative categories]
+      U1[Hypothetical Protein]
+      U2[unknown]
+      U3[Other function]
+    end
+
+    M -. uses .-> U
+```
+
+Flowchart of the annotation pipeline used in this study. Eukaryotic virus proteins were selected from ICTV VMR v40.2, filtered to exclude bacteria- and archaea-hosted entries, and expanded into a final test set after retrieving all associated protein sequences and splitting very long proteins for structure prediction. The BFVD reference database was prepared separately by assigning functional categories to its entries using a custom name-based classifier for eukaryotic virus proteins and PHROG-like categories for bacteriophage proteins by Empathi. The test proteins were then compared against BFVD using three sequence methods (BLASTp, DIAMOND, MMseqs2), two embedding-based methods (ProstT5-3Di and TEA), and two structure-based methods (Foldseek and Reseek after Boltz-2 structure prediction). Hits were filtered by E-value, converted into weighted category scores, summed per functional category, and the highest-scoring category was chosen for each test protein, with a rule that preserves informative categories when they are sufficiently supported over uninformative ones.
+:::
+
+```{=latex}
+\restoregeometry
+\clearpage
+```
 
 ```{=latex}
 \FloatBarrier

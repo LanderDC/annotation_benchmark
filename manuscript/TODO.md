@@ -1,6 +1,7 @@
+Outline:
 - general overview of data and structures
   - [ ] TODO: add annotation of BFVD (eukaryotic vs prokaryotic viruses)
-  - [ ] TODO: add schematic for pipeline
+  - [x] TODO: add schematic for pipeline
 - performance of methods in hits
 - comparison of methods in shared hits
 - comparison of functional annotation per method to original
@@ -15,4 +16,3 @@
 - [x] TODO: look at p-value for Reseek and see if this improves annotations -> still very lenient (p<0.05)
 - ~~Try out LucaVirus?~~
 - ~~Also test on Nomburg dataset, should have ground truth labels (see LucaVirus paper: seems to be protein names)~~
-- possible explanation for bad structure results: small representation of viruses in training sets due to biosafety concerns?

@@ -284,7 +284,7 @@
 \urlstyle{same}
 \hypersetup{
   pdftitle={Benchmarking sequence{,} embedding and structure based methods for eukaryotic virus protein annotation},
-  pdfauthor={Lander De Coninck; Uri Neri; Simon Roux},
+  pdfauthor={Lander De Coninck; Uri Neri; Susie Grigson; Simon Roux},
   colorlinks=true,
   linkcolor={black},
   filecolor={Maroon},
@@ -299,7 +299,7 @@ and structure based methods for eukaryotic virus protein annotation}
 
 % author setup
 \author*[1]{\fnm{Lander} \sur{De
-Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\author[2]{\fnm{Uri} \sur{Neri}\orcidlink{0000-0003-0894-2484}}\email{uneri@lbl.gov}\author[2]{\fnm{Simon} \sur{Roux}\orcidlink{0000-0002-5831-5895}}\email{sroux@lbl.gov}
+Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\author[2]{\fnm{Uri} \sur{Neri}\orcidlink{0000-0003-0894-2484}}\email{uneri@lbl.gov}\author[2]{\fnm{Susie} \sur{Grigson}\orcidlink{0000-0003-4738-3451}}\email{sgrigson@lbl.gov}\author[2]{\fnm{Simon} \sur{Roux}\orcidlink{0000-0002-5831-5895}}\email{sroux@lbl.gov}
 % affil setup
 \affil[1]{\orgname{KU Leuven}%
 , \orgdiv{Microbiology, Immunology and Transplantation}%
@@ -407,7 +407,7 @@ structure alignment using Foldseek or Reseek.
 The pLM approaches both convert the amino acid sequences into new
 1-dimensional sequences representing structural information, but differ
 in the structural alphabet they use (3Di and TEA). Pantolini \emph{et
-al} claim that their structural alphabet has a high association with
+al.} claim that their structural alphabet has a high association with
 secondary structural elements, similar to 3Di, but has better
 representation of helices and loops by multiple characters in TEA,
 compared to an overrepresentation of these structural elements by 3Di-v
@@ -424,7 +424,7 @@ which contains 351,242 high quality predicted viral protein structures,
 as the reference database\textsuperscript{12}. This ensured that each
 annotation method was compared to the same viral proteins.
 
-\section{Results \& Discussion}\label{results-discussion}
+\section{Results}\label{results}
 
 \subsection{Dataset overview}\label{dataset-overview}
 
@@ -690,7 +690,7 @@ and reseek after MSA generation (ColabFold) and structure prediction
 
 \end{figure}%
 
-\section{Conclusion}\label{conclusion}
+\section{Discussion}\label{discussion}
 
 Although new methods like pLMs and structure homology searches have
 shown great promise in detecting remote
@@ -714,11 +714,18 @@ annotation might be limited.
   different conformational state predictions might hamper homolog
   detection (?)
 \item
+  lack of virus representation in training data is a hurdle for the pLMs
+\item
   add note on latest papers showing decreased performance of pLMs for
   viruses (eg. mutation scanning)
 \item
   considerably higher runtime for little reward
 \end{itemize}
+
+Limitations: - polyproteins: cutting in pieces, not real function
+(collection of proteins with different functions) - classification (eg.
+nsp5), proteins same name different function -\textgreater{} finetune
+LLM on scientific papers
 
 \section{Material and Methods}\label{material-and-methods}
 
@@ -1126,6 +1133,40 @@ hits for each query.}
 to the fastest workflow (MMseqs2).}
 
 \end{suppfig}%
+
+\clearpage
+\newgeometry{left=1.3cm,right=1.3cm,top=0cm,bottom=0cm}
+
+\begin{suppfig}
+
+\centering{
+
+\includegraphics[width=7in,height=9in]{manuscript_files/figure-latex/mermaid-figure-1.png}
+
+}
+
+\caption{\label{suppfig-method-diagram}Flowchart of the annotation
+pipeline used in this study. Eukaryotic virus proteins were selected
+from ICTV VMR v40.2, filtered to exclude bacteria- and archaea-hosted
+entries, and expanded into a final test set after retrieving all
+associated protein sequences and splitting very long proteins for
+structure prediction. The BFVD reference database was prepared
+separately by assigning functional categories to its entries using a
+custom name-based classifier for eukaryotic virus proteins and
+PHROG-like categories for bacteriophage proteins by Empathi. The test
+proteins were then compared against BFVD using three sequence methods
+(BLASTp, DIAMOND, MMseqs2), two embedding-based methods (ProstT5-3Di and
+TEA), and two structure-based methods (Foldseek and Reseek after Boltz-2
+structure prediction). Hits were filtered by E-value, converted into
+weighted category scores, summed per functional category, and the
+highest-scoring category was chosen for each test protein, with a rule
+that preserves informative categories when they are sufficiently
+supported over uninformative ones.}
+
+\end{suppfig}%
+
+\restoregeometry
+\clearpage
 
 \FloatBarrier
 
