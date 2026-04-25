@@ -1227,7 +1227,7 @@ annotation_diffs <- method_category_summary |>
   geom_vline(xintercept = 0, linewidth = .5, linetype = "dashed") +
   scale_fill_brewer(
     type = "div",
-    palette = "RdYlGn",
+    palette = "BrBG",
     breaks = c(
       "original_informative_to_deprioritized",
       "original_informative_changed",
