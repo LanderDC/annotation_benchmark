@@ -129,7 +129,7 @@ def extract_protein_metadata(feature, record: SeqIO.SeqRecord) -> Dict[str, Any]
     metadata = {
         "protein_id": feature.qualifiers.get("protein_id", [""])[0],
         "gene_name": feature.qualifiers.get("gene", [""])[0],
-        "product": feature.qualifiers.get("product", ["hypothetical protein"])[0],
+        "protein_names": feature.qualifiers.get("product", ["hypothetical protein"])[0],
         "locus_tag": feature.qualifiers.get("locus_tag", [""])[0],
         "note": feature.qualifiers.get("note", []),  # Keep as list
         "function": feature.qualifiers.get("function", [""])[0],
@@ -203,8 +203,8 @@ def extract_proteins_from_genbank(
             description_parts = []
 
             # Add product (protein name)
-            if metadata["product"]:
-                description_parts.append(metadata["product"])
+            if metadata["protein_names"]:
+                description_parts.append(metadata["protein_names"])
 
             # Add gene name if different from product
             # if metadata['gene_name'] and metadata['gene_name'] not in metadata['product']:
@@ -231,7 +231,7 @@ def extract_proteins_from_genbank(
             )
 
             # Add annotations to SeqRecord
-            protein_record.annotations["product"] = metadata["product"]
+            protein_record.annotations["protein_names"] = metadata["protein_names"]
             protein_record.annotations["gene"] = metadata["gene_name"]
             protein_record.annotations["organism"] = metadata["organism"]
             protein_record.annotations["source_nucleotide"] = record.id
