@@ -287,6 +287,51 @@ def coerce_protein_fields(info: dict) -> tuple[list[str], list[str] | None]:
     return protein_names, taxonomy
 
 
+def normalize_protein_input(proteins_data: Any) -> dict[str, dict]:
+    """
+    Normalize protein input to a consistent dict format.
+    Handles both array format (benchmark_data.json) and dict format (bfvd_category_annotations.json).
+
+    Parameters
+    ----------
+    proteins_data : Any
+        Loaded JSON data, either a list or dict of proteins.
+
+    Returns
+    -------
+    dict[str, dict]
+        Normalized proteins dictionary with accession as key.
+    """
+    if isinstance(proteins_data, list):
+        # Array format (e.g., benchmark_data.json)
+        logger.info(f"Detected array format with {len(proteins_data)} proteins")
+        normalized = {}
+        for item in proteins_data:
+            if not isinstance(item, dict):
+                logger.warning(f"Skipping non-dict item in array: {item}")
+                continue
+            accession = item.get("protein_id")
+            if not accession:
+                logger.warning(f"Skipping item without 'protein_id' field: {item}")
+                continue
+            normalized[accession] = item
+        return normalized
+    elif isinstance(proteins_data, dict):
+        # Dict format (e.g., bfvd_category_annotations.json with accession as key)
+        logger.info(f"Detected dict format with {len(proteins_data)} proteins")
+        # Check if values are dicts and have the expected structure
+        if proteins_data and any(isinstance(v, dict) for v in proteins_data.values()):
+            return proteins_data
+        else:
+            logger.warning(
+                "Dict format detected but values don't appear to be protein records"
+            )
+            return proteins_data
+    else:
+        logger.error(f"Unexpected protein data format: {type(proteins_data)}")
+        sys.exit(1)
+
+
 def load_existing_output(path: str | Path) -> dict[str, dict]:
     """Load an existing output JSON if present, otherwise return an empty dict."""
     path = Path(path)
@@ -700,8 +745,9 @@ def run_classification(
 
     # --- Load inputs -------------------------------------------------------
     logger.info(f"Loading proteins from {proteins_path}")
-    proteins_data = load_json(proteins_path)
-    logger.info(f"Loaded {len(proteins_data)} proteins")
+    proteins_data_raw = load_json(proteins_path)
+    proteins_data = normalize_protein_input(proteins_data_raw)
+    logger.info(f"Normalized to {len(proteins_data)} proteins")
 
     logger.info(f"Loading categories from {categories_path}")
     categories_raw = load_json(categories_path)
