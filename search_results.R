@@ -75,7 +75,10 @@ all_results <- imap(method_files, read_hits) |>
 # Add annotations
 # -------------------------
 
-annotations <- fromJSON("data/bfvd_category_annotations.json")
+annotations <- fromJSON(
+  "results/category_classification/bfvd_category_classifications.json"
+)
+
 
 categories_df <- tibble(
   subject_id = names(annotations),
@@ -743,11 +746,13 @@ ggsave(
 # Load benchmark annotations
 # -------------------------
 # plot with informative protein annotations
-benchmark_list <- fromJSON("data/benchmark_data_classified.json")
+benchmark_list <- fromJSON(
+  "results/category_classification/benchmark_data_classified.json"
+)
 
 benchmark_df <- tibble(
   entry = names(benchmark_list),
-  categories = unlist(map(entry, ~ benchmark_list[[.x]]$categories))
+  categories = map(entry, ~ benchmark_list[[.x]]$categories)
 )
 
 deprioritized <- c(
@@ -1245,11 +1250,11 @@ annotation_diffs <- method_category_summary |>
   ) +
   scale_y_discrete(limits = rev) +
   scale_x_continuous(
-    limits = c(-1000, NA),
-    breaks = c(-1000, seq(0, 12000, by = 2000)),
+    limits = c(-2000, NA),
+    breaks = c(-2000, seq(0, 12000, by = 2000)),
     labels = str_replace(
       as.character(
-        c(-1000, seq(0, 12000, by = 2000))
+        c(-2000, seq(0, 12000, by = 2000))
       ),
       "-",
       ""
@@ -1293,7 +1298,7 @@ ggsave(
   device = cairo_pdf
 )
 
-(free(
+fig3 <- (free(
   (informative_methods_plot /
     pct_category_matching +
     theme(plot.tag.position = c(0.02, 1.3))) +
@@ -1339,6 +1344,138 @@ inf_not_seq <- method_categories |>
   ) |>
   ungroup()
 
+source("data_info.R")
+
+inf_not_seq <- inf_not_seq |>
+  left_join(kingdom_df, by = join_by("entry" == "protein_id")) |>
+  left_join(
+    plddt_df |>
+      mutate(id = gsub("_.*", "", id)),
+    by = join_by("entry" == "id")
+  )
+
+boltzf_kingdom <- inf_not_seq |>
+  count(kingdom) |>
+  ggplot(aes(fill = kingdom, values = n)) +
+  geom_waffle(
+    n_rows = 10,
+    size = 0.5,
+    colour = "white",
+    make_proportional = TRUE,
+    flip = TRUE
+  ) +
+  scale_fill_manual(values = kingdom_palette) +
+  guides(
+    fill = guide_legend(
+      ncol = 2, # one key per line
+      byrow = TRUE,
+      keyheight = unit(0.25, "cm"),
+      keywidth = unit(0.25, "cm"),
+    )
+  ) +
+  coord_equal() +
+  theme_void() +
+  theme_enhance_waffle() +
+  theme(
+    legend.position = "top",
+    legend.text = ggtext::element_markdown(size = 7),
+    legend.title = element_blank()
+  )
+
+boltzf_plddt <- inf_not_seq |>
+  count(plddt_category) |>
+  ggplot(aes(fill = plddt_category, values = n)) +
+  geom_waffle(
+    n_rows = 10,
+    size = 0.5,
+    colour = "white",
+    make_proportional = TRUE,
+    flip = TRUE
+  ) +
+  scale_fill_manual(values = plddt_col) +
+  guides(
+    fill = guide_legend(
+      nrow = 2, # one key per line
+      byrow = TRUE,
+      keyheight = unit(0.25, "cm"),
+      keywidth = unit(0.25, "cm"),
+    )
+  ) +
+  coord_equal() +
+  theme_void() +
+  theme_enhance_waffle() +
+  theme(
+    legend.position = "top",
+    legend.text = ggtext::element_markdown(size = 7),
+    legend.title = element_blank()
+  )
+
+(boltzf_kingdom | boltzf_plddt) +
+  plot_annotation(tag_levels = "A") &
+  theme(
+    plot.tag = element_text(face = "bold", size = 10),
+    legend.text = ggtext::element_markdown(size = 6),
+  )
+ggsave(
+  "figures/search_results/boltz_foldseek_extra_annotations.pdf",
+  dpi = 300,
+  width = 90,
+  height = 60,
+  units = "mm"
+)
+
+# TODO: add process/activity from viralzone
+# dont forget empathi categories
+boltzf_functions <- inf_not_seq |>
+  count(top_category) |>
+  ggplot(aes(fill = top_category, values = n)) +
+  geom_waffle(
+    n_rows = 10,
+    size = 0.5,
+    colour = "white",
+    make_proportional = TRUE,
+    flip = TRUE
+  ) +
+  #scale_fill_manual(values = plddt_col) +
+  scale_fill_viridis_d(option = "turbo") +
+  guides(
+    fill = guide_legend(
+      ncol = 1, # one key per line
+      byrow = TRUE,
+      keyheight = unit(0.25, "cm"),
+      keywidth = unit(0.25, "cm"),
+    )
+  ) +
+  coord_equal() +
+  theme_void() +
+  theme_enhance_waffle() +
+  theme(
+    legend.position = c(1.6, .7),
+    legend.text = ggtext::element_markdown(size = 7),
+    legend.title = element_blank()
+  )
+
+custom_spacer <- plot_spacer() +
+  theme(plot.margin = unit(c(0, 0, 0, 0), "lines"))
+
+(fig3 /
+  ((boltzf_kingdom +
+    boltzf_plddt +
+    boltzf_functions +
+    custom_spacer) +
+    plot_layout(nrow = 1, width = c(1, 1, 1, 1.2)))) +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(size = 10, face = "bold"))
+
+ggsave(
+  "figures/search_results/annotation_combined_2.pdf",
+  dpi = 300,
+  width = 180,
+  height = 180,
+  units = "mm",
+  device = cairo_pdf
+)
+
 inf_not_seq |>
   filter(method != "TEA-mmseqs2" & !is.na(method)) |>
   select(entry, subject_id, original_category, top_category, method) |>
@@ -1354,55 +1491,53 @@ inf_not_seq_subj <- inf_not_seq |>
   pull(subject_id) |>
   unique()
 
-
 plddt_df |>
   mutate(accession = stringr::str_extract(id, "^[^_]+")) |>
   filter(accession %in% inf_not_seq_acc) |>
   select(-accession)
 
-
 ## STOP
-pairwise_matches_full <- bind_rows(
-  pairwise_matches,
-  pairwise_matches |>
-    transmute(method = method_right, method_right = method, matching_queries)
-)
-
-diagonal <- method_totals |>
-  transmute(method, method_right = method, matching_queries = n_queries)
-
-method_list <- sort(unique(top_categories_df$method))
-
-pair_grid <- crossing(method = method_list, method_right = method_list)
-
-top_category_overlap <- pair_grid |>
-  left_join(
-    bind_rows(pairwise_matches_full, diagonal),
-    by = c("method", "method_right")
-  ) |>
-  left_join(method_totals, by = "method") |>
-  mutate(
-    matching_queries = replace_na(matching_queries, 0),
-    matching_pct = if_else(
-      n_queries > 0,
-      round(matching_queries / n_queries * 100, 1),
-      0
-    ),
-    label = glue("{matching_queries}\n({matching_pct}%)")
-  )
-
-category_overlap_plot <- ggplot(
-  top_category_overlap,
-  aes(method_right, method, fill = matching_pct)
-) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = label), size = 3) +
-  scale_fill_gradient(low = "#f7fbff", high = "#08306b", limits = c(0, 100)) +
-  labs(
-    title = "Top-category agreement across methods",
-    x = "Method",
-    y = "Method",
-    fill = "% matching queries"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 25, hjust = 1))
+#pairwise_matches_full <- bind_rows(
+#  pairwise_matches,
+#  pairwise_matches |>
+#    transmute(method = method_right, method_right = method, matching_queries)
+#)
+#
+#diagonal <- method_totals |>
+#  transmute(method, method_right = method, matching_queries = n_queries)
+#
+#method_list <- sort(unique(top_categories_df$method))
+#
+#pair_grid <- crossing(method = method_list, method_right = method_list)
+#
+#top_category_overlap <- pair_grid |>
+#  left_join(
+#    bind_rows(pairwise_matches_full, diagonal),
+#    by = c("method", "method_right")
+#  ) |>
+#  left_join(method_totals, by = "method") |>
+#  mutate(
+#    matching_queries = replace_na(matching_queries, 0),
+#    matching_pct = if_else(
+#      n_queries > 0,
+#      round(matching_queries / n_queries * 100, 1),
+#      0
+#    ),
+#    label = glue("{matching_queries}\n({matching_pct}%)")
+#  )
+#
+#category_overlap_plot <- ggplot(
+#  top_category_overlap,
+#  aes(method_right, method, fill = matching_pct)
+#) +
+#  geom_tile(color = "white") +
+#  geom_text(aes(label = label), size = 3) +
+#  scale_fill_gradient(low = "#f7fbff", high = "#08306b", limits = c(0, 100)) +
+#  labs(
+#    title = "Top-category agreement across methods",
+#    x = "Method",
+#    y = "Method",
+#    fill = "% matching queries"
+#  ) +
+#  theme_minimal() +
+#  theme(axis.text.x = element_text(angle = 25, hjust = 1))
