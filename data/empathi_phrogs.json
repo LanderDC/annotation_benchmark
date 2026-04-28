@@ -1,0 +1,153 @@
+{
+    "categories": [
+        {
+            "label": "pvp",
+            "subcategories": [
+                {
+                    "label": "tail",
+                    "subcategories": [
+                        {
+                            "label": "major_tail"
+                        },
+                        {
+                            "label": "minor_tail"
+                        },
+                        {
+                            "label": "tail_appendage"
+                        },
+                        {
+                            "label": "tail_sheath"
+                        },
+                        {
+                            "label": "baseplate"
+                        }
+                    ]
+                },
+                {
+                    "label": "collar"
+                },
+                {
+                    "label": "head-tail_joining"
+                },
+                {
+                    "label": "portal"
+                },
+                {
+                    "label": "capsid",
+                    "subcategories": [
+                        {
+                            "label": "major_capsid"
+                        },
+                        {
+                            "label": "minor_capsid"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "defense_systems",
+            "subcategories": [
+                {
+                    "label": "toxin"
+                },
+                {
+                    "label": "anti-restriction"
+                },
+                {
+                    "label": "sir2"
+                },
+                {
+                    "label": "crispr"
+                },
+                {
+                    "label": "super_infection"
+                }
+            ]
+        },
+        {
+            "label": "DNA-associated",
+            "subcategories": [
+                {
+                    "label": "helicase"
+                },
+                {
+                    "label": "nuclease"
+                },
+                {
+                    "label": "terminase"
+                },
+                {
+                    "label": "integration"
+                },
+                {
+                    "label": "DNA_polymerase"
+                },
+                {
+                    "label": "annealing"
+                },
+                {
+                    "label": "primase"
+                },
+                {
+                    "label": "replication_initiation"
+                }
+            ]
+        },
+        {
+            "label": "transcriptional_regulator",
+            "subcategories": [
+                {
+                    "label": "transcriptional_activator"
+                },
+                {
+                    "label": "transcriptional_repressor"
+                }
+            ]
+        },
+        {
+            "label": "lysis",
+            "subcategories": [
+                {
+                    "label": "endolysin"
+                },
+                {
+                    "label": "spanin"
+                },
+                {
+                    "label": "lysis_inhibitor"
+                },
+                {
+                    "label": "holin"
+                }
+            ]
+        },
+        {
+            "label": "packaging_assembly"
+        },
+        {
+            "label": "ejection"
+        },
+        {
+            "label": "reductase"
+        },
+        {
+            "label": "phosphorylation"
+        },
+        {
+            "label": "RNA-associated"
+        },
+        {
+            "label": "nucleotide_metabolism"
+        },
+        {
+            "label": "transferase"
+        },
+        {
+            "label": "cell_wall_depolymerase"
+        },
+        {
+            "label": "adsorption-related"
+        }
+    ]
+}

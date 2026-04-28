@@ -11,6 +11,7 @@ Outline:
 - [x] TODO: computational benchmark + add database sizes
 - [ ] TODO: check correlation between structure quality/TEA entropy and correct annotation/agreement between methods
 - [ ] TODO: add recall, precision and F1 plots -> see also Figure 3C
+- [ ] TODO: recall, precision, F1 plots with blastp hits as ground truth
 - [ ] TODO: make annotations better (local LLM, GenePT?)
 - [ ] TODO: do structure search of non-informative vs informative BFVD entries?
 - [x] TODO: look at p-value for Reseek and see if this improves annotations -> still very lenient (p<0.05)

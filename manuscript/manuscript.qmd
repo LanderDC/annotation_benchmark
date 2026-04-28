@@ -48,11 +48,11 @@ abstract: |
 # Introduction
 The current increase in metagenomic sequencing experiments is providing researchers with a steady stream of new viral genomes. A large problem that remains for computational biologists is the annotation of these genomes with functionally relevant labels for the predicted proteins. As annotating all these genomes through experimental evidence is an unfeasible task, researchers transfer annotations of annotated genomes to these novel genomes. The established gold standard for performing this task has been the use of the BLAST suite or comparable sequence alignment tools, such as Diamond and MMSeqs2 [@altschulBasicLocalAlignment1990; @buchfinkFastSensitiveProtein2014; @steineggerMMseqs2EnablesSensitive2017]. However, this approach reaches its limits when newly discovered sequences diverge too much from experimentally validated annotated genomes, a problem that is particularly acute in virology, where mutation rates are high and sequence diversity is vast @simmondsVirusTaxonomyAge2017.
 
-Protein language models (pLMs) have emerged as a powerful paradigm for capturing biologically meaningful representations from amino acid sequences alone, trained on the vast space of known protein sequences using self-supervised objectives analogous to those used in natural language processing [@rivesBiologicalStructureFunction2021; @elnaggarProtTransUnderstandingLanguage2022]. By learning the statistical regularities of protein sequences across billions of examples, pLMs implicitly encode evolutionary, structural, and functional information in dense embedding vectors. These representations have proven useful for a wide range of downstream tasks, including secondary structure prediction, contact map prediction, solubility prediction, and functional site annotation [@rivesBiologicalStructureFunction2021; @elnaggarProtTransUnderstandingLanguage2022; @linEvolutionaryscalePredictionAtomiclevel2023]. Models such as ESM-2 [@linEvolutionaryscalePredictionAtomiclevel2023] and ProtTrans [@elnaggarProtTransUnderstandingLanguage2022] have become widely used as general-purpose sequence encoders in the field.
+Protein language models (pLMs) have emerged as a powerful paradigm for capturing biologically meaningful representations from amino acid sequences alone, trained on known protein sequences using self-supervised objectives analogous to those used in natural language processing [@rivesBiologicalStructureFunction2021; @elnaggarProtTransUnderstandingLanguage2022]. By learning the statistical regularities of protein sequences across billions of examples, pLMs implicitly encode evolutionary, structural, and functional information in dense embedding vectors. These representations have proven useful for a wide range of downstream tasks, including secondary structure prediction, contact map prediction, solubility prediction, and functional site annotation [@rivesBiologicalStructureFunction2021; @elnaggarProtTransUnderstandingLanguage2022; @linEvolutionaryscalePredictionAtomiclevel2023]. Models such as ESM-2 [@linEvolutionaryscalePredictionAtomiclevel2023] and ProtTrans [@elnaggarProtTransUnderstandingLanguage2022] have become widely used as general-purpose sequence encoders in the field.
 
 A complementary and increasingly important line of work leverages protein three-dimensional structure, which is generally more conserved than primary sequence over long evolutionary timescales, because the topology of a folded protein is directly tied to its biochemical function [@illergardStructureThreeTen2009]. The advent of highly accurate structure prediction tools such as AlphaFold2 [@jumperHighlyAccurateProtein2021] and, more recently, Boltz-2 [@passaroBoltz2AccurateEfficient2025], has dramatically lowered the barrier to obtaining structural models. Structural comparison tools, most notably Foldseek [@vankempenFastAccurateProtein2024], have made it feasible to search large structural databases at scale by encoding local backbone geometry into a compact structural alphabet (3Di), enabling alignment-based searches analogous to BLAST but operating on structure rather than sequence. More recently, Reseek [@edgarProteinStructureAlignment2024] was developed to further improve sensitivity to remote structural homologs.
 
-The convergence of pLMs and structural biology has opened a third avenue: using language models to predict structural information without the computational cost of full three-dimensional structure prediction. ProstT5 [@heinzingerBilingualLanguageModel2024] is a notable example, fine-tuning a protein language model to translate amino acid sequences into 3Di token sequences, effectively producing a structural alphabet representation at sequence-model speed. A related approach, The Embedded Alphabet (TEA), uses ESM-2 embeddings as input to generate an alternative structural alphabet that the authors argue better represents helices and loops compared to 3Di [@pantoliniRewritingProteinAlphabets2026]. These compressed one-dimensional structural representations can then be used as inputs to standard alignment tools, bridging the gap between pure sequence methods and full structure comparison pipelines.
+The convergence of pLMs and structural biology has opened a third avenue: using language models to predict structural information without the computational cost of three-dimensional structure prediction. ProstT5 is a notable example, fine-tuning a protein language model to translate amino acid sequences into 3Di token sequences, effectively producing a structural representation with a three order magnitude speedup compared to structure prediction [@heinzingerBilingualLanguageModel2024]. A related approach, The Embedded Alphabet (TEA), uses ESM-2 embeddings as input to generate an alternative structural alphabet that the authors argue better represents helices and loops compared to 3Di [@pantoliniRewritingProteinAlphabets2026]. These compressed one-dimensional structural representations can then be used as inputs to standard alignment tools, bridging the gap between pure sequence methods and full structure comparison pipelines.
 
 To address the annotation bottleneck for phage genomes specifically, Phold [@bourasProteinStructureinformedBacteriophage2026] cleverly combines structural information with a large database of high-quality phage protein predictions. Phold either accepts user-provided structure predictions or uses ProstT5 to convert amino acid sequences into 3Di sequences, which are then aligned against annotated references using Foldseek. Benchmarking showed that Phold improved the annotation of a select set of bacteriophage proteins from approximately 35% to approximately 50% with both ProstT5 and protein structures [@bourasProteinStructureinformedBacteriophage2026]. A similar approach, Baktfold, was subsequently developed by the same group to increase annotation rates in bacterial genomes [@bourasBaktfoldSensitiveProtein2026].
 
@@ -70,9 +70,9 @@ Structure prediction of all 11,467 proteins from our test set with Boltz-2 resul
 ![A) Test protein distribution from the different viral Kingdoms. Each tile roughly corresponds to 110 proteins. B) A cumulative distribution function plot showing the percentage of predicted structures from the test set with a pLDDT score above the pLDDT score on the x-axis. The inset shows a violin- and boxplot with all pLDDT scores from the predicted structures (n=11,467).](../figures/data_info/dataset_overview.pdf){#fig-overview}
 
 ## Sequence homology methods demonstrate superior sensitivity and reproducibility over structure-informed approaches in eukaryotic virus annotation
-We started by evaluating how many of the proteins in our test produced at least one match against the BFVD for each method (see [@fig-overlap]A). In addition, we also filtered the results of each method on an E-value lower than 1e-03 to see how this affected the number of hits for each test protein. This decreased the number of test proteins with a hit on average with 25% for the structure methods. The methods relying on structure homology clearly had less matches compared to the sequence homology-based methods. This suggests that sequence-based methods are still more sensitive in detecting homology for eukaryotic viruses than structure-based methods, despite the promising results for bacteriophages [@bourasProteinStructureinformedBacteriophage2026]. As the quality of our structure predictions was rather high (see [@fig-overview]B), this lower sensitivity is likely not due to poor structure predictions. In contrast, TEA, as only non-protein sequence-based method, had a comparable number of test proteins with a match to the sequence-based methods, almost reaching the total number of test proteins (n=11,354). However, analyzing the total number of hits at different E-value thresholds shows that TEA will result in a very high number of matches across all E-value thresholds, signifying a high number of false positives (see [@fig-overlap]B). A similar pattern is observed for the other structure-based methods, which tend to find too many hits at high E-values. Reseek was less affected by this, due to a combination of already calculating E-values more accurately [@edgarProteinStructureAlignment2024; @edgarProteinStructureAlignment2025] and our use of a modified Reseek version (see [below](#reseek)). On the other hand, the three sequence-based methods had a similar number of test proteins with a hit (BLASTp=11,359; MMseqs2=11,255 and Diamond=11,224), but don't show this inflation of total hits at higher E-values (BLASTp has a slight increase towards larger E-values).
+We started by evaluating how many of the proteins in our test produced at least one match against the BFVD for each method (see [@fig-overlap]A). In addition, we also filtered the results of each method on an E-value lower than 1e-03 to see how this affected the number of hits for each test protein. This decreased the number of test proteins with a hit on average with 25% for the structure methods. The methods relying on structure homology clearly had less matches compared to the sequence homology-based methods. This suggests that sequence-based methods are still more sensitive in detecting homology for eukaryotic viruses than structure-based methods, despite the promising results for bacteriophages [@bourasProteinStructureinformedBacteriophage2026]. As the quality of our structure predictions was rather high (see [@fig-overview]B), this lower sensitivity is likely not due to poor structure predictions. In contrast, TEA had, as only non-protein sequence-based method, a comparable number of test proteins with a match, almost reaching the total number of test proteins (n=11,360). However, analyzing the total number of hits at different E-value thresholds shows that the TEA search resulted in a very high number of matches across all E-value thresholds, signifying a high number of false positives (see [@fig-overlap]B). A similar pattern was observed for the other structure-based methods, which tended to find too many hits at high E-values. Reseek was less affected by this, due to a combination of already calculating E-values more accurately [@edgarProteinStructureAlignment2024; @edgarProteinStructureAlignment2025] and our use of a modified Reseek version (see [below](#reseek)). On the other hand, the three sequence-based methods had a similar number of test proteins with a hit (BLASTp=11,359; MMseqs2=11,255 and Diamond=11,224), but don't show this inflation of total hits at higher E-values (BLASTp had a slight increase towards larger E-values).
 
-When comparing the BFVD matches yielded by all methods against each other (see [@fig-overlap]C-D and [@suppfig-pairwise-method]), we observed that the sequence homology-based methods had a high overlap in identical hits. This was true when comparing the best 25 hits for each test protein (only the comparison of diamond and mmseqs2 against blastp had a low overlap because of the higher amount of hits for blastp), the best 25 hits afterwards filtered on E-value and only the top hits (see [@fig-overlap]C-D and @suppfig-pairwise-method). In contrast, the embedding and structure homology-based methods had low intra-method agreement in resulting hits (~25% between the embedding methods and ~40-75% for the structure methods on the best 25 hits). The percentage of overlapping hits did increase when only taking the top hits into account, but stayed well below the percentage of overlap between the sequence-based methods. It is worth noting that Reseek seemed to perform worse in this metric when looking at the filtered results (see [@suppfig-pairwise-method]B), however this is due to the large reduction in number of matches after filtering. This reduction is due to the more stringent E-value calculations in Reseek compared to Foldseek [@edgarProteinStructureAlignment2024; @edgarProteinStructureAlignment2025]. Notably, while ProstT5 was the worst performer across the three datasets compared to the sequence methods, TEA performed better in the top hits comparison and was on par with the structure-based methods. Overall, the embedding and structure-based methods, that should be better to detect remote homologs, had low agreement on shared hits among each other. 
+When comparing the BFVD matches yielded by all methods against each other (see [@fig-overlap]C-D and [@suppfig-pairwise-method]), we observed that the sequence homology-based methods had a high overlap in identical hits. This was true when comparing the best 25 hits for each test protein (only the comparison of diamond and mmseqs2 against blastp had a low overlap because of the higher amount of hits for blastp), the best 25 hits afterwards filtered on E-value, and only the top hits (see [@fig-overlap]C-D and @suppfig-pairwise-method). In contrast, the embedding and structure homology-based methods had low intra-method agreement in resulting hits (~25% between the embedding methods and ~40-75% for the structure methods on the best 25 hits). The percentage of overlapping hits did increase when only taking the top hits into account, but stayed well below the percentage of overlap between the sequence-based methods. It is worth noting that Reseek seemed to perform worse in this metric when looking at the filtered results (see [@suppfig-pairwise-method]B), however this is due to the large reduction in number of matches after filtering. This reduction is due to the more stringent E-value calculations in Reseek compared to Foldseek [@edgarProteinStructureAlignment2024; @edgarProteinStructureAlignment2025]. Notably, while ProstT5 was the worst performer across the three datasets compared to the sequence methods, TEA performed better in the top hits comparison and was on par with the structure-based methods. Overall, the embedding and structure-based methods, that should be better to detect remote homologs, had low agreement on shared hits among each other. 
 
 ![A) The number of proteins that got a hit against the BFVD shown per method (colored by category) before and after filtering the reported results on E-value lower than 1e-03 (lighter color). B) The total number of hits across all test proteins in function of the E-value for each method. C-D) Pairwise comparisons of shared hits across methods for the same test proteins, shown for the best 25 hits (C), and the top hits regardless of E-value (D). Text inside the colored tiles indicate the number of shared hits for the method on the x-axis compared to the method on the y-axis, followed by the percentage of shared hits as a proportion of the total hits for the method on the y-axis.](../figures/search_results/hit_overlap_summary.pdf){#fig-overlap}
 
@@ -83,10 +83,11 @@ Although TEA made the largest improvements in assigning previous uninformative p
 
 Of note, Boltz structure prediction combined with Foldseek did assign more informative categories than the sequence-based methods to originally non-informative proteins (n=1,571 vs ~1,400; see @tbl-assigned-categories). However, this method retrieved less test proteins with hits against the BFVD.
 
-- TODO: add that ~150 hypothetical proteins got an informative functional annotation with Boltz-foldseek method compared to the sequence methods (make superpose figures with structures but filter first on true hypothetical)
-- TODO: look at which taxonomies benefit most from structure methods
+- TODO: add that 337 could be assigned an informative function with Boltz-foldseek and not with sequence-based methods
+- most of them belong to structural categories (pvp / structural)
+- TODO: make superpose figures with structures but filter first on true hypothetical
 
-![A) The number of proteins that received an informative functional annotation (i.e. not "Hypothetical Protein", "unknown" or "Other Function") after applying each method. Colored by method, light shades indicate non-informative proteins, dark shade indicates informative protein assignments. B) The percentage of queries that have a matching functional category for each method compared tot the informative original functional categories (regarded as the ground truth). C) Comparison of final assigned annotation categories compared to the original categories. Negative changes (ie. different informative categories or informative labels that changed to non-informative categories) are displayed to the left of the zero point, matches or category improvements (from non-informative to informative) are displayed on the right.](../figures/search_results/annotation_combined.pdf){#fig-annotation}
+![A) The number of proteins that received an informative functional annotation (i.e. not "Hypothetical Protein", "unknown" or "Other Function") after applying each method. Colored by method, light shades indicate non-informative proteins, dark shade indicates informative protein assignments. B) The percentage of queries that have a matching functional category for each method compared tot the informative original functional categories (regarded as the ground truth). C) Comparison of final assigned annotation categories compared to the original categories. Negative changes (ie. different informative categories or informative labels that changed to non-informative categories) are displayed to the left of the zero point, matches or category improvements (from non-informative to informative) are displayed on the right. D-E-F) Waffle plots showing the proportions of proteins that could be assigned an informative function with Boltz-foldseek and not with the sequence based methods, colored by D) taxonomy on Kingdom level, E) structure quality and F) main activity the assigned functional category takes part in (starts with uppercase; based on ViralZone) or the main category of the Empathi hierarchical classification system (starts with lowercase). Tiles are ordered from bottom to top, and from left to right. Each tile corresponds to roughly three proteins.](../figures/search_results/annotation_combined_2.pdf){#fig-annotation}
 
 
 ```{r}
@@ -166,7 +167,7 @@ All search methods were benchmarked for runtime and memory usage using Hyperfine
 ![Log~10~-transformed runtime in seconds of the different workflows plotted in function of the log~10~-transformed memory usage (in GiB). For multistep workflows the indicated time is a cumulation of all steps (arrows indicate directionality of workflow steps). Workflows are colored by search method, CPU and GPU steps are indicated by circles and triangles respectively. The inset shows the difference in runtime between foldseek and reseek after MSA generation (ColabFold) and structure prediction (Boltz2).](../figures/computational_benchmark/hyperfine_time_vs_memory.pdf){#fig-computational-benchmark}
 
 # Discussion
-Although new methods like pLMs and structure homology searches have shown great promise in detecting remote homologs [@edgarProteinStructureAlignment2024; @vankempenFastAccurateProtein2024; @pantoliniRewritingProteinAlphabets2026], including bacteriophage protein searches [@bourasProteinStructureinformedBacteriophage2026], [this does not seem to be the case for eukaryotic virus proteins]{.mark}. If we consider that structural homology searches are most useful to find homologs with a clearly defined protein structure, a possible explanation could be that most structural proteins (eg. capsid proteins) are already well annotated in sequence databases compared to more globular, complex proteins, and therefore the advantage of using structural homology searches in eukaryotic virus protein annotation might be limited. 
+Although new methods like pLMs and structure homology searches have shown great promise in detecting remote homologs [@edgarProteinStructureAlignment2024; @vankempenFastAccurateProtein2024; @pantoliniRewritingProteinAlphabets2026], including bacteriophage protein searches [@bourasProteinStructureinformedBacteriophage2026], our benchmark suggests that these advantages do not yet translate straightforwardly to eukaryotic virus proteins. If we consider that structural homology searches are most useful to find homologs with a clearly defined protein structure, a possible explanation could be that most structural proteins (eg. capsid proteins) are already well annotated in sequence databases compared to more globular, complex proteins, and therefore the advantage of using structural homology searches in eukaryotic virus protein annotation might be limited. 
 
 - structure search is compatible with sequence search but retrieves little extra proteins (might be because of less virus proteins in training data)
 - different conformational state predictions might hamper homolog detection (?)
@@ -179,6 +180,23 @@ Limitations:
 - classification (eg. nsp5), proteins same name different function -> finetune LLM on scientific papers
 - DB problem which is too limited (larger db might give better results)
 
+Although protein language models and structure homology searches have shown great promise for detecting remote homologs [@edgarProteinStructureAlignment2024; @vankempenFastAccurateProtein2024; @pantoliniRewritingProteinAlphabets2026], including in bacteriophage-focused annotation workflows [@bourasProteinStructureinformedBacteriophage2026], our benchmark suggests that these advantages do not yet translate straightforwardly to eukaryotic virus proteins. Across our dataset, the sequence-based methods were consistently the most reproducible (high overlap of identical hits) and the most accurate when evaluated against the original classifications, whereas embedding- and structure-based methods showed lower agreement with the ground truth and substantially lower concordance with one another.
+
+One plausible explanation is that the proteins for which structure-based searches are expected to excel (i.e. proteins with highly conserved folds despite limited sequence identity) may not be the dominant driver of annotation gaps in this particular setting. Many of the most abundant and best-characterized viral proteins, including major structural proteins such as capsid proteins, already have detectable sequence homology to entries in reference databases, so structure similarity is unlikely to provide large marginal gains for them. Conversely, proteins that remain annotated as “hypothetical” in eukaryotic virus genomes may include lineage-specific factors, short or low-complexity proteins, and rapidly evolving accessory proteins for which both sequence and structure homology signals can be weak, ambiguous, or absent. In this regime, structural comparison can still yield informative annotations for a subset of queries, but it does not consistently outperform sequence homology in either sensitivity or functional-category accuracy.
+
+Importantly, our results do not imply that structure search is incompatible with sequence search; rather, the current value proposition appears to be complementary. A practical interpretation is that a sequence-first workflow remains the most reliable baseline, with structure-based approaches reserved for targeted follow-up of the subset of proteins that remain uninformative after stringent sequence searches. In our benchmark, structure-informed methods retrieved comparatively few additional proteins with high-confidence, interpretable hits once E-value filtering was applied, while incurring a very large computational cost. This cost–benefit imbalance is especially relevant for large-scale annotation projects, where throughput and reproducibility are essential.
+
+Several methodological and biological factors could contribute to the lower apparent utility of embedding- and structure-based approaches for eukaryotic viruses in this benchmark. First, both pLM-derived alphabets and structure-search pipelines ultimately depend on learned or engineered representations that may be less well calibrated for viral proteins than for the broader (mostly cellular) protein universe they were trained and tuned on. Limited viral representation in training data could reduce the ability of pLMs to produce embeddings that cleanly separate functionally distinct viral proteins, and could also affect downstream translation to structural alphabets such as 3Di or TEA. In addition, the “many hits at high E-values” pattern observed for some non-sequence methods suggests that statistical calibration and filtering thresholds may require method- and domain-specific tuning to avoid inflation of weak or spurious matches.
+
+Second, structural comparisons can be sensitive to conformational heterogeneity. Viral proteins frequently operate in multi-protein assemblies and can adopt different conformational states across the viral life cycle. Predicted structures represent a single (often lowest-energy) state, which may differ from the biologically relevant state for binding or assembly. Even when overall fold is correct, domain motions or alternative conformations could reduce similarity scores for true homologs or increase similarity to unrelated proteins with superficially similar local geometry, potentially lowering both sensitivity and the interpretability of structural hits.
+
+Third, the reference database itself remains a key determinant of performance. Using BFVD as a unified reference ensured a fair comparison between methods, but it also means that any limitations in viral coverage, taxonomic representation, and annotation depth of BFVD will propagate across all approaches. A larger and more diverse viral reference set—especially one enriched for eukaryotic virus proteins and experimentally supported functional annotations—could plausibly increase the payoff of structure-based searches. Similarly, improved viral-aware scoring, E-value calibration, and domain-aware post-processing might yield higher-precision structural or embedding-based annotations for the subset of proteins where sequence methods fail.
+
+These findings should be interpreted in light of several limitations of our benchmark. First, long polyproteins were split into chunks to accommodate structure prediction constraints. While necessary for computation, this can decouple functional context: individual fragments may correspond to multiple mature proteins or partial domains, and their best-matching reference hits may not reflect the final processed product or its function. Second, functional-category assignment was derived from name-based classification rules applied to reference protein names and to the original test annotations. This provides a scalable and consistent labeling scheme, but it can conflate proteins that share a name while differing in function across viral families (e.g. proteins labeled with the same “non-structural protein” identifier can have different biochemical roles), and it can propagate ambiguities present in database annotations. Incorporating richer context—such as genomic neighborhood, domain architecture, or literature-informed curation (potentially via carefully constrained LLM-assisted extraction followed by manual review)—could reduce these mismatches. Third, because all methods were evaluated against a single unified database, our conclusions primarily reflect relative performance under a controlled reference; performance may change with alternative databases, different taxonomic compositions, or additional post-processing.
+
+Overall, our benchmark supports a conservative conclusion: for eukaryotic virus protein annotation, sequence homology remains the most accurate and reproducible primary strategy at present. Embedding- and structure-based methods can still add value as complementary tools for a minority of difficult proteins, but realizing their full promise will likely require viral-aware training data, improved statistical calibration, and reference databases with broader viral diversity and deeper functional validation.
+
+
 # Material and Methods
 ## Dataset selection
 ### Test set
@@ -189,16 +207,20 @@ Protein sequences that were longer than 2,500 amino acids were split into multip
 ### Database
 The BFVD [@kimBFVDLargeRepository2025] was used as the reference database for both sequence and structure homology-based annotation. The BFVD is a comprehensive database of high-quality predicted protein structures from the viral sequence representatives of the UniRef30 clusters. UniRef30 is a UniProt database that clusters protein sequences at 30% sequence identity and selects a representative sequence for each cluster, these representatives thus have a UniProt accession. Since a substantial amount of BFVD's included proteins are no longer available in UniProtKB as they are not part of reference proteomes, we converted their UniProt accessions to UniParc IDs. 
 
-Functional categories for each BFVD entry were derived from protein names associated with the corresponding UniParc IDs (could be from UniProtKB/TrEMBL, RefSeq and/or GenBank) for eukaryotic viruses (also see [below](#functional-classifier)) or by classifying them into PHROG-like [@terzianPHROGFamiliesProkaryotic2021] categories with Empathi [@boulayEmpathiEmbeddingbasedPhage2025] in the case of bacteriophage proteins. The distinction between eukaryotic virus and bacteriophage proteins was made based on the TaxID information from the UniParc protein ID. 
-
 The BFVD database was further converted into the required formats the search tools used in this benchmarking effort (see [sequence](#sequence-homology-based-annotation) and [structure](#structure-homology-based-annotation) homology-based annotation).
 
 ## Functional classifier
-Functional categories for eukaryotic virus proteins were designed with Perplexity AI in deep research mode using the following prompt: "Can you give me an exhaustive list of common protein functions in eukaryotic viruses? Use https://viralzone.expasy.org and https://ictv.global/report/genome as sources. Give me a machine readable file with all functional categories." The resulting functional categories were further manually curated to ensure that they were mutually exclusive. The final list of functional categories is provided in @tbl-supp-functional-categories.
+Functional categories for each BFVD entry were derived from protein names associated with the corresponding UniParc IDs (could be from UniProtKB/TrEMBL, RefSeq and/or GenBank) for eukaryotic viruses or by classifying them into PHROG-like [@terzianPHROGFamiliesProkaryotic2021] categories with Empathi [@boulayEmpathiEmbeddingbasedPhage2025] in the case of bacteriophage proteins. The distinction between eukaryotic virus and bacteriophage proteins was made based on the TaxID information from the UniParc protein ID. 
 
-A custom python script was used to assign functional categories to BFVD proteins based on pattern matching. Perplexity AI was used to assign the most common patterns in all BFVD protein names from UniParc to the most appropriate functional category. The pattern matching rules, functional categories, and classification script were subsequently refined through manual curation to optimize the functional assignment based on protein names. If no keywords in the protein match, the protein is assigned to the "Hypothetical Protein" category. 
+Functional categories for eukaryotic virus proteins were designed based on previously established enzymes by ViralZone (see https://viralzone.expasy.org/10417) and adding structural proteins together with extra enzymatic categories. These extra categories were acquired by prompting Perplexity AI in deep research mode with: 
+
+> "Can you give me an exhaustive list of common protein functions in eukaryotic viruses? Use https://viralzone.expasy.org and https://ictv.global/report/genome as sources. Give me a machine readable file with all functional categories." 
+
+The resulting functional categories were further manually curated to ensure that they were mutually exclusive. The final list of functional categories is provided in @tbl-supp-functional-categories. A custom python script was used to assign the established functional categories to the eukaryotic virus BFVD proteins using Google's Gemma4 31B-it LLM model. The LLM had access to the collection of protein names and the viral taxonomy of each entry, and was asked to provide a category classification based on this information. Assigned functional categories were checked against the originally established functional categories and removed if they did not correspond.
 
 The same functional classifier script was also used on the protein names from our test set to assign functional categories to the eukaryotic virus proteins downloaded from the ICTV exemplar species.
+
+An overview of the LLM pipeline is given in @suppfig-llm-diagram
 
 ## Sequence homology-based annotation
 For sequence homology annotation, we used three state-of-the-art tools widely used in functional annotation pipelines and sequence similarity searches. As gold standard, BLASTp v2.16.0+ [@altschulBasicLocalAlignment1990] was used to align the test set amino acid sequences against the amino acid sequences of the BFVD entries. In addition, we used `diamond blastp` (Diamond v2.1.16) [@buchfinkSensitiveProteinAlignments2021] in sensitive mode and `mmseqs easy-search` (MMseqs2 v18.8cc5c) @steineggerMMseqs2EnablesSensitive2017 with default settings; except for an E-value cutoff of 10 instead of 1e-03 to allow comparison to the other methods.
@@ -258,6 +280,77 @@ During the preparation of this manuscript, the authors made use of large languag
 ![Pairwise comparisons of shared hits between search methods for (A) the best 25 hits, (B) the best 25 hits after filtering on E-value (E < 1e-03), and (C) the top hits for each query.](../figures/search_results/hit_overlap_methods.pdf){#suppfig-pairwise-method fig-pos='H'}
 
 ![Workflow runtime increase compared to the fastest workflow (MMseqs2).](../figures/computational_benchmark/time_fold_increase.pdf){#suppfig-time-increase fig-pos='H'}
+
+
+::: {#suppfig-llm-diagram}
+```{mermaid}
+%%| fig-width: 2.5
+%%| fig-height: 9
+---
+config:
+  theme: neutral
+  themeVariables:
+    fontSize: 12
+---
+flowchart TD
+    A([🚀 Start]) --> B[Read command-line arguments</br>proteins, categories, output, model, etc.]
+    B --> C[Load proteins JSON file]
+    C --> D[Load categories JSON file</br>and normalize into a clean list]
+    D --> E[Load AI language model</br>from HuggingFace]
+
+    E --> F{Optional:</br>Quantize model?}
+    F -- 4-bit or 8-bit --> G[Apply memory compression</br>to reduce GPU usage]
+    F -- No --> H[Load model at full precision]
+    G --> I[Model ready]
+    H --> I
+
+    I --> J{Does an output file</br>already exist?}
+    J -- Yes --> K[Load existing results</br>Skip already-processed proteins]
+    J -- No --> L[Start fresh]
+    K --> M
+    L --> M
+
+    M([🔁 Loop over each protein]) --> N{Already</br>processed?}
+    N -- Yes --> M
+    N -- No --> O[Extract protein names</br>and virus taxonomy]
+
+    O --> P[Build prompt for AI:</br>protein names + taxonomy +</br>predefined categories]
+    P --> Q[Send prompt to</br>AI language model]
+    Q --> R[Receive AI response</br>in JSON format]
+
+    R --> S{Response</br>parseable?}
+    S -- Yes --> T[Validate assigned categories</br>against predefined list]
+    S -- No --> U[⚠️ Log warning</br>Store empty categories]
+
+    T --> V{Any categories</br>need repair?}
+    V -- Yes --> W[Auto-fix minor name issues</br>e.g. missing parentheses]
+    V -- No --> X
+    W --> X[Remove any invalid categories]
+
+    X --> Y[Save result for this protein]
+    U --> Y
+    Y --> Z{Checkpoint:</br>Every N proteins}
+    Z -- Yes --> AA[💾 Save progress to output file]
+    Z -- No --> M
+    AA --> M
+
+    M -- All proteins done --> AB[💾 Final save to output JSON]
+    AB --> AC{Were any original</br>labels provided?}
+    AC -- Yes --> AD[Compute accuracy metrics</br>Precision / Recall / F1]
+    AC -- No --> AE
+    AD --> AE([✅ Done!</br>Results saved to output file])
+
+    style A fill:#4CAF50,color:#fff
+    style AE fill:#4CAF50,color:#fff
+    style M fill:#2196F3,color:#fff
+    style Q fill:#9C27B0,color:#fff
+    style AA fill:#FF9800,color:#fff
+    style AB fill:#FF9800,color:#fff
+    style U fill:#f44336,color:#fff
+```
+
+Flowchart of the LLM classification pipeline for eukaryotic viruses.
+:::
 
 ```{=latex}
 \clearpage
@@ -356,34 +449,21 @@ Flowchart of the annotation pipeline used in this study. Eukaryotic virus protei
 
 ```{r}
 #| label: tbl-supp-functional-categories
-#| tbl-cap: "Final functional categories used for annotation, including descriptions, pattern matching keywords, and exclusions."
+#| tbl-cap: "Final functional categories used for annotation, including their activity and process they are involved in."
 #| warning: false
 #| message: false
-functional_categories_path <- "../data/viral_protein_functional_categories.json"
-functional_categories <- jsonlite::fromJSON(
-  functional_categories_path,
-  simplifyVector = FALSE
-)
+functional_categories_path <- "../data/viralzone_protein_categories.json"
+functional_categories <- jsonlite::fromJSON(functional_categories_path)
 
-collapse_or_none <- function(x) {
-  if (is.null(x) || length(x) == 0) {
-    "None"
-  } else {
-    paste(unlist(x), collapse = "; ")
-  }
-}
+functional_categories_tbl <- functional_categories |>
+  dplyr::select(
+    process,
+    Activity,
+    `Enzyme/Protein`
+  ) |>
+  dplyr::rename(Process = process) |>
+  dplyr::arrange(Process)
 
-functional_categories_tbl <- purrr::imap_dfr(
-  functional_categories,
-  function(entry, category_name) {
-    tibble::tibble(
-      Category = category_name,
-      Description = if (is.null(entry$description)) "" else entry$description,
-      `Pattern matching keywords` = collapse_or_none(entry$keywords),
-      Exclusions = collapse_or_none(entry$exclude)
-    )
-  }
-)
 
 table_align <- if (knitr::is_latex_output()) {
   c("p{3.2cm}", "p{4.4cm}", "p{10.8cm}", "p{4.2cm}")
@@ -395,8 +475,7 @@ knitr::kable(
   functional_categories_tbl,
   format = if (knitr::is_latex_output()) "latex" else "pipe",
   booktabs = TRUE,
-  longtable = knitr::is_latex_output(),
-  align = table_align
+  longtable = knitr::is_latex_output()
 )
 ```
 

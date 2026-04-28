@@ -1424,20 +1424,98 @@ ggsave(
   units = "mm"
 )
 
-# TODO: add process/activity from viralzone
-# dont forget empathi categories
+
+# categories
+
+normalize_category <- function(x) {
+  str_squish(str_to_lower(x))
+}
+
+flatten_empathi_categories <- function(node, main_label) {
+  current <- tibble(
+    top_category = node$label,
+    main_function = main_label
+  )
+
+  children <- node$subcategories
+  if (is.null(children) || length(children) == 0) {
+    return(current)
+  }
+
+  bind_rows(
+    current,
+    children |>
+      map(flatten_empathi_categories, main_label = main_label) |>
+      list_rbind()
+  )
+}
+
+empathi_annotations <- fromJSON(
+  path("data", "empathi_phrogs.json"),
+  simplifyVector = FALSE
+)
+
+empathi_lookup <- empathi_annotations$categories |>
+  map(~ flatten_empathi_categories(.x, main_label = .x$label)) |>
+  list_rbind() |>
+  transmute(
+    top_category = normalize_category(top_category),
+    main_function
+  )
+
+viralzone_lookup <- fromJSON(path(
+  "data",
+  "viralzone_protein_categories.json"
+)) |>
+  as_tibble() |>
+  transmute(
+    main_function = Activity,
+    top_category = `Enzyme/Protein`
+  ) |>
+  separate_rows(top_category, sep = "\\s*;\\s*") |>
+  transmute(
+    top_category = normalize_category(top_category),
+    main_function
+  )
+
+main_function_lookup <- bind_rows(empathi_lookup, viralzone_lookup) |>
+  filter(!is.na(top_category), top_category != "") |>
+  distinct(top_category, .keep_all = TRUE)
+
+inf_not_seq <- inf_not_seq |>
+  mutate(
+    main_function = coalesce(
+      main_function_lookup$main_function[
+        match(
+          normalize_category(top_category),
+          main_function_lookup$top_category
+        )
+      ],
+      "Other"
+    )
+  )
+
+custom_spacer <- plot_spacer() +
+  theme(plot.margin = unit(c(0, 0, 0, 0), "lines"))
+
 boltzf_functions <- inf_not_seq |>
-  count(top_category) |>
-  ggplot(aes(fill = top_category, values = n)) +
+  count(main_function) |>
+  mutate(
+    main_function = forcats::fct_reorder(main_function, n, .desc = TRUE)
+  ) |>
+  arrange(tolower(as.character(main_function))) |>
+  ggplot(aes(fill = main_function, values = n)) +
   geom_waffle(
     n_rows = 10,
     size = 0.5,
     colour = "white",
-    make_proportional = TRUE,
+    make_proportional = T,
     flip = TRUE
   ) +
-  #scale_fill_manual(values = plddt_col) +
-  scale_fill_viridis_d(option = "turbo") +
+  scale_fill_viridis_d(
+    option = "turbo",
+    breaks = sort(unique(as.character(inf_not_seq$main_function)))
+  ) +
   guides(
     fill = guide_legend(
       ncol = 1, # one key per line
@@ -1450,17 +1528,15 @@ boltzf_functions <- inf_not_seq |>
   theme_void() +
   theme_enhance_waffle() +
   theme(
-    legend.position = c(1.6, .7),
+    legend.position = c(1.6, .5),
     legend.text = ggtext::element_markdown(size = 7),
     legend.title = element_blank()
   )
 
-custom_spacer <- plot_spacer() +
-  theme(plot.margin = unit(c(0, 0, 0, 0), "lines"))
-
 (fig3 /
-  ((boltzf_kingdom +
-    boltzf_plddt +
+  (((boltzf_kingdom +
+    theme(legend.position = c(.5, 1.2))) +
+    (boltzf_plddt + theme(legend.position = c(.5, 1.2))) +
     boltzf_functions +
     custom_spacer) +
     plot_layout(nrow = 1, width = c(1, 1, 1, 1.2)))) +
