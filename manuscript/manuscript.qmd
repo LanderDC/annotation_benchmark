@@ -37,7 +37,7 @@ execute:
 crossref:
   custom:
     - kind: float
-      reference-prefix: Supplemental Figure
+      reference-prefix: Supplementary Figure
       key: suppfig
       latex-env: suppfig
       latex-list-of-description: Supplementary Figure
@@ -444,9 +444,11 @@ Flowchart of the annotation pipeline used in this study. Eukaryotic virus protei
 
 {{< pagebreak >}}
 
-::: {.landscape}
+```{=latex}
+\clearpage
+\newgeometry{left=1cm,right=1cm,top=2cm,bottom=2cm}
+```
 # Supplementary Tables
-
 ```{r}
 #| label: tbl-supp-functional-categories
 #| tbl-cap: "Final functional categories used for annotation, including their activity and process they are involved in."
@@ -464,13 +466,6 @@ functional_categories_tbl <- functional_categories |>
   dplyr::rename(Process = process) |>
   dplyr::arrange(Process)
 
-
-table_align <- if (knitr::is_latex_output()) {
-  c("p{3.2cm}", "p{4.4cm}", "p{10.8cm}", "p{4.2cm}")
-} else {
-  c("l", "l", "l", "l")
-}
-
 knitr::kable(
   functional_categories_tbl,
   format = if (knitr::is_latex_output()) "latex" else "pipe",
@@ -479,4 +474,7 @@ knitr::kable(
 )
 ```
 
-:::
+```{=latex}
+\restoregeometry
+\clearpage
+```

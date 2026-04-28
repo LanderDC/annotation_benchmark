@@ -232,7 +232,7 @@
 \@ifpackageloaded{float}{}{\usepackage{float}}
 \floatstyle{plain}
 \@ifundefined{c@chapter}{\newfloat{suppfig}{h}{losuppfig}}{\newfloat{suppfig}{h}{losuppfig}[chapter]}
-\floatname{suppfig}{Supplemental Figure}
+\floatname{suppfig}{Supplementary Figure}
 \newcommand*\listofsuppfigs{\listof{suppfig}{List of Supplementary Figures}}
 \makeatother
 \makeatletter
@@ -269,9 +269,6 @@
 \@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
 \floatname{codelisting}{Listing}
 \newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
-\makeatother
-\makeatletter
-\usepackage{pdflscape}
 \makeatother
 \makeatletter
 \makeatother
@@ -474,7 +471,7 @@ These test dataset viruses covered all eukaryotic viral Kingdoms, with
 the majority of proteins originating from \emph{Orthornavirae} (RNA
 viruses) and \emph{Bamfordvirae} (dsDNA viruses) (see
 Figure~\ref{fig-overview}A), despite the latter only representing 43
-viruses (see Supplemental Figure~\ref{suppfig-kingdom}).
+viruses (see Supplementary Figure~\ref{suppfig-kingdom}).
 
 Structure prediction of all 11,467 proteins from our test set with
 Boltz-2 resulted in high-quality predicted structures, with a median
@@ -540,14 +537,14 @@ towards larger E-values).
 
 When comparing the BFVD matches yielded by all methods against each
 other (see Figure~\ref{fig-overlap}C-D and
-Supplemental Figure~\ref{suppfig-pairwise-method}), we observed that the
-sequence homology-based methods had a high overlap in identical hits.
-This was true when comparing the best 25 hits for each test protein
-(only the comparison of diamond and mmseqs2 against blastp had a low
-overlap because of the higher amount of hits for blastp), the best 25
-hits afterwards filtered on E-value, and only the top hits (see
+Supplementary Figure~\ref{suppfig-pairwise-method}), we observed that
+the sequence homology-based methods had a high overlap in identical
+hits. This was true when comparing the best 25 hits for each test
+protein (only the comparison of diamond and mmseqs2 against blastp had a
+low overlap because of the higher amount of hits for blastp), the best
+25 hits afterwards filtered on E-value, and only the top hits (see
 Figure~\ref{fig-overlap}C-D and
-Supplemental Figure~\ref{suppfig-pairwise-method}). In contrast, the
+Supplementary Figure~\ref{suppfig-pairwise-method}). In contrast, the
 embedding and structure homology-based methods had low intra-method
 agreement in resulting hits (\textasciitilde25\% between the embedding
 methods and \textasciitilde40-75\% for the structure methods on the best
@@ -556,8 +553,8 @@ taking the top hits into account, but stayed well below the percentage
 of overlap between the sequence-based methods. It is worth noting that
 Reseek seemed to perform worse in this metric when looking at the
 filtered results (see
-Supplemental Figure~\ref{suppfig-pairwise-method}B), however this is due
-to the large reduction in number of matches after filtering. This
+Supplementary Figure~\ref{suppfig-pairwise-method}B), however this is
+due to the large reduction in number of matches after filtering. This
 reduction is due to the more stringent E-value calculations in Reseek
 compared to Foldseek\textsuperscript{12,19}. Notably, while ProstT5 was
 the worst performer across the three datasets compared to the sequence
@@ -706,7 +703,7 @@ Hyperfine\textsuperscript{20}, and \texttt{nvidia-smi} for GPU memory
 consumption. As expected, the sequence-based methods were much faster
 and less memory intensive compared to the embedding and structure-based
 methods (see Figure~\ref{fig-computational-benchmark} and
-Supplemental Figure~\ref{suppfig-time-increase}). Both Diamond and
+Supplementary Figure~\ref{suppfig-time-increase}). Both Diamond and
 MMseqs2 finished the search of the \textgreater11,000 proteins against
 the BFVD in under 10 seconds, followed by BLASTp with a runtime of
 almost two minutes, a \textasciitilde28x time increase compared to
@@ -718,9 +715,9 @@ precision ESM2 model required substantially greater GPU VRAM,
 necessitating specialized hardware, whereas ProstT5 operated within the
 memory constraints of consumer-grade GPUs. The structural workflows, by
 contrast, required over 20,000-fold more runtime than the sequence-based
-tools (see Supplemental Figure~\ref{suppfig-time-increase}) and demanded
-substantial computational resources, exceeding 400 GiB of system memory
-(CPU) and approximately 80 GiB of GPU memory (see
+tools (see Supplementary Figure~\ref{suppfig-time-increase}) and
+demanded substantial computational resources, exceeding 400 GiB of
+system memory (CPU) and approximately 80 GiB of GPU memory (see
 Figure~\ref{fig-computational-benchmark}). Furthermore, the Reseek
 structural comparison incurred an additional two-hour runtime, whereas
 the Foldseek-based structural comparison completed in approximately two
@@ -974,7 +971,7 @@ from our test set to assign functional categories to the eukaryotic
 virus proteins downloaded from the ICTV exemplar species.
 
 An overview of the LLM pipeline is given in
-Supplemental Figure~\ref{suppfig-llm-diagram}
+Supplementary Figure~\ref{suppfig-llm-diagram}
 
 \subsection{Sequence homology-based
 annotation}\label{sequence-homology-based-annotation}
@@ -1401,7 +1398,8 @@ supported over uninformative ones.}
 
 \newpage{}
 
-\begin{landscape}
+\clearpage
+\newgeometry{left=1cm,right=1cm,top=2cm,bottom=2cm}
 
 \section{Supplementary Tables}\label{supplementary-tables}
 
@@ -1526,7 +1524,8 @@ Virion assembly & Assembly & Assembly factor\\
 
 \end{longtable}
 
-\end{landscape}
+\restoregeometry
+\clearpage
 
 
 
