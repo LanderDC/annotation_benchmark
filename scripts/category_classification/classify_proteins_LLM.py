@@ -808,8 +808,7 @@ def run_classification(
                 "protein_names": protein_names,
                 "taxid": info.get("taxid"),
                 "taxonomy": taxonomy if taxonomy is not None else [],
-                "original_categories": info.get("categories", []),
-                "predicted_categories": result["categories"],
+                "categories": result["categories"],
             }
             newly_processed += 1
 
@@ -831,14 +830,13 @@ def run_classification(
             "protein_names": protein_names,
             "taxid": info.get("taxid"),
             "taxonomy": taxonomy if taxonomy is not None else [],
-            "original_categories": info.get("categories", []),
-            "predicted_categories": [],
+            "categories": [],
         }
 
     save_json(output_data, output_path)
 
     # --- Summary -----------------------------------------------------------
-    classified = sum(1 for v in output_data.values() if v["predicted_categories"])
+    classified = sum(1 for v in output_data.values() if v["categories"])
     logger.info(
         f"Classification complete: {classified}/{total} proteins received "
         f"at least one category."
@@ -846,56 +844,6 @@ def run_classification(
     logger.info(f"Newly processed in this run: {newly_processed}")
     if errors:
         logger.warning(f"{len(errors)} proteins encountered errors: {errors}")
-
-    if any(info.get("categories") for info in proteins_data.values()):
-        compute_agreement(output_data)
-
-
-def compute_agreement(output_data: dict) -> None:
-    """Compute and log simple agreement metrics against original labels."""
-    exact_match = 0
-    total_with_labels = 0
-    total_precision_sum = 0.0
-    total_recall_sum = 0.0
-
-    for accession, info in output_data.items():
-        original = set(info.get("original_categories", []))
-        predicted = set(info.get("predicted_categories", []))
-
-        if not original:
-            continue
-        total_with_labels += 1
-
-        if original == predicted:
-            exact_match += 1
-
-        if predicted:
-            precision = len(original & predicted) / len(predicted)
-            total_precision_sum += precision
-        if original:
-            recall = len(original & predicted) / len(original)
-            total_recall_sum += recall
-
-    if total_with_labels == 0:
-        return
-
-    avg_precision = total_precision_sum / total_with_labels
-    avg_recall = total_recall_sum / total_with_labels
-    f1 = (
-        2 * avg_precision * avg_recall / (avg_precision + avg_recall)
-        if (avg_precision + avg_recall) > 0
-        else 0.0
-    )
-
-    logger.info("--- Agreement with original labels ---")
-    logger.info(f"  Proteins with labels: {total_with_labels}")
-    logger.info(
-        f"  Exact match: {exact_match}/{total_with_labels} "
-        f"({100 * exact_match / total_with_labels:.1f}%)"
-    )
-    logger.info(f"  Avg precision: {avg_precision:.3f}")
-    logger.info(f"  Avg recall:    {avg_recall:.3f}")
-    logger.info(f"  Avg F1:        {f1:.3f}")
 
 
 # ---------------------------------------------------------------------------
