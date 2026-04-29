@@ -1,7 +1,7 @@
 library(tidyverse)
 library(readxl)
 df <- readxl::read_excel(
-  "~/OneDrive - KU Leuven/Documents/Studies/C1 project/Worldwide virome/final_analysis/data/diversity/VMR_MSL40.v2.20251013.xlsx",
+  "data/VMR_MSL40.v2.20251013.xlsx",
   sheet = 2
 )
 
@@ -58,7 +58,7 @@ kingdom_df |>
   theme_classic() +
   theme(
     legend.position = "none",
-    axis.text.x = ggtext::element_markdown(angle = 45, hjust = 1),
+    axis.text.x = ggtext::element_markdown(angle = 25, hjust = 1),
     axis.title.x = element_blank()
   )
 ggsave(
