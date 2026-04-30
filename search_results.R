@@ -1495,6 +1495,12 @@ inf_not_seq <- inf_not_seq |>
     )
   )
 
+# count top categories
+inf_not_seq |>
+  count(top_category) |>
+  arrange(desc(n)) |>
+  print(n = 100)
+
 custom_spacer <- plot_spacer() +
   theme(plot.margin = unit(c(0, 0, 0, 0), "lines"))
 
@@ -1571,6 +1577,70 @@ plddt_df |>
   mutate(accession = stringr::str_extract(id, "^[^_]+")) |>
   filter(accession %in% inf_not_seq_acc) |>
   select(-accession)
+
+# BFVD categories
+
+annotations_main_function <- tibble(
+  subject_id = names(annotations),
+  entry = annotations
+) |>
+  mutate(
+    categories = map(entry, "categories"),
+    categories = map(
+      categories,
+      ~ if (is.null(.x)) {
+        character()
+      } else {
+        normalize_category(as.character(unlist(.x)))
+      }
+    )
+  ) |>
+  select(subject_id, categories) |>
+  tidyr::unnest_longer(categories, values_to = "category", keep_empty = TRUE) |>
+  mutate(category = normalize_category(coalesce(category, "unknown"))) |>
+  left_join(
+    main_function_lookup,
+    by = c("category" = "top_category")
+  ) |>
+  mutate(
+    main_function = dplyr::if_else(
+      category == "unknown",
+      "Unknown",
+      coalesce(main_function, "Unknown")
+    )
+  ) |>
+  select(subject_id, category, main_function)
+
+annotations_main_function |>
+  filter(main_function != "Unknown") |>
+  count(main_function) |>
+  mutate(
+    color = case_when(
+      stringr::str_detect(main_function, "^(DNA|RNA)-associated$") ~
+        "bacteriophage classification (Empathi)",
+      stringr::str_detect(main_function, "^[a-z]") ~
+        "bacteriophage classification (Empathi)",
+      TRUE ~ "eukaryotic virus classification (ViralZone)"
+    )
+  ) |>
+  ggplot(aes(x = reorder(main_function, -n), y = n, fill = color)) +
+  geom_col() +
+  scale_fill_brewer(name = "", palette = "Set2") +
+  scale_y_continuous(expand = expansion(mult = c(.01, 0))) +
+  labs(y = "# informative proteins in BFVD") +
+  theme_classic() +
+  theme(
+    axis.text.x = element_text(angle = 25, hjust = 1, size = 6),
+    axis.title.x = element_blank(),
+    legend.position = c(.75, .9)
+  )
+ggsave(
+  "figures/data_info/BFVD_informative_classification.pdf",
+  dpi = 300,
+  width = 180,
+  height = 90,
+  units = "mm"
+)
 
 ## STOP
 #pairwise_matches_full <- bind_rows(
