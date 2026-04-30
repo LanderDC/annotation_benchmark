@@ -19,6 +19,12 @@ author:
     orcid: 0000-0003-4738-3451
     email: sgrigson@lbl.gov
     corresponding: false
+  - name: Dimitris Karapliafis 
+    affiliations: 
+      - ref: wur
+    orcid: 0009-0004-3960-6461
+    email: dimitris.karapliafis@wur.nl
+    corresponding: false
   - name: Simon Roux
     affiliations: 
       - ref: jgi
@@ -44,3 +50,10 @@ affiliations:
     state: CA
     country: USA
     postal-code: CA 94720
+  - id: wur
+    name: Wageningen University
+    group: Bioinformatics Group
+    address: Droevendaalsesteeg 1
+    city: Wageningen
+    country: The Netherlands
+    postal-code: 6708PB

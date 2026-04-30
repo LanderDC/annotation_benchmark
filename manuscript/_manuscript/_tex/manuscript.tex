@@ -281,7 +281,7 @@
 \urlstyle{same}
 \hypersetup{
   pdftitle={Benchmarking sequence{,} embedding and structure-based methods for eukaryotic virus protein annotation},
-  pdfauthor={Lander De Coninck; Uri Neri; Susie Grigson; Simon Roux},
+  pdfauthor={Lander De Coninck; Uri Neri; Susie Grigson; Dimitris Karapliafis; Simon Roux},
   colorlinks=true,
   linkcolor={black},
   filecolor={Maroon},
@@ -296,7 +296,7 @@ and structure-based methods for eukaryotic virus protein annotation}
 
 % author setup
 \author*[1]{\fnm{Lander} \sur{De
-Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\author[2]{\fnm{Uri} \sur{Neri}\orcidlink{0000-0003-0894-2484}}\email{uneri@lbl.gov}\author[2]{\fnm{Susie} \sur{Grigson}\orcidlink{0000-0003-4738-3451}}\email{sgrigson@lbl.gov}\author[2]{\fnm{Simon} \sur{Roux}\orcidlink{0000-0002-5831-5895}}\email{sroux@lbl.gov}
+Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\author[2]{\fnm{Uri} \sur{Neri}\orcidlink{0000-0003-0894-2484}}\email{uneri@lbl.gov}\author[2]{\fnm{Susie} \sur{Grigson}\orcidlink{0000-0003-4738-3451}}\email{sgrigson@lbl.gov}\author[3]{\fnm{Dimitris} \sur{Karapliafis}\orcidlink{0009-0004-3960-6461}}\email{dimitris.karapliafis@wur.nl}\author[2]{\fnm{Simon} \sur{Roux}\orcidlink{0000-0002-5831-5895}}\email{sroux@lbl.gov}
 % affil setup
 \affil[1]{\orgname{KU Leuven}%
 , \orgdiv{Microbiology, Immunology and Transplantation}%
@@ -317,6 +317,16 @@ Coninck}\orcidlink{0000-0001-6847-2379}}\email{lander.deconinck@kuleuven.be}\aut
   %
   , \postcode{CA 94720}%
   , \country{USA}%
+}}
+\affil[3]{\orgname{Wageningen University}%
+%
+, \orggroup{Bioinformatics Group}%
+, \orgaddress{%
+  \street{Droevendaalsesteeg 1}%
+  , \city{Wageningen}%
+  %
+  , \postcode{6708PB}%
+  , \country{The Netherlands}%
 }}
 
 % abstract 
@@ -342,13 +352,14 @@ sequence-based methods. Additionally, all methods improved the number of
 informative categories (ie. not ``hypothetical protein'') for the VMR
 proteins, with embedding and structure methods producing the largest
 increases. However, when evaluated against proteins with informative
-GenBank annotations as ground truth (n=2,791), embedding- and
+GenBank annotations as ground truth (n=3,983), embedding- and
 structure-based methods agreed less often with the ``ground truth'' than
-sequence-based methods (\textasciitilde67\% and \textasciitilde78\% vs
-\textasciitilde84\%, respectively). Overall, sequence homology remains
-the most accurate approach for protein annotation of eukaryotic viruses
-at present, although for a minority of ``hypothetical proteins''
-structure homology could help resolve functional annotation.}
+sequence-based methods (maximum 63.6\% and 72.2\% vs 78.4\%,
+respectively). Overall, sequence homology remains the most accurate
+approach for protein annotation of eukaryotic viruses at present,
+although for a minority of ``hypothetical proteins'' in mostly large
+dsDNA viruses structure homology could help resolve functional
+annotation.}
 
 % keywords
 
@@ -378,7 +389,7 @@ capturing biologically meaningful representations from amino acid
 sequences alone, trained on known protein sequences using
 self-supervised objectives analogous to those used in natural language
 processing\textsuperscript{5,6}. By learning the statistical
-regularities of protein sequences across billions of examples, pLMs
+regularities of protein sequences across millions of examples, pLMs
 implicitly encode evolutionary, structural, and functional information
 in dense embedding vectors. These representations have proven useful for
 a wide range of downstream tasks, including secondary structure
@@ -387,7 +398,7 @@ functional site annotation\textsuperscript{5--7}. Models such as
 ESM-2\textsuperscript{7} and ProtTrans\textsuperscript{6} have become
 widely used as general-purpose sequence encoders in the field.
 
-A complementary and increasingly important line of work leverages
+A complementary and increasingly important line of research leverages
 protein three-dimensional structure, which is generally more conserved
 than primary sequence over long evolutionary timescales, because the
 topology of a folded protein is directly tied to its biochemical
@@ -593,49 +604,59 @@ Using a weighted approach, we assigned functional categories to the test
 proteins for each method based on the hits with an E-value smaller than
 1e-03 (see \hyperref[functional-category-assignment]{methods}). To
 evaluate the accuracy of the benchmarked methods, we considered the test
-proteins with an originally informative annotation (n=2,938) as the
+proteins with an originally informative annotation (n=3,983) as the
 ground truth to compare our results to. All methods improved the number
 of informative categories (see Figure~\ref{fig-annotation}A), with the
 sequence-based methods, together with TEA and Boltz-Foldseek, improving
 the number of informative assignments the most. However, when comparing
 the functional annotations to the ``ground truth'', all embedding and
 structure-based methods underperformed compared to the sequence-based
-methods (maximum \textasciitilde67\% and \textasciitilde78\% vs
-\textasciitilde84\% agreement with ground truth; see
-Figure~\ref{fig-annotation}B).
+methods (maximum 63.6\% and 72.2\% vs 78.4\% agreement with ``ground
+truth''; see Figure~\ref{fig-annotation}B).
 
 Although TEA made the largest improvements in assigning previous
 uninformative proteins to informative categories, it also showed the
 greatest inconsistencies between assigned informative categories that
 were already informative in the original test set (see
-Figure~\ref{fig-annotation}C). In addition, it also has 387 queries that
+Figure~\ref{fig-annotation}C). In addition, it also has 558 queries that
 were changed from an informative function to a non-informative one,
 which is almost double the amount compared to blastp which had the
 second highest informative-to-uninformative reassignments (see
 Figure~\ref{fig-annotation}C and Table~\ref{tbl-assigned-categories}).
 The same applies to the number of test proteins that originally had an
 informative category, but was assigned a different category with TEA
-(n=522). Furthermore, due to the likely high number of false positives
+(n=1,062). Furthermore, due to the likely high number of false positives
 in TEA hits (see Figure~\ref{fig-overlap}B), we concluded that the TEA
 uninformative-to-informative assignments lacked reliability.
 
 Of note, Boltz structure prediction combined with Foldseek did assign
 more informative categories than the sequence-based methods to
-originally non-informative proteins (n=1,571 vs \textasciitilde1,400;
+originally non-informative proteins (n=1,578 vs \textasciitilde1,460;
 see Table~\ref{tbl-assigned-categories}). However, this method retrieved
-less test proteins with hits against the BFVD.
-
-\begin{itemize}
-\tightlist
-\item
-  TODO: add that 337 could be assigned an informative function with
-  Boltz-foldseek and not with sequence-based methods
-\item
-  most of them belong to structural categories (pvp / structural)
-\item
-  TODO: make superpose figures with structures but filter first on true
-  hypothetical
-\end{itemize}
+less test proteins with hits against the BFVD. Interestingly, 337
+proteins were assigned an informative category with Boltz-foldseek that
+were uninformative with either of the sequence-based methods. Most of
+these proteins belonged to the \emph{Bamfordvirae}, a kingdom including
+nucleocytoplasmic large dsDNA viruses (NCLDVs) characterized by their
+massive genome sizes. Furthermore, also proteins from the
+\emph{Heunggongvirae} kingdom were overrepresented compared to their
+presence in the total dataset (see Figure~\ref{fig-overview}A and
+Figure~\ref{fig-annotation}D). The eukaryotic viruses in the
+\emph{Heunggongvirae} consist of members of the \emph{Herpesvirales},
+which also have large dsDNA genomes. In addition, the quality of the
+predicted protein structure was an important factor in the assignment of
+an informative category by Boltz-foldseek as \textgreater90\% of these
+proteins had at least a medium quality structure, while across the
+structure prediction of all proteins this was 79.3\% (see
+Figure~\ref{fig-overview}B and Figure~\ref{fig-annotation}E). For the
+high-quality structures, this percentage even almost doubled (15\% vs
+8.7\%). Finally, we looked at the categories these proteins belonged to
+and found that most (\textasciitilde40\%) of them belonged to proteins
+with a structural function (see Figure~\ref{fig-annotation}F; includes
+both Structural and pvp - phage virion proteins). Also,
+\textasciitilde10\% of the proteins were assigned an ``Anti-viral
+evasion'' function which was mostly driven by Ser/Thr-kinases and
+interferon antagonist assignments.
 
 \begin{figure}[H]
 
@@ -657,15 +678,15 @@ to the original categories. Negative changes (ie. different informative
 categories or informative labels that changed to non-informative
 categories) are displayed to the left of the zero point, matches or
 category improvements (from non-informative to informative) are
-displayed on the right. D-E-F) Waffle plots showing the proportions of
+displayed on the right. D-F) Waffle plots showing the proportions of
 proteins that could be assigned an informative function with
 Boltz-foldseek and not with the sequence based methods, colored by D)
 taxonomy on Kingdom level, E) structure quality and F) main activity the
 assigned functional category takes part in (starts with uppercase; based
-on ViralZone) or the main category of the Empathi hierarchical
-classification system (starts with lowercase). Tiles are ordered from
-bottom to top, and from left to right. Each tile corresponds to roughly
-three proteins.}
+on Table~\ref{tbl-supp-functional-categories}) or the main category of
+the Empathi hierarchical classification system (starts with lowercase).
+Tiles are ordered from bottom to top, and from left to right. Each tile
+corresponds to roughly three proteins.}
 
 \end{figure}%
 
@@ -685,7 +706,6 @@ diamond & 11119 & 2934 & 5710 & 765 & 1462 & 248\\
 mmseqs2 & 11135 & 2930 & 5731 & 768 & 1452 & 254\\
 ProstT5-foldseek & 7366 & 2198 & 2902 & 789 & 1313 & 164\\
 TEA-mmseqs2 & 11318 & 2358 & 5132 & 1062 & 2208 & 558\\
-\addlinespace
 Boltz-foldseek & 8889 & 2703 & 3592 & 807 & 1578 & 209\\
 Boltz-reseek & 7065 & 2408 & 2710 & 635 & 1116 & 196\\
 \bottomrule
@@ -745,153 +765,108 @@ and reseek after MSA generation (ColabFold) and structure prediction
 
 \section{Discussion}\label{discussion}
 
+In this study, we benchmarked several established and novel methods for
+annotating eukaryotic viral proteins with a function. Our goal was to
+evaluate these tools using largely default settings, reflecting their
+usability in high-throughput annotation workflows by experienced
+researchers without specialized expertise in each method. In this
+regards, all tools performed well and were easy to run due to their
+extensive documentation. Most notably, structure prediction with Boltz-2
+produced high-quality models without extensive parameter tuning. Aside
+from expanding the ColabFold MSA with additional viral sequences, all
+runs were performed using default settings, indicating that generating
+accurate structures is accessible even to researchers with limited
+experience in structure prediction.
+
 Although new methods like pLMs and structure homology searches have
 shown great promise in detecting remote
 homologs\textsuperscript{11,12,14}, including bacteriophage protein
 searches\textsuperscript{15}, our benchmark suggests that these
 advantages do not yet translate straightforwardly to eukaryotic virus
-proteins. If we consider that structural homology searches are most
-useful to find homologs with a clearly defined protein structure, a
-possible explanation could be that most structural proteins (eg. capsid
-proteins) are already well annotated in sequence databases compared to
-more globular, complex proteins, and therefore the advantage of using
-structural homology searches in eukaryotic virus protein annotation
-might be limited.
-
-\begin{itemize}
-\tightlist
-\item
-  structure search is compatible with sequence search but retrieves
-  little extra proteins (might be because of less virus proteins in
-  training data)
-\item
-  different conformational state predictions might hamper homolog
-  detection (?)
-\item
-  lack of virus representation in training data is a hurdle for the pLMs
-\item
-  add note on latest papers showing decreased performance of pLMs for
-  viruses (eg. mutation scanning)
-\item
-  considerably higher runtime for little reward
-\end{itemize}
-
-Limitations: - polyproteins: cutting in pieces, not real function
-(collection of proteins with different functions) - classification (eg.
-nsp5), proteins same name different function -\textgreater{} finetune
-LLM on scientific papers - DB problem which is too limited (larger db
-might give better results)
-
-Although protein language models and structure homology searches have
-shown great promise for detecting remote
-homologs\textsuperscript{11,12,14}, including in bacteriophage-focused
-annotation workflows\textsuperscript{15}, our benchmark suggests that
-these advantages do not yet translate straightforwardly to eukaryotic
-virus proteins. Across our dataset, the sequence-based methods were
+proteins. Across our dataset, the sequence-based methods were
 consistently the most reproducible (high overlap of identical hits) and
 the most accurate when evaluated against the original classifications,
 whereas embedding- and structure-based methods showed lower agreement
 with the ground truth and substantially lower concordance with one
 another.
 
-One plausible explanation is that the proteins for which structure-based
-searches are expected to excel (i.e.~proteins with highly conserved
-folds despite limited sequence identity) may not be the dominant driver
-of annotation gaps in this particular setting. Many of the most abundant
-and best-characterized viral proteins, including major structural
-proteins such as capsid proteins, already have detectable sequence
-homology to entries in reference databases, so structure similarity is
-unlikely to provide large marginal gains for them. Conversely, proteins
-that remain annotated as ``hypothetical'' in eukaryotic virus genomes
-may include lineage-specific factors, short or low-complexity proteins,
-and rapidly evolving accessory proteins for which both sequence and
-structure homology signals can be weak, ambiguous, or absent. In this
-regime, structural comparison can still yield informative annotations
-for a subset of queries, but it does not consistently outperform
-sequence homology in either sensitivity or functional-category accuracy.
+A possible explanation for the low performance of the pLM approaches
+used here could be the lack of (eukaryotic virus) training data that was
+used to train these models due to an underrepresentation of viruses in
+large protein databases (e.g.~UniRef90) and biosafety
+concerns\textsuperscript{21--23}. The use of a virus-specific pLMs, like
+LucaVirus\textsuperscript{21}, could potentially mitigate this issue.
+Although the LucaVirus pLM is already available to generate the
+embeddings, their newly developed tool, LMalign, to align the generated
+embeddings is not. This did not readily allow us to compare the test
+protein embeddings with embeddings from the BFVD, our unified reference
+to ensure a fair comparison. On the other hand, it should be noted that
+recent work on mutational effect prediction with fine-tuned pLMs on
+viral sequences found that fine-tuning pLMs did not completely resolve
+the observed performance issues of pLMs on viral
+datasets\textsuperscript{24}.
 
-Importantly, our results do not imply that structure search is
-incompatible with sequence search; rather, the current value proposition
-appears to be complementary. A practical interpretation is that a
-sequence-first workflow remains the most reliable baseline, with
-structure-based approaches reserved for targeted follow-up of the subset
-of proteins that remain uninformative after stringent sequence searches.
-In our benchmark, structure-informed methods retrieved comparatively few
-additional proteins with high-confidence, interpretable hits once
-E-value filtering was applied, while incurring a very large
-computational cost. This cost--benefit imbalance is especially relevant
-for large-scale annotation projects, where throughput and
-reproducibility are essential.
+In contrast, the structure-based comparison with Foldseek outperformed
+the best pLM approach by \textasciitilde9\% when benchmarked against the
+ground truth, yet remained less accurate than sequence-based methods.
+Despite this limitation, structural comparison enabled the functional
+annotation of 337 previously hypothetical proteins that were not
+classified based on sequence approaches. However, this gain is modest
+relative to the broader improvements in functional annotation reported
+for bacteriophages using structure homology\textsuperscript{15}. The
+majority of these newly annotated proteins originate from large dsDNA
+viruses and were assigned structural functions, which likely reflects
+the overrepresentation of structurally annotated proteins in the BFVD
+(see Supplementary Figure~\ref{suppfig-bfvd-classification}), thereby
+facilitating the detection of homologs among hypothetical proteins.
+Notably, approximately 10\% of the hypothetical proteins receiving
+informative annotations were assigned the ``Anti-viral evasion'' label.
+Although this category is well-represented in the BFVD, its frequency
+among newly annotated proteins exceeds what would be expected relative
+to their presence in the BFVD. This implies that structure-based
+approaches may be particularly valuable for uncovering anti-viral
+evasion functions in large dsDNA viruses, consistent with evidence of
+conserved evasion strategies shared across phylogenetically unrelated
+virus families such as \emph{Poxviridae} and
+\emph{Paramyxoviridae}\textsuperscript{25}.
 
-Several methodological and biological factors could contribute to the
-lower apparent utility of embedding- and structure-based approaches for
-eukaryotic viruses in this benchmark. First, both pLM-derived alphabets
-and structure-search pipelines ultimately depend on learned or
-engineered representations that may be less well calibrated for viral
-proteins than for the broader (mostly cellular) protein universe they
-were trained and tuned on. Limited viral representation in training data
-could reduce the ability of pLMs to produce embeddings that cleanly
-separate functionally distinct viral proteins, and could also affect
-downstream translation to structural alphabets such as 3Di or TEA. In
-addition, the ``many hits at high E-values'' pattern observed for some
-non-sequence methods suggests that statistical calibration and filtering
-thresholds may require method- and domain-specific tuning to avoid
-inflation of weak or spurious matches.
-
-Second, structural comparisons can be sensitive to conformational
-heterogeneity. Viral proteins frequently operate in multi-protein
-assemblies and can adopt different conformational states across the
-viral life cycle. Predicted structures represent a single (often
-lowest-energy) state, which may differ from the biologically relevant
-state for binding or assembly. Even when overall fold is correct, domain
-motions or alternative conformations could reduce similarity scores for
-true homologs or increase similarity to unrelated proteins with
-superficially similar local geometry, potentially lowering both
-sensitivity and the interpretability of structural hits.
-
-Third, the reference database itself remains a key determinant of
-performance. Using BFVD as a unified reference ensured a fair comparison
-between methods, but it also means that any limitations in viral
-coverage, taxonomic representation, and annotation depth of BFVD will
-propagate across all approaches. A larger and more diverse viral
-reference set---especially one enriched for eukaryotic virus proteins
-and experimentally supported functional annotations---could plausibly
-increase the payoff of structure-based searches. Similarly, improved
-viral-aware scoring, E-value calibration, and domain-aware
-post-processing might yield higher-precision structural or
-embedding-based annotations for the subset of proteins where sequence
-methods fail.
-
-These findings should be interpreted in light of several limitations of
-our benchmark. First, long polyproteins were split into chunks to
-accommodate structure prediction constraints. While necessary for
-computation, this can decouple functional context: individual fragments
-may correspond to multiple mature proteins or partial domains, and their
-best-matching reference hits may not reflect the final processed product
-or its function. Second, functional-category assignment was derived from
-name-based classification rules applied to reference protein names and
-to the original test annotations. This provides a scalable and
-consistent labeling scheme, but it can conflate proteins that share a
-name while differing in function across viral families (e.g.~proteins
-labeled with the same ``non-structural protein'' identifier can have
-different biochemical roles), and it can propagate ambiguities present
-in database annotations. Incorporating richer context---such as genomic
-neighborhood, domain architecture, or literature-informed curation
-(potentially via carefully constrained LLM-assisted extraction followed
-by manual review)---could reduce these mismatches. Third, because all
-methods were evaluated against a single unified database, our
-conclusions primarily reflect relative performance under a controlled
-reference; performance may change with alternative databases, different
-taxonomic compositions, or additional post-processing.
+A few limitations arise from our approach: First, polyproteins --- large
+precursor proteins that are subsequently cleaved by proteases into
+multiple smaller, functional proteins --- were treated as single
+entities throughout our analysis. While this does not accurately reflect
+their biological reality, it was an inherent constraint imposed by the
+BFVD and UniProt, neither of which consistently provides information on
+individual subproteins within a polyprotein. Secondly, our LLM-based
+classification is susceptible to ambiguity when viral proteins with a
+distinct function share the same name. A notable example is VP1 (viral
+protein 1), which designates a capsid protein in
+\emph{Parvoviridae}\textsuperscript{26} but corresponds to the
+RNA-dependent RNA polymerase in
+\emph{Sedoreoviridae}\textsuperscript{27}. To mitigate this, we provided
+taxonomic information to the LLM to guide classification; however,
+classification errors were not completely avoided. For instance, when
+the name was spelled out in full as ``viral protein 1'', the LLM failed
+to correctly classify the \emph{Parvoviridae} VP1, instead assigning it
+the ``Hypothetical protein'' label. Nevertheless, even with these
+shortcomings, the LLM-based approach outperforms classical pattern-based
+matching in handling such ambiguities. Finally, the structural homology
+search was constrained by the composition of the BFVD, which currently
+contains approximately 350,000 structures, a small fraction of all known
+viral proteins. Nevertheless, the BFVD represents the largest available
+repository of eukaryotic virus protein structures, and expanding its
+coverage would represent a major undertaking, requiring substantial
+computational resources and time.
 
 Overall, our benchmark supports a conservative conclusion: for
 eukaryotic virus protein annotation, sequence homology remains the most
-accurate and reproducible primary strategy at present. Embedding- and
-structure-based methods can still add value as complementary tools for a
-minority of difficult proteins, but realizing their full promise will
-likely require viral-aware training data, improved statistical
-calibration, and reference databases with broader viral diversity and
-deeper functional validation.
+accurate and reproducible primary strategy. Structure-based methods
+serve as valuable complementary tools; however, their application should
+be deliberate and targeted given the substantial computational resources
+they require. The embedding-based methods and pLMs evaluated in this
+study do not offer sufficient accuracy for reliable functional
+annotation of eukaryotic virus proteins. While fine-tuned models may
+improve performance, their accuracy for functional annotation must be
+rigorously and continuously validated rather than assumed.
 
 \section{Material and Methods}\label{material-and-methods}
 
@@ -937,8 +912,8 @@ annotation).
 Functional categories for each BFVD entry were derived from protein
 names associated with the corresponding UniParc IDs (could be from
 UniProtKB/TrEMBL, RefSeq and/or GenBank) for eukaryotic viruses or by
-classifying them into PHROG-like\textsuperscript{21} categories with
-Empathi\textsuperscript{22} in the case of bacteriophage proteins. The
+classifying them into PHROG-like\textsuperscript{28} categories with
+Empathi\textsuperscript{29} in the case of bacteriophage proteins. The
 distinction between eukaryotic virus and bacteriophage proteins was made
 based on the TaxID information from the UniParc protein ID.
 
@@ -959,19 +934,21 @@ The resulting functional categories were further manually curated to
 ensure that they were mutually exclusive. The final list of functional
 categories is provided in Table~\ref{tbl-supp-functional-categories}. A
 custom python script was used to assign the established functional
-categories to the eukaryotic virus BFVD proteins using Google's Gemma4
-31B-it LLM model. The LLM had access to the collection of protein names
-and the viral taxonomy of each entry, and was asked to provide a
-category classification based on this information. Assigned functional
-categories were checked against the originally established functional
-categories and removed if they did not correspond.
+categories to the eukaryotic virus BFVD proteins using Google's Gemma 4
+31 billion parameter, instruction-trained LLM model locally
+(https://huggingface.co/google/gemma-4-31B-it). The LLM had access to
+the collection of protein names and the viral taxonomy of each entry,
+and was asked to provide a category classification based on this
+information. Assigned functional categories were checked against the
+originally established functional categories and removed if they did not
+correspond.
 
 The same functional classifier script was also used on the protein names
 from our test set to assign functional categories to the eukaryotic
 virus proteins downloaded from the ICTV exemplar species.
 
 An overview of the LLM pipeline is given in
-Supplementary Figure~\ref{suppfig-llm-diagram}
+Supplementary Figure~\ref{suppfig-llm-diagram}.
 
 \subsection{Sequence homology-based
 annotation}\label{sequence-homology-based-annotation}
@@ -981,7 +958,7 @@ widely used in functional annotation pipelines and sequence similarity
 searches. As gold standard, BLASTp v2.16.0+\textsuperscript{1} was used
 to align the test set amino acid sequences against the amino acid
 sequences of the BFVD entries. In addition, we used
-\texttt{diamond\ blastp} (Diamond v2.1.16)\textsuperscript{23} in
+\texttt{diamond\ blastp} (Diamond v2.1.16)\textsuperscript{30} in
 sensitive mode and \texttt{mmseqs\ easy-search} (MMseqs2
 v18.8cc5c)\textsuperscript{3} with default settings; except for an
 E-value cutoff of 10 instead of 1e-03 to allow comparison to the other
@@ -1027,11 +1004,11 @@ annotation}\label{structure-homology-based-annotation}
 
 For the structure prediction of our test set proteins, we relied on
 Boltz v2.2.1\textsuperscript{10} (default settings) with MSAs generated
-by a local, adapted ColabFold installation\textsuperscript{24} (see
+by a local, adapted ColabFold installation\textsuperscript{31} (see
 \url{https://github.com/gbouras13/colabfoldv}). To increase the depth
 and diversity of the MSAs, we used the default ColabFold sequence
 databases, supplemented with extra \emph{Orthornavirae}
-sequences\textsuperscript{25} and viral sequences used in the structure
+sequences\textsuperscript{32} and viral sequences used in the structure
 prediction for the Phold database\textsuperscript{15}.
 
 \subsubsection{Foldseek}\label{foldseek}
@@ -1105,7 +1082,6 @@ Research Foundation - Flanders (FWO) and the Flemish Government.
 
 During the preparation of this manuscript, the authors made use of large
 language model (LLM)-based artificial intelligence tools to assist with
-several aspects of the writing and research process, including
 literature searches, restructuring and improving sentences, and
 generating code for data analysis. All AI-generated content and code was
 critically reviewed, verified, and edited by the authors, and full
@@ -1252,36 +1228,88 @@ doi:\href{https://doi.org/10.1101/2025.07.17.665375}{10.1101/2025.07.17.665375}.
 \CSLLeftMargin{20. }%
 \CSLRightInline{Peter, D. Hyperfine. (2023).}
 
-\bibitem[\citeproctext]{ref-terzianPHROGFamiliesProkaryotic2021}
+\bibitem[\citeproctext]{ref-panPredictingEvolutionaryFunctional2026}
 \CSLLeftMargin{21. }%
+\CSLRightInline{Pan, Y.-F. \emph{et al.} Predicting the {Evolutionary}
+and {Functional Landscapes} of {Viruses} with a {Unified
+Nucleotide-Protein Language Model}: {LucaVirus}. 2025.06.14.659722
+(2026)
+doi:\href{https://doi.org/10.1101/2025.06.14.659722}{10.1101/2025.06.14.659722}.}
+
+\bibitem[\citeproctext]{ref-varadiAlphaFoldProteinStructure2024}
+\CSLLeftMargin{22. }%
+\CSLRightInline{Varadi, M. \emph{et al.}
+\href{https://doi.org/10.1093/nar/gkad1011}{{AlphaFold Protein Structure
+Database} in 2024: Providing structure coverage for over 214 million
+protein sequences}. \emph{Nucleic Acids Research} \textbf{52},
+D368--D375 (2024).}
+
+\bibitem[\citeproctext]{ref-sawhneyFinetuningProteinLanguage2025}
+\CSLLeftMargin{23. }%
+\CSLRightInline{Sawhney, R. \emph{et al.}
+\href{https://doi.org/10.7717/peerj.19919}{Fine-tuning protein language
+models unlocks the potential of underrepresented viral proteomes}.
+\emph{PeerJ} \textbf{13}, e19919 (2025).}
+
+\bibitem[\citeproctext]{ref-vieiraIntrinsicDatasetFeatures2026}
+\CSLLeftMargin{24. }%
+\CSLRightInline{Vieira, L. C., Lin, S. \& Wilke, C. O. Intrinsic dataset
+features drive mutational effect prediction by protein language models.
+2026.03.08.710389 (2026)
+doi:\href{https://doi.org/10.64898/2026.03.08.710389}{10.64898/2026.03.08.710389}.}
+
+\bibitem[\citeproctext]{ref-talbot-cooperPoxvirusesParamyxovirusesUse2022}
+\CSLLeftMargin{25. }%
+\CSLRightInline{Talbot-Cooper, C. \emph{et al.}
+\href{https://doi.org/10.1016/j.chom.2022.01.014}{Poxviruses and
+paramyxoviruses use a conserved mechanism of {STAT1} antagonism to
+inhibit interferon signaling}. \emph{Cell Host \& Microbe} \textbf{30},
+357--372.e11 (2022).}
+
+\bibitem[\citeproctext]{ref-cotmoreICTVVirusTaxonomy2019}
+\CSLLeftMargin{26. }%
+\CSLRightInline{Cotmore, S. F. \emph{et al.}
+\href{https://doi.org/10.1099/jgv.0.001212}{{ICTV Virus Taxonomy
+Profile}: {Parvoviridae}}. \emph{Journal of General Virology}
+\textbf{100}, 367--368 (2019).}
+
+\bibitem[\citeproctext]{ref-matthijnssensICTVVirusTaxonomy2022}
+\CSLLeftMargin{27. }%
+\CSLRightInline{{Matthijnssens, J. \emph{et al.}}
+\href{https://doi.org/10.1099/jgv.0.001782}{{ICTV Virus Taxonomy
+Profile}: {Sedoreoviridae} 2022}. \emph{Journal of General Virology}
+\textbf{103}, 001782 (2022).}
+
+\bibitem[\citeproctext]{ref-terzianPHROGFamiliesProkaryotic2021}
+\CSLLeftMargin{28. }%
 \CSLRightInline{Terzian, P. \emph{et al.}
 \href{https://doi.org/10.1093/nargab/lqab067}{{PHROG}: Families of
 prokaryotic virus proteins clustered using remote homology}. \emph{NAR
 Genomics and Bioinformatics} \textbf{3}, lqab067 (2021).}
 
 \bibitem[\citeproctext]{ref-boulayEmpathiEmbeddingbasedPhage2025}
-\CSLLeftMargin{22. }%
+\CSLLeftMargin{29. }%
 \CSLRightInline{Boulay, A., Leprince, A., Enault, F., Rousseau, E. \&
 Galiez, C. \href{https://doi.org/10.1038/s41467-025-64177-5}{Empathi:
 Embedding-based phage protein annotation tool by hierarchical
 assignment}. \emph{Nature Communications} \textbf{16}, 9114 (2025).}
 
 \bibitem[\citeproctext]{ref-buchfinkSensitiveProteinAlignments2021}
-\CSLLeftMargin{23. }%
+\CSLLeftMargin{30. }%
 \CSLRightInline{Buchfink, B., Reuter, K. \& Drost, H.-G.
 \href{https://doi.org/10.1038/s41592-021-01101-x}{Sensitive protein
 alignments at tree-of-life scale using {DIAMOND}}. \emph{Nature Methods}
 \textbf{18}, 366--368 (2021).}
 
 \bibitem[\citeproctext]{ref-mirditaColabFoldMakingProtein2022}
-\CSLLeftMargin{24. }%
+\CSLLeftMargin{31. }%
 \CSLRightInline{Mirdita, M. \emph{et al.}
 \href{https://doi.org/10.1038/s41592-022-01488-1}{{ColabFold}: Making
 protein folding accessible to all}. \emph{Nature Methods} \textbf{19},
 679--682 (2022).}
 
 \bibitem[\citeproctext]{ref-mutzProteinStructuromeOrthornavirae2024}
-\CSLLeftMargin{25. }%
+\CSLLeftMargin{32. }%
 \CSLRightInline{Mutz, P. \emph{et al.}
 \href{https://doi.org/10.1128/mbio.03200-24}{The protein structurome of
 {Orthornavirae} and its dark matter}. \emph{mBio} \textbf{16},
@@ -1351,12 +1379,27 @@ to the fastest workflow (MMseqs2).}
 
 \centering{
 
+\pandocbounded{\includegraphics[keepaspectratio]{../figures/data_info/BFVD_informative_classification.pdf}}
+
+}
+
+\caption{\label{suppfig-bfvd-classification}The number of informative
+proteins in BFVD by their main function, colored by eukaryotic or
+bacteriophage protein.}
+
+\end{suppfig}%
+
+\begin{suppfig}
+
+\centering{
+
 \includegraphics[width=2.5in,height=9in]{manuscript_files/figure-latex/mermaid-figure-1.png}
 
 }
 
 \caption{\label{suppfig-llm-diagram}Flowchart of the LLM classification
-pipeline for eukaryotic viruses.}
+pipeline for eukaryotic viruses based on the protein names in databases
+like GenBank, UniProt, etc.}
 
 \end{suppfig}%
 
@@ -1405,9 +1448,9 @@ supported over uninformative ones.}
 
 \begin{longtable}{lll}
 
-\caption{\label{tbl-supp-functional-categories}Final functional
-categories used for annotation, including their activity and process
-they are involved in.}
+\caption{\label{tbl-supp-functional-categories}Final eukaryotic virus
+functional categories used for annotation, including their activity and
+process they are involved in.}
 
 \tabularnewline
 
@@ -1419,103 +1462,86 @@ Exit & Budding & Phospholipase\\
 Exit & Virion release & Neuraminidase\\
 Exit & Ion-channel & Viroporin\\
 Exit & Budding & Virion release facilitator\\
-\addlinespace
 Exit & Virion release & Movement protein\\
 Other to be classified & Host shut off & Trans-prenyltransferase\\
 Other to be classified & Host shut off & Deoxyuridine 5'-triphosphate nucleotidohydrolase\\
 Other to be classified & Host shut off & Ribonucleoside-diphosphate reductase\\
 Other to be classified & Host shut off & FAD-linked sulfhydryl oxidase\\
-\addlinespace
 Other to be classified & Host shut off & Nucleoside triphosphatase\\
 Other to be classified & Host shut off & Alkaline nuclease\\
 Other to be classified & Host shut off & ADP-ribose hydrolase\\
 Other to be classified & Host shut off & dUTP nucleo-tidohydrolase\\
 Other to be classified & Host shut off & Uracil-DNA glycosylase\\
-\addlinespace
 Polyprotein & Polyprotein & Polyprotein\\
 Protein & Proteases & Cys/Ser-proteases\\
 Protein & Proteases & Asp-proteases\\
 Protein & Proteases & Metallo-proteases\\
 Protein & Proteases & Asparagine-proteases\\
-\addlinespace
 Protein & Post translational modification & Beta-1,6-N-acetyl-glucosaminyl transferase\\
 Protein & Post translational modification & Peptide N-myristoyl transferase\\
 Protein & Post translational modification & thiol oxidase\\
 Protein & Post translational modification & RNA-binding regulatory protein\\
 Structural & Structural & Capsid protein\\
-\addlinespace
 Structural & Structural & Nucleocapsid protein\\
 Structural & Structural & Surface/envelope glycoprotein\\
 Structural & Structural & Matrix protein\\
 Structural & Structural & Tegument protein\\
 Structural & Structural & Occlusion Body Protein\\
-\addlinespace
 Unknown & Unknown & Hypothetical protein\\
 Viral replication & Polymerase & DNA dependent DNA polymerase (DNA replicase)\\
 Viral replication & Initiation & Primase\\
 Viral replication & Initiation & Protein-primed initiation of DNA replication\\
 Viral replication & Initiation & Protein-primed initiation of RNA replication (=VPG capping)\\
-\addlinespace
 Viral replication & Initiation & Cress-type Endonuclease\\
 Viral replication & Initiation & Ribozyme Endonuclease\\
 Viral replication & Elongation & RNA-DNA duplex dependent endoribonuclease (RNase H)\\
 Viral replication & Topology & DNA topoisomerase\\
 Viral replication & Topology & DNA ligase\\
-\addlinespace
 Viral replication & Topology & Helicase\\
 Viral replication & Topology & Holliday junction resolvase\\
 Viral replication & Topology & Integrase\\
 Viral replication & Topology & Transposase (DDE recombinase)\\
 Viral replication & Nucleotide metabolism & Thymidine kinase\\
-\addlinespace
 Viral replication & Nucleotide metabolism & Thymidylate synthase\\
 Viral replication & Nucleotide metabolism & Thymidylate kinase\\
 Viral replication & Nucleotide metabolism & dUTP diphosphatase\\
 Viral replication & Nucleotide metabolism & dihydrofolate reductase\\
 Viral replication & Nucleotide metabolism & Ribonucleotide reductase\\
-\addlinespace
 Viral replication & Regulation & E3 SUMO-protein ligase\\
 Viral replication & Polymerase stabilization & Replication cofactor\\
 Viral replication/transcription & Polymerase/Transcriptase & RNA dependent RNA polymerase (RNA replicase)\\
 Viral replication/transcription & Polymerase/Transcriptase & RNA dependent DNA polymerase (Reverse transcriptase)\\
 Viral transcription & Transcriptase & Proofreading exoribonuclease (ExoN)\\
-\addlinespace
 Viral transcription & Viral mRNA capping & Cell-type capping\\
 Viral transcription & Viral mRNA capping & Triphosphatase\\
 Viral transcription & Viral mRNA capping & GTase\\
 Viral transcription & Viral mRNA capping & N7-MTase\\
 Viral transcription & Viral mRNA capping & 2'O Mtase\\
-\addlinespace
 Viral transcription & Viral mRNA capping & Alpha type capping\\
 Viral transcription & Viral mRNA capping & Nido-type capping\\
 Viral transcription & Viral mRNA capping & Mononega-type capping\\
 Viral transcription & Viral mRNA capping & VPG capping\\
 Viral transcription & Viral mRNA capping & Cap snatching\\
-\addlinespace
 Viral transcription & Viral mRNA capping & Toti-type cap snatching\\
 Viral transcription & Viral mRNA capping & FAD capping\\
 Viral transcription & PolyAdenylation & Poly(A) polymerase\\
 Viral transcription & PolyAdenylation & RNA polymerase stuttering\\
 Viral transcription & Regulation & Transactivator protein\\
-\addlinespace
 Viral transcription & Regulation & RNA export/splicing regulator\\
 Viral-Host modulation & Anti-viral evasion & Polyuridine endonuclease\\
 Viral-Host modulation & Anti-viral evasion & Viral ADP-Ribosylhydrolase\\
 Viral-Host modulation & Anti-viral evasion & Asparagine deaminase\\
 Viral-Host modulation & Anti-viral evasion & Ser/Thr kinase\\
-\addlinespace
 Viral-Host modulation & Anti-viral evasion & Tyr kinase\\
 Viral-Host modulation & Anti-viral evasion & Ubiquitin transferase=Ubiquitin-conjugating enzyme E2\\
 Viral-Host modulation & Anti-viral evasion & ubiquitinyl hydrolase\\
 Viral-Host modulation & Anti-viral evasion & Tyr/ser/thr phosphatase\\
 Viral-Host modulation & Anti-viral evasion & 2',3'-cGAMP endonuclease\\
-\addlinespace
 Viral-Host modulation & Anti-viral evasion & 3 beta-hydroxysteroid dehydrogenase/Delta 5-->4-isomerase\\
 Viral-Host modulation & Anti-viral evasion & ADP-ribose hydrolase\\
 Viral-Host modulation & Host shut off & mRNA-decapping\\
 Viral-Host modulation & Apoptosis modulator & vCyclin\\
 Viral-Host modulation & Apoptosis modulator & Apoptosis/cell-cycle modulator\\
-\addlinespace
 Viral-Host modulation & Apoptosis modulator & vBcl-2\\
 Viral-Host modulation & Anti-viral evasion & Interferon antagonist\\
 Viral-Host modulation & Anti-viral evasion & Cytokine modulator\\
