@@ -39,7 +39,7 @@ kingdom_df <- sample_df |>
   select(Kingdom) |>
   count(Kingdom) |>
   mutate(
-    Kingdom = if_else(!is.na(Kingdom), glue("*{Kingdom}*"), Kingdom),
+    Kingdom = if_else(!is.na(Kingdom), glue::glue("*{Kingdom}*"), Kingdom),
     Kingdom = replace_na(Kingdom, "Unclassified")
   )
 
