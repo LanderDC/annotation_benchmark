@@ -998,7 +998,7 @@ informative_methods_plot <- info_bar_df |>
     )
   ) +
   labs(
-    y = "# proteins with\ninformative annotation",
+    y = "# proteins with annotation",
   ) +
   guides(
     #fill = guide_legend(

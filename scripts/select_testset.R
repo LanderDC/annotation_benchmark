@@ -50,6 +50,7 @@ kingdom_palette <- setNames(
 kingdom_palette["Unclassified"] <- "lightgrey"
 
 kingdom_df |>
+  mutate(Kingdom = forcats::fct_reorder(Kingdom, n, .desc = T)) |>
   ggplot(aes(x = Kingdom, y = n, fill = Kingdom)) +
   geom_col() +
   scale_fill_manual(values = kingdom_palette) +

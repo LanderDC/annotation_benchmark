@@ -299,3 +299,26 @@ ggsave(
   bg = "transparent",
   device = grDevices::cairo_pdf
 )
+
+
+cdf_plot
+ggsave(
+  "figures/data_info/cdf_plot.pdf",
+  width = 120,
+  height = 90,
+  dpi = 300,
+  units = "mm",
+  bg = "transparent",
+  device = grDevices::cairo_pdf
+)
+
+plddt_plot + theme(legend.position = "left")
+ggsave(
+  "figures/data_info/plddt_plot.pdf",
+  width = 120,
+  height = 90,
+  dpi = 300,
+  units = "mm",
+  bg = "transparent",
+  device = grDevices::cairo_pdf
+)
